@@ -242,7 +242,6 @@ module "api" {
     DATABASE_URL               = "postgresql://${aws_db_instance.main.username}:${random_password.db.result}@${aws_db_instance.main.endpoint}/${aws_db_instance.main.db_name}?sslmode=require"
     SVAP_CONFIG_BUCKET         = aws_s3_bucket.data.bucket
     PIPELINE_STATE_MACHINE_ARN = aws_sfn_state_machine.pipeline.arn
-    ALLOWED_ORIGINS            = join(",", local.allowed_origins)
     COGNITO_USER_POOL_ID       = local.cognito_user_pool_id
     COGNITO_CLIENT_ID          = local.cognito_client_id
   }
@@ -471,7 +470,7 @@ module "site" {
   bucket_name         = local.frontend_bucket
 
   runtime_config = {
-    apiBaseUrl        = "https://${local.api_domain}"
+    apiBaseUrl        = "https://${local.api_domain}/api"
     cognitoUserPoolId = local.cognito_user_pool_id
     cognitoClientId   = local.cognito_client_id
   }

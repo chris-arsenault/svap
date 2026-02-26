@@ -13,7 +13,7 @@ echo ""
 # Backend
 cd "$ROOT_DIR/backend"
 echo "Starting backend on http://localhost:8000"
-uv run uvicorn svap.api:app --reload --port 8000 &
+uv run python -m svap.dev_server &
 BACKEND_PID=$!
 
 # Frontend

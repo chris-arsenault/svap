@@ -1,26 +1,21 @@
 """
-SVAP API Server
+SVAP API — Lambda handler for API Gateway V2 HTTP API.
 
-FastAPI application that wraps the SVAP pipeline backend and serves
-structured data to the React UI. This is the bridge between the Python
-pipeline (PostgreSQL storage, Bedrock client, stage modules) and the
-browser-based workstation.
+Routes directly on event["routeKey"] without a web framework.
+API Gateway handles CORS, JWT auth, and path parameter extraction.
 
 Run locally:
-    uvicorn svap.api:app --reload --port 8000
+    python -m svap.dev_server
 
 Deployed as Lambda:
-    handler = Mangum(app) (at bottom of file)
-
-The React dev server proxies /api/* to this server.
+    handler = svap.api.handler
 """
 
 import json
+import logging
 import os
+import traceback
 from datetime import UTC, datetime
-
-from fastapi import BackgroundTasks, FastAPI, HTTPException
-from pydantic import BaseModel
 
 from svap.api_schemas import (
     enrich_cases,
@@ -32,6 +27,7 @@ from svap.hhs_data import (
     ENFORCEMENT_SOURCES,
     HHS_DATA_SOURCES,
     HHS_POLICY_CATALOG,
+    SCANNED_PROGRAMS,
     flatten_policy_catalog,
     get_dashboard_data,
     get_data_sources_for_policy,
@@ -39,18 +35,10 @@ from svap.hhs_data import (
 )
 from svap.storage import SVAPStorage
 
-# ── App setup ─────────────────────────────────────────────────────────
+logger = logging.getLogger(__name__)
+logger.setLevel(os.environ.get("LOG_LEVEL", "INFO"))
 
-app = FastAPI(
-    title="SVAP API",
-    description="Structural Vulnerability Analysis Pipeline — HHS OIG Workstation Backend",
-    version="0.2.0",
-)
-
-# CORS is handled by API Gateway (cors_configuration block).
-# Do NOT add CORSMiddleware here — it conflicts with the gateway headers.
-
-# ── Configuration ─────────────────────────────────────────────────────
+# ── Configuration ────────────────────────────────────────────────────────
 
 CONFIG_PATH = os.environ.get("SVAP_CONFIG", "config.yaml")
 DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://svap:password@localhost:5432/svap")
@@ -58,8 +46,19 @@ IS_LAMBDA = bool(os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
 PIPELINE_STATE_MACHINE_ARN = os.environ.get("PIPELINE_STATE_MACHINE_ARN", "")
 
 
+# ── Helpers ──────────────────────────────────────────────────────────────
+
+
+class ApiError(Exception):
+    """Raised by route handlers to return an error response."""
+
+    def __init__(self, status_code: int, message: str):
+        self.status_code = status_code
+        self.message = message
+
+
 def get_storage() -> SVAPStorage:
-    """Get a storage instance. Creates the DB if it doesn't exist."""
+    """Get a storage instance."""
     return SVAPStorage(DATABASE_URL)
 
 
@@ -67,96 +66,118 @@ def get_active_run_id(storage: SVAPStorage) -> str:
     """Get the most recent run_id, or raise 404."""
     run_id = storage.get_latest_run()
     if not run_id:
-        raise HTTPException(
-            404, "No pipeline runs found. Run 'python -m svap.orchestrator seed' first."
-        )
+        raise ApiError(404, "No pipeline runs found. Seed the pipeline first.")
     return run_id
 
 
-# ── Dashboard / Overview ──────────────────────────────────────────────
+def _json_body(event: dict) -> dict:
+    """Parse JSON body from API Gateway V2 event."""
+    body = event.get("body", "")
+    if not body:
+        return {}
+    if event.get("isBase64Encoded"):
+        import base64
+
+        body = base64.b64decode(body).decode()
+    return json.loads(body)
 
 
-@app.get("/api/dashboard")
-def dashboard():
-    """
-    Full dashboard payload: pipeline status, counts, cases, taxonomy,
-    policies, predictions, detection patterns, convergence data.
-
-    This is the primary data endpoint — the React app calls this on load
-    and populates all views from the response.
-    """
-    storage = get_storage()
-    run_id = get_active_run_id(storage)
-    return get_dashboard_data(storage, run_id)
-
-
-@app.get("/api/status")
-def pipeline_status():
-    """Lightweight status check — stage completion states only."""
-    storage = get_storage()
-    run_id = get_active_run_id(storage)
+def _ok(body) -> dict:
+    """200 response in API Gateway V2 format."""
     return {
-        "run_id": run_id,
-        "stages": storage.get_pipeline_status(run_id),
+        "statusCode": 200,
+        "headers": {"Content-Type": "application/json"},
+        "body": json.dumps(body, default=str),
     }
 
 
-# ── Cases ─────────────────────────────────────────────────────────────
+def _error(status_code: int, message: str) -> dict:
+    """Error response in API Gateway V2 format."""
+    return {
+        "statusCode": status_code,
+        "headers": {"Content-Type": "application/json"},
+        "body": json.dumps({"detail": message}),
+    }
 
 
-@app.get("/api/cases")
-def list_cases():
+# ── Route handlers ──────────────────────────────────────────────────────
+# Each takes (event) and returns a Python object.
+# The top-level handler() wraps the return with _ok().
+# Raise ApiError for error responses.
+
+
+def _dashboard(event):
+    storage = get_storage()
+    run_id = storage.get_latest_run()
+    if not run_id:
+        return {
+            "run_id": "",
+            "source": "api",
+            "pipeline_status": [],
+            "counts": {
+                "cases": 0,
+                "taxonomy_qualities": 0,
+                "policies": 0,
+                "predictions": 0,
+                "detection_patterns": 0,
+            },
+            "calibration": {"threshold": 3},
+            "cases": [],
+            "taxonomy": [],
+            "policies": [],
+            "predictions": [],
+            "detection_patterns": [],
+            "case_convergence": [],
+            "policy_convergence": [],
+            "policy_catalog": HHS_POLICY_CATALOG,
+            "enforcement_sources": ENFORCEMENT_SOURCES,
+            "data_sources": HHS_DATA_SOURCES,
+            "scanned_programs": SCANNED_PROGRAMS,
+        }
+    return get_dashboard_data(storage, run_id)
+
+
+def _status(event):
     storage = get_storage()
     run_id = get_active_run_id(storage)
-    cases = storage.get_cases(run_id)
-    matrix = storage.get_convergence_matrix(run_id)
-    return enrich_cases(cases, matrix)
+    return {"run_id": run_id, "stages": storage.get_pipeline_status(run_id)}
 
 
-@app.get("/api/cases/{case_id}")
-def get_case(case_id: str):
+def _list_cases(event):
     storage = get_storage()
     run_id = get_active_run_id(storage)
-    cases = storage.get_cases(run_id)
-    matrix = storage.get_convergence_matrix(run_id)
-    enriched = enrich_cases(cases, matrix)
+    return enrich_cases(storage.get_cases(run_id), storage.get_convergence_matrix(run_id))
+
+
+def _get_case(event):
+    case_id = event["pathParameters"]["case_id"]
+    storage = get_storage()
+    run_id = get_active_run_id(storage)
+    enriched = enrich_cases(storage.get_cases(run_id), storage.get_convergence_matrix(run_id))
     case = next((c for c in enriched if c["case_id"] == case_id), None)
     if not case:
-        raise HTTPException(404, f"Case {case_id} not found")
+        raise ApiError(404, f"Case {case_id} not found")
     return case
 
 
-# ── Taxonomy ──────────────────────────────────────────────────────────
-
-
-@app.get("/api/taxonomy")
-def list_taxonomy():
+def _list_taxonomy(event):
     storage = get_storage()
     run_id = get_active_run_id(storage)
-    taxonomy = storage.get_taxonomy(run_id)
-    matrix = storage.get_convergence_matrix(run_id)
-    return enrich_taxonomy(taxonomy, matrix)
+    return enrich_taxonomy(storage.get_taxonomy(run_id), storage.get_convergence_matrix(run_id))
 
 
-@app.get("/api/taxonomy/{quality_id}")
-def get_quality(quality_id: str):
+def _get_quality(event):
+    quality_id = event["pathParameters"]["quality_id"]
     storage = get_storage()
     run_id = get_active_run_id(storage)
-    taxonomy = storage.get_taxonomy(run_id)
-    matrix = storage.get_convergence_matrix(run_id)
-    enriched = enrich_taxonomy(taxonomy, matrix)
+    enriched = enrich_taxonomy(storage.get_taxonomy(run_id), storage.get_convergence_matrix(run_id))
     quality = next((q for q in enriched if q["quality_id"] == quality_id), None)
     if not quality:
-        raise HTTPException(404, f"Quality {quality_id} not found")
+        raise ApiError(404, f"Quality {quality_id} not found")
     return quality
 
 
-# ── Convergence ───────────────────────────────────────────────────────
-
-
-@app.get("/api/convergence/cases")
-def convergence_cases():
-    """Convergence matrix: cases x qualities."""
+def _convergence_cases(event):
     storage = get_storage()
     run_id = get_active_run_id(storage)
     return {
@@ -165,9 +186,7 @@ def convergence_cases():
     }
 
 
-@app.get("/api/convergence/policies")
-def convergence_policies():
-    """Convergence matrix: policies x qualities."""
+def _convergence_policies(event):
     storage = get_storage()
     run_id = get_active_run_id(storage)
     return {
@@ -176,23 +195,21 @@ def convergence_policies():
     }
 
 
-# ── Policies ──────────────────────────────────────────────────────────
-
-
-@app.get("/api/policies")
-def list_policies():
+def _list_policies(event):
     storage = get_storage()
     run_id = get_active_run_id(storage)
-    policies = storage.get_policies(run_id)
-    scores = storage.get_policy_scores(run_id)
-    calibration = storage.get_calibration(run_id)
-    return enrich_policies(policies, scores, calibration)
+    return enrich_policies(
+        storage.get_policies(run_id),
+        storage.get_policy_scores(run_id),
+        storage.get_calibration(run_id),
+    )
 
 
-@app.get("/api/policies/{policy_id}")
-def get_policy(policy_id: str):
+def _get_policy(event):
+    policy_id = event["pathParameters"]["policy_id"]
     storage = get_storage()
     run_id = get_active_run_id(storage)
+
     policies = storage.get_policies(run_id)
     scores = storage.get_policy_scores(run_id)
     calibration = storage.get_calibration(run_id)
@@ -200,9 +217,8 @@ def get_policy(policy_id: str):
 
     policy = next((p for p in enriched if p["policy_id"] == policy_id), None)
     if not policy:
-        raise HTTPException(404, f"Policy {policy_id} not found")
+        raise ApiError(404, f"Policy {policy_id} not found")
 
-    # Add detail-level data: per-score rows, predictions, patterns
     predictions = enrich_predictions(storage.get_predictions(run_id))
     patterns = storage.get_detection_patterns(run_id)
 
@@ -221,79 +237,47 @@ def get_policy(policy_id: str):
     }
 
 
-# ── Predictions ───────────────────────────────────────────────────────
-
-
-@app.get("/api/predictions")
-def list_predictions():
+def _list_predictions(event):
     storage = get_storage()
     run_id = get_active_run_id(storage)
     return enrich_predictions(storage.get_predictions(run_id))
 
 
-# ── Detection Patterns ────────────────────────────────────────────────
-
-
-@app.get("/api/detection-patterns")
-def list_detection_patterns():
+def _list_detection_patterns(event):
     storage = get_storage()
     run_id = get_active_run_id(storage)
     return storage.get_detection_patterns(run_id)
 
 
-# ── HHS Reference Data (static, no pipeline run needed) ──────────────
-
-
-@app.get("/api/hhs/policy-catalog")
-def policy_catalog():
+def _policy_catalog(event):
     return HHS_POLICY_CATALOG
 
 
-@app.get("/api/hhs/policy-catalog/flat")
-def policy_catalog_flat():
+def _policy_catalog_flat(event):
     return flatten_policy_catalog()
 
 
-@app.get("/api/hhs/enforcement-sources")
-def enforcement_sources():
+def _enforcement_sources(event):
     return ENFORCEMENT_SOURCES
 
 
-@app.get("/api/hhs/data-sources")
-def data_sources():
+def _data_sources(event):
     return HHS_DATA_SOURCES
 
 
-# ── Pipeline Operations (trigger stages) ──────────────────────────────
-
-
-class RunPipelineRequest(BaseModel):
-    config_overrides: dict | None = None
-    notes: str = ""
-
-
-@app.post("/api/pipeline/run")
-def run_pipeline(req: RunPipelineRequest, background_tasks: BackgroundTasks):
-    """
-    Start a full pipeline run.
-
-    In Lambda: starts a Step Functions execution that drives all stages.
-    Locally: creates the run and kicks off stage 1 via BackgroundTasks.
-
-    The React UI calls this, then polls /api/status to track progress.
-    """
+def _run_pipeline(event):
+    body = _json_body(event)
     storage = get_storage()
     run_id = f"run_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}"
 
     from svap.orchestrator import _load_config
 
     config = _load_config(CONFIG_PATH)
-    if req.config_overrides:
-        config.update(req.config_overrides)
-    storage.create_run(run_id, config=config, notes=req.notes or "")
+    if body.get("config_overrides"):
+        config.update(body["config_overrides"])
+    storage.create_run(run_id, config=config, notes=body.get("notes", ""))
 
     if IS_LAMBDA and PIPELINE_STATE_MACHINE_ARN:
-        # In Lambda: start Step Functions execution
         import boto3
 
         sfn = boto3.client("stepfunctions")
@@ -307,52 +291,40 @@ def run_pipeline(req: RunPipelineRequest, background_tasks: BackgroundTasks):
             "run_id": run_id,
             "execution_arn": response["executionArn"],
         }
-    else:
-        # Local dev: run stage 1 as a BackgroundTask
-        from svap.orchestrator import _run_stage
-
-        background_tasks.add_task(_run_stage, storage, run_id, 1, config)
 
     return {"status": "started", "run_id": run_id}
 
 
-class ApproveRequest(BaseModel):
-    stage: int
-
-
-@app.post("/api/pipeline/approve")
-def approve_stage(req: ApproveRequest):
-    """Approve a human-gated stage (2 or 5) to allow downstream stages to proceed."""
-    if req.stage not in (2, 5):
-        raise HTTPException(400, "Only stages 2 and 5 have human review gates.")
+def _approve_stage(event):
+    body = _json_body(event)
+    stage = body.get("stage")
+    if stage not in (2, 5):
+        raise ApiError(400, "Only stages 2 and 5 have human review gates.")
 
     storage = get_storage()
     run_id = get_active_run_id(storage)
-    status = storage.get_stage_status(run_id, req.stage)
+    status = storage.get_stage_status(run_id, stage)
 
     if status != "pending_review":
-        raise HTTPException(400, f"Stage {req.stage} is '{status}', not pending review.")
+        raise ApiError(400, f"Stage {stage} is '{status}', not pending review.")
 
-    storage.approve_stage(run_id, req.stage)
+    storage.approve_stage(run_id, stage)
 
     if IS_LAMBDA and PIPELINE_STATE_MACHINE_ARN:
-        # Resume the Step Functions execution waiting on this approval
         import boto3
 
-        task_token = storage.get_task_token(run_id, req.stage)
+        task_token = storage.get_task_token(run_id, stage)
         if task_token:
             sfn = boto3.client("stepfunctions")
             sfn.send_task_success(
                 taskToken=task_token,
-                output=json.dumps({"approved": True, "stage": req.stage}),
+                output=json.dumps({"approved": True, "stage": stage}),
             )
 
-    return {"status": "approved", "stage": req.stage}
+    return {"status": "approved", "stage": stage}
 
 
-@app.post("/api/pipeline/seed")
-def seed_pipeline():
-    """Load seed data (HHS OIG enforcement cases, taxonomy, policies)."""
+def _seed_pipeline(event):
     from svap.orchestrator import _seed
 
     storage = get_storage()
@@ -360,20 +332,54 @@ def seed_pipeline():
     return {"status": "seeded", **result}
 
 
-# ── Health check ──────────────────────────────────────────────────────
-
-
-@app.get("/api/health")
-def health():
+def _health(event):
     return {"status": "ok", "database": "postgresql", "lambda": IS_LAMBDA}
 
 
-# ── Lambda entry point ────────────────────────────────────────────────
+# ── Route table ─────────────────────────────────────────────────────────
+# Keys are the exact routeKey strings from API Gateway V2, matching the
+# routes list in infrastructure/terraform/svap.tf.
 
-try:
-    from mangum import Mangum
+ROUTES = {
+    "GET /api/dashboard": _dashboard,
+    "GET /api/status": _status,
+    "GET /api/cases": _list_cases,
+    "GET /api/cases/{case_id}": _get_case,
+    "GET /api/taxonomy": _list_taxonomy,
+    "GET /api/taxonomy/{quality_id}": _get_quality,
+    "GET /api/convergence/cases": _convergence_cases,
+    "GET /api/convergence/policies": _convergence_policies,
+    "GET /api/policies": _list_policies,
+    "GET /api/policies/{policy_id}": _get_policy,
+    "GET /api/predictions": _list_predictions,
+    "GET /api/detection-patterns": _list_detection_patterns,
+    "GET /api/hhs/policy-catalog": _policy_catalog,
+    "GET /api/hhs/policy-catalog/flat": _policy_catalog_flat,
+    "GET /api/hhs/enforcement-sources": _enforcement_sources,
+    "GET /api/hhs/data-sources": _data_sources,
+    "POST /api/pipeline/run": _run_pipeline,
+    "POST /api/pipeline/approve": _approve_stage,
+    "POST /api/pipeline/seed": _seed_pipeline,
+    "GET /api/health": _health,
+}
 
-    handler = Mangum(app, lifespan="off")
-except ImportError:
-    # Mangum not installed (local dev without Lambda deps)
-    pass
+
+# ── Lambda entry point ──────────────────────────────────────────────────
+
+
+def handler(event, context):
+    """Lambda handler for API Gateway V2 HTTP API (payload format 2.0)."""
+    route_key = event.get("routeKey", "")
+    logger.info("Request: %s", route_key)
+
+    route_fn = ROUTES.get(route_key)
+    if not route_fn:
+        return _error(404, f"Not found: {route_key}")
+
+    try:
+        return _ok(route_fn(event))
+    except ApiError as e:
+        return _error(e.status_code, e.message)
+    except Exception:
+        logger.error("Unhandled error on %s:\n%s", route_key, traceback.format_exc())
+        return _error(500, "Internal server error")

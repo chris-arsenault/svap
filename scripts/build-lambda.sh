@@ -20,7 +20,6 @@ uv pip install \
     --python-version 3.12 \
     --no-build \
     pyyaml tiktoken numpy \
-    fastapi uvicorn mangum \
     psycopg2-binary
 
 # Copy source code
