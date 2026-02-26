@@ -131,7 +131,7 @@ def _default_config() -> dict:
     return {
         "bedrock": {
             "region": "us-east-1",
-            "model_id": "us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+            "model_id": "us.anthropic.claude-sonnet-4-6",
             "max_tokens": 4096,
             "temperature": 0.2,
             "retry_attempts": 3,

@@ -4,7 +4,7 @@
 bedrock:
   region: us-east-1
   # Model ID for Claude on Bedrock. Update to your provisioned model.
-  model_id: us.anthropic.claude-sonnet-4-5-20250929-v1:0
+  model_id: us.anthropic.claude-sonnet-4-6
   max_tokens: 4096
   temperature: 0.2        # Low temp for extraction/scoring; stages override as needed
   retry_attempts: 3
