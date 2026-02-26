@@ -9,7 +9,7 @@ const PRIORITY_ORDER: RiskLevel[] = ["critical", "high", "medium", "low"];
 function PatternDetail({ pat }: { pat: DetectionPattern }) {
   return (
     <div className="panel-body" style={{ borderTop: "1px solid var(--border-subtle)" }}>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--sp-6)" }}>
+      <div className="detail-grid">
         <div>
           <div className="detail-label">Data Source</div>
           <div style={{ fontSize: 13, color: "var(--accent-bright)", fontFamily: "var(--font-mono)" }}>
@@ -129,7 +129,7 @@ export default function DetectionView({ onNavigate: _onNavigate }: ViewProps) {
         </div>
       </div>
 
-      <div style={{ display: "flex", gap: 8, marginBottom: "var(--sp-5)" }} className="stagger-in">
+      <div className="filter-bar stagger-in" style={{ marginBottom: "var(--sp-5)" }}>
         <button className={`btn ${!filterPriority ? "btn-accent" : ""}`} onClick={() => setFilterPriority(null)}>
           All ({detection_patterns.length})
         </button>

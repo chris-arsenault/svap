@@ -1,15 +1,8 @@
 /**
  * usePipelineData — single data hook for the entire SVAP UI
  *
- * Strategy:
- *   1. On mount, tries to fetch /api/dashboard from the FastAPI server
- *   2. If the API is available, uses live pipeline data from PostgreSQL
- *   3. If the API is unavailable (no backend running), falls back to
- *      the FALLBACK_DATA empty state — so the UI always works standalone
- *
- * The dashboard endpoint returns everything in one call (cases, taxonomy,
- * policies, predictions, patterns, convergence, calibration, HHS reference
- * data). Individual views don't need separate fetches.
+ * On mount, fetches /api/dashboard from the FastAPI server. If the API is
+ * unreachable, sets an error state so the UI can alert the user.
  *
  * To refresh after a pipeline stage runs:
  *   call refresh() from any component
@@ -17,15 +10,29 @@
 
 /* eslint-disable react-refresh/only-export-components */
 import { useState, useEffect, useCallback, useMemo, createContext, useContext } from "react";
-import { FALLBACK_DATA } from "./fallback";
 import { config } from "../config";
 import type { FallbackData, PipelineData, PipelineStageStatus, Quality } from "../types";
 
 const API_BASE = config.apiBaseUrl || "/api";
 
-function buildStaticData(): FallbackData {
-  return FALLBACK_DATA;
-}
+const EMPTY_DATA: FallbackData = {
+  run_id: "",
+  source: "api",
+  pipeline_status: [],
+  counts: { cases: 0, taxonomy_qualities: 0, policies: 0, predictions: 0, detection_patterns: 0 },
+  calibration: { threshold: 3 },
+  cases: [],
+  taxonomy: [],
+  policies: [],
+  predictions: [],
+  detection_patterns: [],
+  case_convergence: [],
+  policy_convergence: [],
+  policy_catalog: {},
+  enforcement_sources: [],
+  data_sources: {},
+  scanned_programs: [],
+};
 
 function deduplicatePipelineStatus(apiData: FallbackData): void {
   if (!apiData.pipeline_status) return;
@@ -50,7 +57,7 @@ async function apiPost(path: string, body?: unknown, token?: string): Promise<un
 }
 
 export function usePipelineData(token: string): PipelineData {
-  const [data, setData] = useState<FallbackData>(() => buildStaticData());
+  const [data, setData] = useState<FallbackData>(EMPTY_DATA);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [apiAvailable, setApiAvailable] = useState(false);
@@ -60,7 +67,7 @@ export function usePipelineData(token: string): PipelineData {
     setError(null);
     try {
       const res = await fetch(`${API_BASE}/dashboard`, {
-        signal: AbortSignal.timeout(3000),
+        signal: AbortSignal.timeout(10000),
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       if (!res.ok) throw new Error(`API returned ${res.status}`);
@@ -69,8 +76,9 @@ export function usePipelineData(token: string): PipelineData {
       setData({ ...apiData, source: "api" });
       setApiAvailable(true);
     } catch (err) {
-      console.info("SVAP API unavailable, using fallback data.", (err as Error).message);
-      setData(buildStaticData());
+      const message = (err as Error).message || "Unknown error";
+      console.error("SVAP API unreachable:", message);
+      setError(`Unable to reach the SVAP API. ${message}`);
       setApiAvailable(false);
     } finally {
       setLoading(false);
@@ -89,13 +97,12 @@ export function usePipelineData(token: string): PipelineData {
     return map;
   }, [data.taxonomy]);
 
-  const runStage = useCallback(
-    async (stage: number) => {
-      if (!apiAvailable) throw new Error("API not available");
-      return apiPost("/pipeline/run", { stage }, token);
-    },
-    [apiAvailable, token]
-  );
+  const runPipeline = useCallback(async () => {
+    if (!apiAvailable) throw new Error("API not available");
+    const result = await apiPost("/pipeline/run", {}, token);
+    await fetchDashboard();
+    return result;
+  }, [apiAvailable, fetchDashboard, token]);
 
   const approveStage = useCallback(
     async (stage: number) => {
@@ -122,7 +129,7 @@ export function usePipelineData(token: string): PipelineData {
     error,
     apiAvailable,
     refresh: fetchDashboard,
-    runStage,
+    runPipeline,
     approveStage,
     seedPipeline,
   };

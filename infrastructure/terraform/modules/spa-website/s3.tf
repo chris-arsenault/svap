@@ -99,6 +99,20 @@ resource "aws_s3_object" "website_files" {
   })
 }
 
+# Deployment marker — triggers CloudFront invalidation when S3 objects change.
+resource "terraform_data" "deployment_marker" {
+  input = sha256(jsonencode([
+    for k, v in aws_s3_object.website_files : v.source_hash
+  ]))
+
+  lifecycle {
+    action_trigger {
+      events  = [after_create, after_update]
+      actions = [action.aws_cloudfront_create_invalidation.invalidate_all]
+    }
+  }
+}
+
 resource "aws_s3_bucket_policy" "website" {
   bucket = aws_s3_bucket.website.id
 

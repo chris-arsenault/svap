@@ -160,7 +160,7 @@ export default function ConvergenceMatrix({ onNavigate: _onNavigate }: ViewProps
         </div>
       </div>
 
-      <div style={{ marginBottom: "var(--sp-4)", display: "flex", gap: 8 }} className="stagger-in">
+      <div className="filter-bar stagger-in" style={{ marginBottom: "var(--sp-4)" }}>
         <button className={`btn ${!showPolicies ? "btn-accent" : ""}`} onClick={() => setShowPolicies(false)}>
           Cases ({cases.length})
         </button>
@@ -171,7 +171,7 @@ export default function ConvergenceMatrix({ onNavigate: _onNavigate }: ViewProps
 
       <div className="panel stagger-in">
         <div className="panel-body dense" style={{ overflowX: "auto" }}>
-          <table className="data-table" style={{ minWidth: 900 }}>
+          <table className="data-table matrix-table">
             <thead>
               <tr>
                 <th

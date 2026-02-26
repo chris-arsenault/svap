@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { usePipeline } from "../data/usePipelineData";
-import { ScoreBar, QualityTags, formatDollars, RiskBadge } from "../components/SharedUI";
-import type { Case, Policy, ViewId, ViewProps } from "../types";
+import { ScoreBar, QualityTags, formatDollars, RiskBadge, StageDot } from "../components/SharedUI";
+import type { Case, Policy, ViewId, ViewProps, StageStatus } from "../types";
 
 function MetricsRow({
   cases,
@@ -138,6 +138,83 @@ function TopCasesTable({ cases, onNavigate }: { cases: Case[]; onNavigate: (view
   );
 }
 
+const STAGE_NAMES: Record<number, string> = {
+  1: "Ingest enforcement cases",
+  2: "Build vulnerability taxonomy",
+  3: "Scan policy catalog",
+  4: "Generate predictions",
+  5: "Design detection patterns",
+  6: "Compile final report",
+};
+
+const HUMAN_GATE_STAGES = [2, 5];
+
+function PipelineControls() {
+  const { pipeline_status, run_id, apiAvailable, runPipeline, approveStage, seedPipeline, refresh } = usePipeline();
+  const [busy, setBusy] = useState<string | null>(null);
+
+  const wrap = (label: string, fn: () => Promise<unknown>) => async () => {
+    setBusy(label);
+    try {
+      await fn();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  if (!apiAvailable) return null;
+
+  const hasPipeline = run_id && run_id !== "static";
+
+  return (
+    <div className="panel stagger-in">
+      <div className="panel-header">
+        <h3>Pipeline Controls</h3>
+        <div className="pipeline-header-actions">
+          {!hasPipeline && (
+            <button className="btn btn-accent" onClick={wrap("seed", seedPipeline)} disabled={!!busy}>
+              {busy === "seed" ? "Seeding\u2026" : "Seed Pipeline"}
+            </button>
+          )}
+          <button className="btn btn-accent" onClick={wrap("run", runPipeline)} disabled={!!busy}>
+            {busy === "run" ? "Running\u2026" : "Run Pipeline"}
+          </button>
+          <button className="btn" onClick={wrap("refresh", refresh)} disabled={!!busy}>
+            {busy === "refresh" ? "Refreshing\u2026" : "Refresh"}
+          </button>
+        </div>
+      </div>
+      <div className="panel-body">
+        <div className="pipeline-controls-stages">
+          {[1, 2, 3, 4, 5, 6].map((stage) => {
+            const ps = pipeline_status.find((s) => s.stage === stage);
+            const status: StageStatus = ps?.status ?? "idle";
+            const needsApproval = HUMAN_GATE_STAGES.includes(stage) && status === "pending_review";
+            return (
+              <div key={stage} className="pipeline-stage-row">
+                <StageDot status={status} />
+                <span className="stage-name">{STAGE_NAMES[stage]}</span>
+                <span className={`stage-status-label ${status}`}>{status.replace("_", " ")}</span>
+                {needsApproval && (
+                  <button
+                    className="btn btn-warning btn-sm"
+                    onClick={wrap(`approve-${stage}`, () => approveStage(stage))}
+                    disabled={!!busy}
+                  >
+                    {busy === `approve-${stage}` ? "Approving\u2026" : "Approve"}
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Dashboard({ onNavigate }: ViewProps) {
   const { cases, taxonomy, policies, detection_patterns, threshold } = usePipeline();
   const criticalPolicies = policies.filter((p) => p.risk_level === "critical").length;
@@ -153,6 +230,8 @@ export default function Dashboard({ onNavigate }: ViewProps) {
           risk
         </div>
       </div>
+
+      <PipelineControls />
 
       <MetricsRow
         cases={cases.length}

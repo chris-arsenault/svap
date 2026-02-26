@@ -72,7 +72,7 @@ function QualityDetail({ quality, matchingCases }: { quality: Quality; matchingC
         </h3>
       </div>
       <div className="panel-body">
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "var(--sp-6)" }}>
+        <div className="detail-grid">
           <div>
             <div className="detail-label">Recognition Test</div>
             <div style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7 }}>

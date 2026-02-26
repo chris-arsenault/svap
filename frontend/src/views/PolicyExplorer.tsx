@@ -212,7 +212,7 @@ export default function PolicyExplorer({ onNavigate: _onNavigate }: ViewProps) {
             <h3>HHS Policy Catalog</h3>
             <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{scanned_programs.length} scanned</span>
           </div>
-          <div className="panel-body" style={{ maxHeight: 600, overflowY: "auto" }}>
+          <div className="panel-body tree-scroll">
             {Object.entries(policy_catalog).map(([k, node]) => (
               <TreeNode key={k} nodeKey={k} node={node as CatalogNode} depth={0} scannedPrograms={scanned_programs} />
             ))}

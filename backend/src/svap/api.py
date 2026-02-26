@@ -20,7 +20,6 @@ import os
 from datetime import UTC, datetime
 
 from fastapi import BackgroundTasks, FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from svap.api_schemas import (
@@ -48,14 +47,8 @@ app = FastAPI(
     version="0.2.0",
 )
 
-# CORS origins: from environment (Lambda) or defaults (local dev)
-_allowed_origins = os.environ.get("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000")
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[o.strip() for o in _allowed_origins.split(",")],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# CORS is handled by API Gateway (cors_configuration block).
+# Do NOT add CORSMiddleware here — it conflicts with the gateway headers.
 
 # ── Configuration ─────────────────────────────────────────────────────
 

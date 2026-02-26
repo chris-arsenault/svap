@@ -64,7 +64,7 @@ function PredictionCard({
 
       {isExpanded && (
         <div className="panel-body" style={{ borderTop: "1px solid var(--border-subtle)" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "var(--sp-6)" }}>
+          <div className="detail-grid-wide">
             <div>
               <div className="detail-label">Predicted Exploitation Mechanics</div>
               <div style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7 }}>{pred.mechanics}</div>

@@ -93,3 +93,11 @@ resource "aws_cloudfront_distribution" "website" {
     Name = "${local.resource_prefix}-cloudfront"
   })
 }
+
+# CloudFront cache invalidation (Terraform 1.14+)
+action "aws_cloudfront_create_invalidation" "invalidate_all" {
+  config {
+    distribution_id = aws_cloudfront_distribution.website.id
+    paths           = ["/*"]
+  }
+}

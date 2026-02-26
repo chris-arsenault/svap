@@ -60,7 +60,7 @@ function CaseRow({
         <td style={{ fontFamily: "var(--font-mono)", whiteSpace: "nowrap" }}>
           {formatDollars(caseData.scale_dollars)}
         </td>
-        <td style={{ fontSize: 12, color: "var(--text-secondary)" }}>{caseData.detection_method}</td>
+        <td className="hide-on-mobile" style={{ fontSize: 12, color: "var(--text-secondary)" }}>{caseData.detection_method}</td>
         <td>
           <QualityTags ids={caseData.qualities} />
         </td>
@@ -109,7 +109,7 @@ export default function CaseSourcing({ onNavigate: _onNavigate }: ViewProps) {
                 <th style={{ width: 24 }}></th>
                 <th>Case</th>
                 <th>Scale</th>
-                <th>Detection</th>
+                <th className="hide-on-mobile">Detection</th>
                 <th>Qualities</th>
               </tr>
             </thead>

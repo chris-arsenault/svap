@@ -1,5 +1,5 @@
 // Pipeline stage status
-export type StageStatus = "idle" | "pending" | "running" | "completed";
+export type StageStatus = "idle" | "pending" | "running" | "completed" | "pending_review";
 export type RiskLevel = "critical" | "high" | "medium" | "low";
 export type ViewId =
   | "dashboard"
@@ -112,7 +112,7 @@ export interface PipelineData extends FallbackData {
   error: string | null;
   apiAvailable: boolean;
   refresh: () => Promise<void>;
-  runStage: (stage: number) => Promise<unknown>;
+  runPipeline: () => Promise<unknown>;
   approveStage: (stage: number) => Promise<unknown>;
   seedPipeline: () => Promise<unknown>;
 }

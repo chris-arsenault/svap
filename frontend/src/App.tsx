@@ -1,5 +1,5 @@
 import { useState, useEffect, type FormEvent } from "react";
-import { PipelineProvider } from "./data/usePipelineData";
+import { PipelineProvider, usePipeline } from "./data/usePipelineData";
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./views/Dashboard";
 import CaseSourcing from "./views/CaseSourcing";
@@ -30,6 +30,7 @@ const VIEWS: Record<ViewId, React.ComponentType<ViewProps>> = {
 export default function App() {
   const [auth, setAuth] = useState<AuthState>({ status: "loading", token: "", username: "" });
   const [activeView, setActiveView] = useState<ViewId>("dashboard");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
@@ -108,12 +109,53 @@ export default function App() {
   const ViewComponent = VIEWS[activeView] || Dashboard;
   return (
     <PipelineProvider token={auth.token}>
-      <div className="app-layout">
-        <Sidebar activeView={activeView} onNavigate={setActiveView} onSignOut={handleSignOut} username={auth.username} />
+      <div className={`app-layout ${sidebarOpen ? "sidebar-open" : ""}`}>
+        {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
+        <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
+        <Sidebar
+          activeView={activeView}
+          onNavigate={(view) => { setActiveView(view); setSidebarOpen(false); }}
+          onSignOut={handleSignOut}
+          username={auth.username}
+        />
         <main className="main-content" key={activeView}>
-          <ViewComponent onNavigate={setActiveView} />
+          <button
+            className="mobile-menu-btn"
+            onClick={() => setSidebarOpen((o) => !o)}
+            aria-label="Toggle menu"
+          >
+            <span className="hamburger-icon" />
+          </button>
+          <ApiGate>
+            <ViewComponent onNavigate={setActiveView} />
+          </ApiGate>
         </main>
       </div>
     </PipelineProvider>
   );
+}
+
+function ApiGate({ children }: { children: React.ReactNode }) {
+  const { loading, error, refresh } = usePipeline();
+
+  if (loading) {
+    return (
+      <div className="api-gate">
+        <div className="api-gate-spinner" />
+        <p>Connecting to SVAP API&hellip;</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="api-gate">
+        <h2>Service Unavailable</h2>
+        <p>{error}</p>
+        <button className="btn btn-accent" onClick={refresh}>Retry</button>
+      </div>
+    );
+  }
+
+  return <>{children}</>;
 }

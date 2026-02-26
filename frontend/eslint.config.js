@@ -8,6 +8,8 @@ import jsxA11y from "eslint-plugin-jsx-a11y";
 import sonarjs from "eslint-plugin-sonarjs";
 import prettier from "eslint-config-prettier";
 import tseslint from "typescript-eslint";
+import maxJsxProps from "./eslint-rules/max-jsx-props.js";
+import noInlineStyles from "./eslint-rules/no-inline-styles.js";
 
 export default tseslint.config(
   {
@@ -41,6 +43,7 @@ export default tseslint.config(
       "react-refresh": reactRefresh,
       "react-perf": reactPerf,
       "jsx-a11y": jsxA11y,
+      local: { rules: { "max-jsx-props": maxJsxProps, "no-inline-styles": noInlineStyles } },
     },
     languageOptions: {
       globals: {
@@ -69,6 +72,8 @@ export default tseslint.config(
       "react-perf/jsx-no-new-function-as-prop": ["warn", { nativeAllowList: "all" }],
       "react-perf/jsx-no-jsx-as-prop": ["warn", { nativeAllowList: "all" }],
       "react/jsx-no-constructed-context-values": "warn",
+      "local/max-jsx-props": ["warn", { max: 12 }],
+      "local/no-inline-styles": "warn",
     },
   },
 
