@@ -209,7 +209,10 @@ data "aws_iam_policy_document" "lambda" {
     actions = [
       "bedrock:InvokeModel"
     ]
-    resources = ["arn:aws:bedrock:*::foundation-model/anthropic.*"]
+    resources = [
+      "arn:aws:bedrock:*::foundation-model/anthropic.*",
+      "arn:aws:bedrock:*:*:inference-profile/*"
+    ]
   }
 
   statement {
