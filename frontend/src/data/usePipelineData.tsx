@@ -121,6 +121,15 @@ export function usePipelineData(token: string): PipelineData {
     return result;
   }, [apiAvailable, fetchDashboard, token]);
 
+  const refreshSources = useCallback(async () => {
+    const headers: Record<string, string> = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    const res = await fetch(`${API_BASE}/enforcement-sources`, { headers });
+    if (!res.ok) return;
+    const sources = await res.json();
+    setData((prev) => ({ ...prev, enforcement_sources: sources }));
+  }, [token]);
+
   const uploadSourceDocument = useCallback(
     async (sourceId: string, file: File) => {
       if (!apiAvailable) throw new Error("API not available");
@@ -135,30 +144,30 @@ export function usePipelineData(token: string): PipelineData {
         { source_id: sourceId, filename: file.name, content: btoa(binary) },
         token
       );
-      await fetchDashboard();
+      await refreshSources();
       return result;
     },
-    [apiAvailable, fetchDashboard, token]
+    [apiAvailable, refreshSources, token]
   );
 
   const createSource = useCallback(
     async (source: { name: string; url?: string; description?: string }) => {
       if (!apiAvailable) throw new Error("API not available");
       const result = await apiPost("/enforcement-sources", source, token);
-      await fetchDashboard();
+      await refreshSources();
       return result;
     },
-    [apiAvailable, fetchDashboard, token]
+    [apiAvailable, refreshSources, token]
   );
 
   const deleteSource = useCallback(
     async (sourceId: string) => {
       if (!apiAvailable) throw new Error("API not available");
       const result = await apiPost("/enforcement-sources/delete", { source_id: sourceId }, token);
-      await fetchDashboard();
+      await refreshSources();
       return result;
     },
-    [apiAvailable, fetchDashboard, token]
+    [apiAvailable, refreshSources, token]
   );
 
   return {
