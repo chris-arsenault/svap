@@ -1,0 +1,31 @@
+Below are enabling conditions extracted from {num_cases} enforcement cases. Each describes WHY a specific policy was exploitable — the structural design property that created the opening.
+
+Your task: Group these into clusters where the enabling conditions share the same ABSTRACT STRUCTURAL QUALITY. You are looking for the general category of design flaw, not the specific policy.
+
+For example, "Medicare pays claims before verifying service delivery" and "ACA tax credits are issued months before IRS reconciliation" are both instances of the same abstract quality: "Payment precedes verification."
+
+Rules:
+- Aim for 5-12 clusters. Fewer means you haven't differentiated enough. More means you haven't abstracted enough.
+- Each quality should be DOMAIN-AGNOSTIC in principle. "Payment precedes verification" could apply to any payment system. "Medicare doesn't check DME claims" is too specific.
+- Qualities should be INDEPENDENT. If two proposed qualities always co-occur in your data, they may actually be one quality. Flag any you're uncertain about.
+- Every enabling condition should map to at least one cluster. If an enabling condition doesn't fit any cluster, it may represent a quality you're missing.
+
+For each cluster, provide:
+- name: A short, memorable label (3-6 words)
+- definition: One sentence describing the structural property in domain-agnostic terms
+- enabling_conditions: List of the specific enabling conditions from the cases that belong to this cluster
+
+Return ONLY valid JSON:
+{{
+  "qualities": [
+    {{
+      "name": "...",
+      "definition": "...",
+      "enabling_conditions": ["...", "..."]
+    }}
+  ]
+}}
+
+ENABLING CONDITIONS:
+
+{enabling_conditions}

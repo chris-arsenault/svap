@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "svap"
+version = "0.2.0"
+description = "Structural Vulnerability Analysis Pipeline"
+requires-python = ">=3.11"
+dependencies = [
+    "boto3>=1.34.0",
+    "pyyaml>=6.0",
+    "tiktoken>=0.5.0",
+    "numpy>=1.24.0",
+    "fastapi>=0.109.0",
+    "uvicorn[standard]>=0.27.0",
+    "mangum>=0.17.0",
+    "psycopg2-binary>=2.9.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "httpx", "ruff>=0.9.0"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+src = ["src"]
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "N",      # pep8-naming
+    "UP",     # pyupgrade
+    "B",      # flake8-bugbear
+    "C90",    # mccabe complexity
+    "SIM",    # flake8-simplify
+    "RUF",    # ruff-specific
+    "PLR",    # pylint refactoring (too-many-statements, too-many-args, etc.)
+]
+ignore = [
+    "E501",    # line too long — handled by formatter
+    "PLR2004", # magic-value-comparison — too noisy for prototype
+    "PLR0913", # too-many-arguments — several functions legitimately need 6+ args
+]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pylint]
+max-statements = 75
+max-args = 8
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"

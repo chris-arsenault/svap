@@ -1,0 +1,66 @@
+[
+  {
+    "id": "oig_newsroom",
+    "name": "HHS OIG Newsroom",
+    "url": "https://oig.hhs.gov/newsroom/",
+    "type": "press_releases",
+    "description": "Official OIG enforcement announcements, audit reports, and data briefs",
+    "frequency": "Weekly"
+  },
+  {
+    "id": "doj_healthcare",
+    "name": "DOJ Healthcare Fraud Unit",
+    "url": "https://www.justice.gov/criminal/criminal-fraud/health-care-fraud-unit",
+    "type": "press_releases",
+    "description": "DOJ Criminal Division healthcare fraud prosecutions and national takedowns",
+    "frequency": "Weekly"
+  },
+  {
+    "id": "doj_fca",
+    "name": "DOJ False Claims Act Settlements",
+    "url": "https://www.justice.gov/civil/fraud-statistics",
+    "type": "settlements",
+    "description": "Annual FCA statistics and major settlement announcements",
+    "frequency": "Annual"
+  },
+  {
+    "id": "oig_workplan",
+    "name": "OIG Work Plan",
+    "url": "https://oig.hhs.gov/reports/workplan/",
+    "type": "planned_work",
+    "description": "Active and planned OIG audits, evaluations, and investigations",
+    "frequency": "Ongoing"
+  },
+  {
+    "id": "oig_semiannual",
+    "name": "OIG Semiannual Report",
+    "url": "https://oig.hhs.gov/reports/semiannual/",
+    "type": "summary_report",
+    "description": "Comprehensive summary of OIG enforcement activity and recommendations",
+    "frequency": "Biannual"
+  },
+  {
+    "id": "cms_pi",
+    "name": "CMS Program Integrity",
+    "url": "https://www.cms.gov/About-CMS/Components/CPI",
+    "type": "program_data",
+    "description": "Improper payment rates, CERT findings, SMRC referrals",
+    "frequency": "Annual"
+  },
+  {
+    "id": "gao",
+    "name": "GAO Healthcare Reports",
+    "url": "https://www.gao.gov/topics/health",
+    "type": "audit_reports",
+    "description": "GAO audits including High Risk List updates for Medicare/Medicaid",
+    "frequency": "As published"
+  },
+  {
+    "id": "mfcu",
+    "name": "State MFCU Activity",
+    "url": "https://oig.hhs.gov/fraud/medicaid-fraud-control-units/",
+    "type": "state_enforcement",
+    "description": "Medicaid Fraud Control Unit statistical reports by state",
+    "frequency": "Annual"
+  }
+]

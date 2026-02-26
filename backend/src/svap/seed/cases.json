@@ -1,0 +1,98 @@
+[
+  {
+    "case_id": "gold_rush_01",
+    "case_name": "Operation Gold Rush — Transnational DME Fraud",
+    "scheme_mechanics": "Russian-led transnational criminal organization purchased dozens of legitimate DME supply companies using foreign straw owners. Submitted $10.6B in fraudulent Medicare claims for urinary catheters and other DME using stolen identities of over 1 million Americans. Used AI to fabricate patient consent recordings. Laundered proceeds through cryptocurrency and overseas shell companies.",
+    "exploited_policy": "Medicare Part B fee-for-service reimbursement for durable medical equipment. Claims processed and paid automatically with no prior authorization. Provider enrollment allowed rapid acquisition of billing numbers through company purchases.",
+    "enabling_condition": "Payment issued before verification of service delivery, combined with low barriers to acquiring billing entities (purchased existing companies) and a new era of AI-generated synthetic consent recordings that circumvented traditional verification.",
+    "scale_dollars": 10600000000,
+    "scale_defendants": 11,
+    "scale_duration": "Multiple years",
+    "detection_method": "DOJ Data Analytics Team identified billing anomalies; CMS blocked $4.45B in scheduled payments before reaching defendants",
+    "qualities": ["V1", "V2", "V7", "V8"]
+  },
+  {
+    "case_id": "kaiser_ma_01",
+    "case_name": "Kaiser Permanente MA Risk Adjustment Fraud",
+    "scheme_mechanics": "Kaiser added approximately 500,000 false diagnoses to patient records through chart addenda created months or years after clinical visits. These false diagnoses increased HCC risk scores, inflating the capitation payments Kaiser received from CMS for its Medicare Advantage enrollees.",
+    "exploited_policy": "Medicare Advantage Hierarchical Condition Category (HCC) risk adjustment model. Plans self-report diagnosis codes that directly determine their own payment amount. CMS pays plans more for patients coded as sicker. Retrospective chart reviews can add diagnoses long after the clinical encounter.",
+    "enabling_condition": "The entity receiving payment (MA plan) is the same entity that generates the data determining payment amount (diagnosis codes), with no independent third-party verification of the clinical validity of reported diagnoses.",
+    "scale_dollars": 556000000,
+    "scale_defendants": 1,
+    "scale_duration": "Multiple years",
+    "detection_method": "Whistleblower (qui tam action)",
+    "qualities": ["V2", "V4"]
+  },
+  {
+    "case_id": "wound_graft_01",
+    "case_name": "Gehrke/King Wound Graft Fraud ($1.2B)",
+    "scheme_mechanics": "Arizona couple operated company that contracted medically untrained sales reps to find elderly Medicare beneficiaries with any wound. Ordered only largest-size amniotic grafts regardless of wound dimensions to maximize reimbursement. Directed nurse practitioners to suspend medical judgment and apply all ordered grafts — including on infected wounds, healed wounds, non-existent wounds, and terminally ill hospice patients. Gehrke received $279M+ in kickbacks from graft distributor.",
+    "exploited_policy": "Medicare Part B skin substitute billing codes with no prior authorization requirement. New product category created for amniotic allografts with high per-unit reimbursement. Fee-for-service payment model where each application generates a separate claim.",
+    "enabling_condition": "Uncapped new billing category (skin substitutes) with high per-unit reimbursement and no prior authorization, combined with fee-for-service payment that incentivized volume over medical necessity. Subjective wound care assessment criteria made medical necessity determination difficult to challenge.",
+    "scale_dollars": 1200000000,
+    "scale_defendants": 7,
+    "scale_duration": "2019-2023",
+    "detection_method": "CMS data analytics identified spending anomaly (Part B skin substitutes went from $256M to $10B in 5 years)",
+    "qualities": ["V1", "V2", "V3", "V4", "V8"]
+  },
+  {
+    "case_id": "done_global_01",
+    "case_name": "Done Global Telehealth Adderall Mill",
+    "scheme_mechanics": "Digital health company generated $100M+ in revenue through subscription model prescribing 40M+ Adderall pills. Spent $40M on deceptive social media ads targeting ADHD self-diagnosis. Limited initial appointments to half normal psychiatric exam length. Created auto-refill features allowing prescriptions without clinical interaction for years. Compensated providers based on prescription volume rather than care quality.",
+    "exploited_policy": "COVID-era DEA telehealth prescribing flexibilities for Schedule II controlled substances, extended through Dec 2026. Telehealth expansion removed geographic restrictions and in-person examination requirements. Provider enrollment screening relaxed during pandemic.",
+    "enabling_condition": "Rapid regulatory expansion (telehealth flexibilities) outpaced oversight infrastructure. Subjective clinical criteria (ADHD diagnosis based on brief telehealth screen and patient self-report). Low barriers to establishing a prescribing telehealth platform.",
+    "scale_dollars": 100000000,
+    "scale_defendants": 2,
+    "scale_duration": "2020-2024",
+    "detection_method": "DEA investigation triggered by prescription volume anomalies",
+    "qualities": ["V4", "V5", "V6", "V8"]
+  },
+  {
+    "case_id": "az_bh_01",
+    "case_name": "Arizona Medicaid Behavioral Health Fraud ($650M)",
+    "scheme_mechanics": "Network of providers extracted ~$650M from Arizona Medicaid for substance abuse treatment services that were never provided or so substandard they had no therapeutic value. Paid kickbacks to recruit patients from homeless populations and Native American reservations. Billed for impossible service hours. Arizona behavioral health claims rose from $132M to $668M in 2 years while enrollment grew only 30%.",
+    "exploited_policy": "Medicaid behavioral health reimbursement under state waiver programs. Subjective diagnostic criteria for substance use disorder and behavioral health conditions. Fee-for-service billing for individual therapy sessions and group counseling. State licensing requirements minimal for behavioral health treatment facilities.",
+    "enabling_condition": "Subjective clinical criteria (SUD/behavioral health diagnoses rely on patient self-report and clinical interpretation). Rapid program expansion (Medicaid behavioral health spending grew 5x without proportional oversight). Low barriers to provider entry. Intermediary opacity through management service organizations.",
+    "scale_dollars": 650000000,
+    "scale_defendants": null,
+    "scale_duration": "~2 years",
+    "detection_method": "State investigation triggered by spending anomaly (5x increase in 2 years with only 30% enrollment growth)",
+    "qualities": ["V1", "V4", "V5", "V6"]
+  },
+  {
+    "case_id": "hospice_ca_01",
+    "case_name": "California Sham Hospice Network ($16M)",
+    "scheme_mechanics": "Operators enrolled ineligible patients in hospice using identities of foreign nationals and falsified medical records. Billed Medicare per diem for patients who were not terminally ill and received minimal or no services. Used names of deceased doctors on certifications. Paid kickbacks to patient recruiters.",
+    "exploited_policy": "Medicare hospice benefit per diem payment structure. Payment is the same daily rate regardless of service quantity or quality delivered. Terminal prognosis certification is made by the hospice's own medical director. No experience or certification required for hospice administrators.",
+    "enabling_condition": "Payment disconnected from service delivery intensity (per diem regardless of services provided). The hospice itself certifies the clinical eligibility (terminal prognosis) that triggers its own payment. Low barriers to becoming a hospice provider (no administrator certification required).",
+    "scale_dollars": 16000000,
+    "scale_defendants": 4,
+    "scale_duration": "Multiple years",
+    "detection_method": "Law enforcement investigation",
+    "qualities": ["V1", "V2", "V4", "V8"]
+  },
+  {
+    "case_id": "aca_gao_01",
+    "case_name": "ACA Marketplace Enrollment Fraud (GAO Findings)",
+    "scheme_mechanics": "GAO covert testing found 100% of fictitious applicants approved for subsidized ACA coverage. 18 of 20 fake enrollees maintained coverage months later at ~$10,000/month in subsidies. One SSN was used for 125 separate policies. Over 275,000 complaints of unauthorized plan-switching by brokers in just 8 months during 2024.",
+    "exploited_policy": "ACA marketplace enrollment verification system. Applicants self-attest income and identity. Advance premium tax credits issued monthly before IRS reconciliation (which has been paused 2021-2024). Broker enrollment system allows automated batch enrollments. CMS has not updated marketplace fraud risk assessment since 2018.",
+    "enabling_condition": "Payment precedes verification (APTC issued before IRS reconciliation). Applicants self-attest the data (income, identity) that determines their subsidy amount. Rapid program expansion with enhanced subsidies without proportional oversight. Low barriers to broker registration enabling unauthorized enrollments.",
+    "scale_dollars": 21000000000,
+    "scale_defendants": null,
+    "scale_duration": "2021-2024",
+    "detection_method": "GAO covert testing; CMS paused enforcement based on IRS data",
+    "qualities": ["V1", "V2", "V6", "V7"]
+  },
+  {
+    "case_id": "teva_copay_01",
+    "case_name": "Teva Pharmaceuticals Copay Kickback ($450M)",
+    "scheme_mechanics": "Teva funneled payments through third-party copay assistance foundations to cover patient out-of-pocket costs for its MS drug Copaxone. The payments functioned as disguised kickbacks — by eliminating patients' cost-sharing, Teva ensured continued prescriptions of its high-priced drug rather than cheaper alternatives. The foundations were nominally independent but effectively controlled by Teva.",
+    "exploited_policy": "Anti-Kickback Statute as applied to copay assistance foundations for Medicare Part D drugs. Third-party foundations can legally provide copay assistance if they meet OIG guidelines for independence. The intermediary structure of foundations creates opacity about whether assistance is truly independent or is a disguised kickback.",
+    "enabling_condition": "Intermediary opacity: financial flows through nominally independent foundations obscure the economic relationship between the manufacturer payment and the patient's prescription decision. The foundation structure creates a legal fiction of independence.",
+    "scale_dollars": 450000000,
+    "scale_defendants": 1,
+    "scale_duration": "Multiple years",
+    "detection_method": "Whistleblower (qui tam action)",
+    "qualities": ["V5", "V7"]
+  }
+]

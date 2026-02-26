@@ -1,0 +1,38 @@
+You are refining a draft vulnerability quality from a structural taxonomy.
+
+DRAFT QUALITY:
+Name: {quality_name}
+Definition: {quality_definition}
+
+EXAMPLE ENABLING CONDITIONS that belong to this cluster:
+{example_conditions}
+
+OTHER QUALITIES IN THE TAXONOMY (for independence checking):
+{other_quality_names}
+
+Refine this quality by providing:
+
+1. name: Keep or improve the name. It should be 3-6 words, memorable, and domain-agnostic.
+
+2. definition: A single precise sentence defining the structural property. It must be specific enough that two independent analysts would AGREE on whether a given policy has this quality. Avoid vague language like "weak," "insufficient," or "inadequate."
+
+3. recognition_test: A set of 3-5 concrete YES/NO questions an analyst can ask about ANY policy to determine if this quality is present. These questions should be answerable from the policy's design documents without needing operational data.
+
+   Good: "Is payment issued to the provider before an independent party confirms the service was delivered?"
+   Bad: "Is oversight sufficient?" (subjective, not answerable from design docs)
+
+4. exploitation_logic: The causal mechanism. WHY does this structural property create exploitable conditions? What specific action does it enable a bad actor to take? This should be a 2-3 sentence explanation of the cause-and-effect chain from the structural property to the exploitative behavior it enables.
+
+5. canonical_examples: 2-3 brief examples from the cases, showing how this quality manifested in specific real policies.
+
+6. independence_check: Could this quality exist WITHOUT each of the other qualities in the taxonomy? If it ALWAYS co-occurs with another quality, explain why they should or should not be merged.
+
+Return ONLY valid JSON:
+{{
+  "name": "...",
+  "definition": "...",
+  "recognition_test": "...",
+  "exploitation_logic": "...",
+  "canonical_examples": ["...", "..."],
+  "independence_check": "..."
+}}

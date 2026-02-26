@@ -1,0 +1,68 @@
+[
+  {
+    "pattern_id": "D001",
+    "prediction_id": "PR001",
+    "policy_name": "HCBS",
+    "data_source": "EVV (Electronic Visit Verification) + TAF Claims",
+    "anomaly_signal": "Providers billing >16 hours/day of personal care services per attendant, where P95 for legitimate providers is 10 hours/day",
+    "baseline": "Historical distribution of daily service hours per attendant, by state and service type",
+    "false_positive_risk": "Live-in caregivers in self-directed programs may legitimately bill extended hours",
+    "detection_latency": "30-60 days (EVV data available within weeks)",
+    "priority": "critical"
+  },
+  {
+    "pattern_id": "D002",
+    "prediction_id": "PR001",
+    "policy_name": "HCBS",
+    "data_source": "PECOS/State Provider Enrollment + TAF Claims",
+    "anomaly_signal": "Newly enrolled HCBS agencies (within 90 days) generating >$200K in first-quarter claims, where median for new agencies is $15K",
+    "baseline": "Distribution of first-quarter billing for new HCBS providers, by state",
+    "false_positive_risk": "Acquisitions of existing agencies may appear as new enrollments with immediate high volume",
+    "detection_latency": "90 days",
+    "priority": "critical"
+  },
+  {
+    "pattern_id": "D003",
+    "prediction_id": "PR001",
+    "policy_name": "HCBS",
+    "data_source": "TAF Claims + Beneficiary Enrollment",
+    "anomaly_signal": "HCBS personal care claims for beneficiaries simultaneously enrolled in residential facilities (ALF, group homes) where personal care would be duplicative",
+    "baseline": "Cross-reference HCBS claims with facility enrollment records",
+    "false_positive_risk": "Some HCBS services are legitimately provided in residential settings (e.g., community integration)",
+    "detection_latency": "3-6 months (requires facility enrollment data matching)",
+    "priority": "high"
+  },
+  {
+    "pattern_id": "D004",
+    "prediction_id": "PR002",
+    "policy_name": "PACE",
+    "data_source": "PACE Encounter Data + MBSF",
+    "anomaly_signal": "PACE organizations with participant hospitalization rates >50% below comparable FFS dual-eligible population, suggesting systematic access barriers or undertriage",
+    "baseline": "Expected hospitalization rates for nursing-facility-eligible dual populations by geographic area",
+    "false_positive_risk": "Well-managed PACE programs legitimately reduce hospitalizations through preventive care",
+    "detection_latency": "6-12 months (requires sufficient enrollment duration)",
+    "priority": "high"
+  },
+  {
+    "pattern_id": "D005",
+    "prediction_id": "PR003",
+    "policy_name": "Hospital-at-Home",
+    "data_source": "CCLF Claims + AHCAH Waiver Registry",
+    "anomaly_signal": "AHCAH programs billing acute DRG rates with average length-of-stay <2 days or readmission rates >30% (suggesting patients discharged from home care prematurely or never truly acute)",
+    "baseline": "Inpatient DRG-specific average LOS and readmission rates for comparable diagnoses",
+    "false_positive_risk": "Some conditions treated at home may genuinely resolve faster than inpatient equivalents",
+    "detection_latency": "3-6 months",
+    "priority": "high"
+  },
+  {
+    "pattern_id": "D006",
+    "prediction_id": "PR004",
+    "policy_name": "340B Drug Pricing",
+    "data_source": "340B OPAIS + PDE + TAF Pharmacy Claims",
+    "anomaly_signal": "340B covered entities with contract pharmacy volume >500% of in-house pharmacy volume, or contract pharmacies >50 miles from any covered entity site",
+    "baseline": "Distribution of contract-to-in-house pharmacy ratios across covered entity types",
+    "false_positive_risk": "Rural covered entities may legitimately rely heavily on distant contract pharmacies",
+    "detection_latency": "Quarterly (OPAIS data updated quarterly)",
+    "priority": "medium"
+  }
+]

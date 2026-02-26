@@ -1,0 +1,26 @@
+You are scoring a known exploitation case against a vulnerability taxonomy.
+
+CASE: {case_name}
+EXPLOITED POLICY: {exploited_policy}
+SCHEME MECHANICS: {scheme_mechanics}
+ENABLING CONDITION: {enabling_condition}
+
+TAXONOMY:
+{taxonomy}
+
+For EACH quality in the taxonomy, apply its recognition test to the exploited policy described above.
+
+Rules:
+- Mark PRESENT only if the policy CLEARLY exhibits the structural property
+- Mark ABSENT if ambiguous or not clearly present
+- The evidence field should cite the SPECIFIC feature of this policy that does or does not match, in one sentence
+- Do not infer qualities that aren't directly observable from the case description
+
+Return ONLY valid JSON:
+{{
+  "scores": {{
+    "V1": {{"present": true/false, "evidence": "..."}},
+    "V2": {{"present": true/false, "evidence": "..."}},
+    ...
+  }}
+}}
