@@ -11,9 +11,11 @@ Deployed as Lambda:
     handler = svap.api.handler
 """
 
+import base64
 import json
 import logging
 import os
+import re
 import traceback
 from datetime import UTC, datetime
 
@@ -40,13 +42,60 @@ logger.setLevel(os.environ.get("LOG_LEVEL", "INFO"))
 
 # ── Configuration ────────────────────────────────────────────────────────
 
-CONFIG_PATH = os.environ.get("SVAP_CONFIG", "config.yaml")
 DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://svap:password@localhost:5432/svap")
 IS_LAMBDA = bool(os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
 PIPELINE_STATE_MACHINE_ARN = os.environ.get("PIPELINE_STATE_MACHINE_ARN", "")
+CONFIG_BUCKET = os.environ.get("SVAP_CONFIG_BUCKET", "")
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────
+
+_DEFAULT_CONFIG = {
+    "bedrock": {
+        "region": "us-east-1",
+        "model_id": "anthropic.claude-sonnet-4-20250514-v1:0",
+        "max_tokens": 4096,
+        "temperature": 0.2,
+        "retry_attempts": 3,
+        "retry_delay_seconds": 5,
+    },
+    "rag": {
+        "chunk_size": 1500,
+        "chunk_overlap": 200,
+        "max_context_chunks": 10,
+        "embedding_model": None,
+    },
+    "pipeline": {
+        "human_gates": [2, 5],
+        "max_concurrency": 5,
+        "export_dir": "/tmp/results",
+    },
+}
+
+
+def _get_config(overrides: dict | None = None) -> dict:
+    """Load pipeline config from S3 (Lambda) or local file (dev)."""
+    config = {}
+    if CONFIG_BUCKET:
+        try:
+            import boto3
+            import yaml
+
+            obj = boto3.client("s3").get_object(Bucket=CONFIG_BUCKET, Key="config.yaml")
+            config = yaml.safe_load(obj["Body"].read())
+        except Exception:
+            config = dict(_DEFAULT_CONFIG)
+    else:
+        try:
+            from svap.orchestrator import _load_config
+
+            config = _load_config("config.yaml")
+        except FileNotFoundError:
+            config = dict(_DEFAULT_CONFIG)
+
+    if overrides:
+        config.update(overrides)
+    return config
 
 
 class ApiError(Exception):
@@ -108,6 +157,7 @@ def _error(status_code: int, message: str) -> dict:
 
 def _dashboard(event):
     storage = get_storage()
+    storage.seed_enforcement_sources_if_empty()
     run_id = storage.get_latest_run()
     if not run_id:
         return {
@@ -130,7 +180,7 @@ def _dashboard(event):
             "case_convergence": [],
             "policy_convergence": [],
             "policy_catalog": HHS_POLICY_CATALOG,
-            "enforcement_sources": ENFORCEMENT_SOURCES,
+            "enforcement_sources": storage.get_enforcement_sources(),
             "data_sources": HHS_DATA_SOURCES,
             "scanned_programs": SCANNED_PROGRAMS,
         }
@@ -270,11 +320,7 @@ def _run_pipeline(event):
     storage = get_storage()
     run_id = f"run_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}"
 
-    from svap.orchestrator import _load_config
-
-    config = _load_config(CONFIG_PATH)
-    if body.get("config_overrides"):
-        config.update(body["config_overrides"])
+    config = _get_config(body.get("config_overrides"))
     storage.create_run(run_id, config=config, notes=body.get("notes", ""))
 
     if IS_LAMBDA and PIPELINE_STATE_MACHINE_ARN:
@@ -336,6 +382,117 @@ def _health(event):
     return {"status": "ok", "database": "postgresql", "lambda": IS_LAMBDA}
 
 
+# ── Enforcement source management ────────────────────────────────────────
+
+
+def _list_enforcement_sources(event):
+    storage = get_storage()
+    storage.seed_enforcement_sources_if_empty()
+    return storage.get_enforcement_sources()
+
+
+def _create_enforcement_source(event):
+    body = _json_body(event)
+    name = body.get("name", "").strip()
+    if not name:
+        raise ApiError(400, "Missing required field: name")
+
+    source_id = body.get("source_id") or re.sub(r"[^a-z0-9_]", "", name.lower().replace(" ", "_"))[:50]
+    storage = get_storage()
+    if storage.get_enforcement_source(source_id):
+        raise ApiError(409, f"Source '{source_id}' already exists")
+
+    storage.upsert_enforcement_source(
+        {
+            "source_id": source_id,
+            "name": name,
+            "url": body.get("url"),
+            "source_type": body.get("source_type", "press_release"),
+            "description": body.get("description", ""),
+        }
+    )
+    return storage.get_enforcement_source(source_id)
+
+
+def _upload_enforcement_document(event):
+    body = _json_body(event)
+    source_id = body.get("source_id")
+    filename = body.get("filename")
+    content_b64 = body.get("content")
+
+    if not all([source_id, filename, content_b64]):
+        raise ApiError(400, "Missing source_id, filename, or content")
+
+    storage = get_storage()
+    source = storage.get_enforcement_source(source_id)
+    if not source:
+        raise ApiError(404, f"Source '{source_id}' not found")
+
+    file_bytes = base64.b64decode(content_b64)
+
+    # Extract text based on file type
+    from svap.stages.stage0_source_fetch import _extract_text
+
+    lower_name = filename.lower()
+    if lower_name.endswith((".html", ".htm")):
+        text = _extract_text(file_bytes.decode("utf-8", errors="replace"))
+    else:
+        text = file_bytes.decode("utf-8", errors="replace")
+
+    if len(text) < 100:
+        raise ApiError(400, "Extracted text too short — document may be empty or unreadable")
+
+    # Store to S3
+    s3_key = f"enforcement-sources/{source_id}/{filename}"
+    _upload_to_s3(s3_key, file_bytes, "application/octet-stream")
+
+    # Ingest into RAG store
+    from svap.rag import DocumentIngester
+
+    config = _get_config()
+    ingester = DocumentIngester(storage, config)
+    doc_id, n_chunks = ingester.ingest_text(
+        text=text,
+        filename=source_id,
+        doc_type="enforcement",
+        metadata={"source_id": source_id, "original_filename": filename, "s3_key": s3_key},
+    )
+
+    storage.update_enforcement_source_document(source_id, s3_key=s3_key, doc_id=doc_id)
+
+    return {
+        "source_id": source_id,
+        "doc_id": doc_id,
+        "chunks": n_chunks,
+        "s3_key": s3_key,
+        "text_length": len(text),
+    }
+
+
+def _delete_enforcement_source(event):
+    body = _json_body(event)
+    source_id = body.get("source_id")
+    if not source_id:
+        raise ApiError(400, "Missing source_id")
+
+    storage = get_storage()
+    if not storage.get_enforcement_source(source_id):
+        raise ApiError(404, f"Source '{source_id}' not found")
+
+    storage.delete_enforcement_source(source_id)
+    return {"status": "deleted", "source_id": source_id}
+
+
+def _upload_to_s3(key: str, body: bytes, content_type: str):
+    import boto3
+
+    bucket = CONFIG_BUCKET
+    if not bucket:
+        logger.warning("SVAP_CONFIG_BUCKET not set, skipping S3 upload")
+        return
+    boto3.client("s3").put_object(Bucket=bucket, Key=key, Body=body, ContentType=content_type)
+
+
 # ── Route table ─────────────────────────────────────────────────────────
 # Keys are the exact routeKey strings from API Gateway V2, matching the
 # routes list in infrastructure/terraform/svap.tf.
@@ -357,6 +514,10 @@ ROUTES = {
     "GET /api/hhs/policy-catalog/flat": _policy_catalog_flat,
     "GET /api/hhs/enforcement-sources": _enforcement_sources,
     "GET /api/hhs/data-sources": _data_sources,
+    "GET /api/enforcement-sources": _list_enforcement_sources,
+    "POST /api/enforcement-sources": _create_enforcement_source,
+    "POST /api/enforcement-sources/upload": _upload_enforcement_document,
+    "POST /api/enforcement-sources/delete": _delete_enforcement_source,
     "POST /api/pipeline/run": _run_pipeline,
     "POST /api/pipeline/approve": _approve_stage,
     "POST /api/pipeline/seed": _seed_pipeline,

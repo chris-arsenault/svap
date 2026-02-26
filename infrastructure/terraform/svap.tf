@@ -265,6 +265,10 @@ module "api" {
     "GET /api/hhs/policy-catalog/flat",
     "GET /api/hhs/enforcement-sources",
     "GET /api/hhs/data-sources",
+    "GET /api/enforcement-sources",
+    "POST /api/enforcement-sources",
+    "POST /api/enforcement-sources/upload",
+    "POST /api/enforcement-sources/delete",
     "POST /api/pipeline/run",
     "POST /api/pipeline/approve",
     "POST /api/pipeline/seed",
@@ -340,9 +344,22 @@ resource "aws_sfn_state_machine" "pipeline" {
   role_arn = aws_iam_role.sfn.arn
 
   definition = jsonencode({
-    Comment = "SVAP 6-stage pipeline with human gates at stages 2 and 5"
-    StartAt = "Stage1_CaseAssembly"
+    Comment = "SVAP 7-stage pipeline (0-6) with human gates at stages 2 and 5"
+    StartAt = "Stage0_SourceFetch"
     States = {
+      Stage0_SourceFetch = {
+        Type     = "Task"
+        Resource = "arn:aws:states:::lambda:invoke"
+        Parameters = {
+          FunctionName = aws_lambda_function.stage_runner.arn
+          Payload = {
+            "run_id.$" = "$.run_id"
+            stage      = 0
+          }
+        }
+        ResultPath = "$.stage0_result"
+        Next       = "Stage1_CaseAssembly"
+      }
       Stage1_CaseAssembly = {
         Type     = "Task"
         Resource = "arn:aws:states:::lambda:invoke"

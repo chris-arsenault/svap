@@ -23,6 +23,7 @@ from pathlib import Path
 import yaml
 
 from svap.stages import (
+    stage0_source_fetch,
     stage1_case_assembly,
     stage2_taxonomy,
     stage3_scoring,
@@ -33,6 +34,7 @@ from svap.stages import (
 from svap.storage import SVAPStorage
 
 STAGES = {
+    0: stage0_source_fetch,
     1: stage1_case_assembly,
     2: stage2_taxonomy,
     3: stage3_scoring,
@@ -63,13 +65,13 @@ def cmd_run(args, config):
         storage.create_run(run_id, config, notes="CLI run")
     print(f"Run ID: {run_id}")
 
-    stages_to_run = [1, 2, 3, 4, 5, 6] if args.stage == "all" else [int(args.stage)]
+    stages_to_run = [0, 1, 2, 3, 4, 5, 6] if args.stage == "all" else [int(args.stage)]
 
     human_gates = config.get("pipeline", {}).get("human_gates", [2, 5])
 
     for stage_num in stages_to_run:
         # Check prerequisites
-        if stage_num > 1:
+        if stage_num > 0:
             prev_status = storage.get_stage_status(run_id, stage_num - 1)
             if prev_status not in ("completed", "approved"):
                 if prev_status == "pending_review":
@@ -227,9 +229,9 @@ def _seed(storage, config=None):
 
 
 def _mark_seed_stages_complete(storage, run_id):
-    """Mark all 6 stages as completed and approve human gates."""
+    """Mark all stages as completed and approve human gates."""
     print("  Marking all stages as completed...")
-    for stage in range(1, 7):
+    for stage in range(0, 7):
         storage.log_stage_start(run_id, stage)
         storage.log_stage_complete(run_id, stage, {"source": "seed_data"})
     for gate_stage in [2, 5]:
@@ -258,7 +260,7 @@ def _run_stage(storage, run_id: str, stage: int, config: dict):
     human_gates = config.get("pipeline", {}).get("human_gates", [2, 5])
 
     # Check prerequisites
-    if stage > 1:
+    if stage > 0:
         prev_status = storage.get_stage_status(run_id, stage - 1)
         if prev_status not in ("completed", "approved"):
             raise RuntimeError(
@@ -293,6 +295,7 @@ def cmd_status(args, config):
     status = storage.get_pipeline_status(run_id)
 
     stage_names = {
+        0: "Source Fetching",
         1: "Case Assembly",
         2: "Taxonomy Extraction",
         3: "Convergence Scoring",
@@ -309,7 +312,7 @@ def cmd_status(args, config):
             latest[stage] = s
 
     print("\n  Pipeline Status:")
-    for stage_num in range(1, 7):
+    for stage_num in range(0, 7):
         s = latest.get(stage_num)
         icon = {
             "completed": "✅",
@@ -482,7 +485,7 @@ def main():
 
     # Run
     run_parser = subparsers.add_parser("run", help="Run pipeline stages")
-    run_parser.add_argument("--stage", required=True, help="Stage number (1-6) or 'all'")
+    run_parser.add_argument("--stage", required=True, help="Stage number (0-6) or 'all'")
     run_parser.add_argument("--config", default="config.yaml")
 
     # Seed

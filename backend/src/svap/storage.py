@@ -174,6 +174,22 @@ SCHEMA_STATEMENTS = [
         token_count         INTEGER,
         FOREIGN KEY (doc_id) REFERENCES documents(doc_id)
     )""",
+    # Enforcement source registry (mutable, not tied to a run)
+    """CREATE TABLE IF NOT EXISTS enforcement_sources (
+        source_id         TEXT PRIMARY KEY,
+        name              TEXT NOT NULL,
+        url               TEXT,
+        source_type       TEXT NOT NULL DEFAULT 'press_release',
+        description       TEXT,
+        has_document      BOOLEAN NOT NULL DEFAULT FALSE,
+        s3_key            TEXT,
+        doc_id            TEXT,
+        summary           TEXT,
+        validation_status TEXT DEFAULT 'pending'
+            CHECK(validation_status IN ('pending','valid','invalid','error')),
+        created_at        TEXT NOT NULL,
+        updated_at        TEXT NOT NULL
+    )""",
     # Unique indexes for upsert conflict targets
     "CREATE UNIQUE INDEX IF NOT EXISTS uq_convergence ON convergence_scores(run_id, case_id, quality_id)",
     "CREATE UNIQUE INDEX IF NOT EXISTS uq_policy_score ON policy_scores(run_id, policy_id, quality_id)",
@@ -708,6 +724,116 @@ class SVAPStorage:
             )
             row = cur.fetchone()
         return row["task_token"] if row else None
+
+
+    # ── Enforcement Sources ────────────────────────────────────────
+
+    def upsert_enforcement_source(self, source: dict):
+        with self.conn.cursor() as cur:
+            cur.execute(
+                """INSERT INTO enforcement_sources
+                (source_id, name, url, source_type, description,
+                 has_document, s3_key, doc_id, summary, validation_status,
+                 created_at, updated_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (source_id) DO UPDATE SET
+                    name = EXCLUDED.name,
+                    url = EXCLUDED.url,
+                    source_type = EXCLUDED.source_type,
+                    description = EXCLUDED.description,
+                    has_document = EXCLUDED.has_document,
+                    s3_key = EXCLUDED.s3_key,
+                    doc_id = EXCLUDED.doc_id,
+                    summary = EXCLUDED.summary,
+                    validation_status = EXCLUDED.validation_status,
+                    updated_at = EXCLUDED.updated_at""",
+                (
+                    source["source_id"],
+                    source["name"],
+                    source.get("url"),
+                    source.get("source_type", "press_release"),
+                    source.get("description"),
+                    source.get("has_document", False),
+                    source.get("s3_key"),
+                    source.get("doc_id"),
+                    source.get("summary"),
+                    source.get("validation_status", "pending"),
+                    source.get("created_at", _now()),
+                    _now(),
+                ),
+            )
+        self._safe_commit()
+
+    def get_enforcement_sources(self) -> list[dict]:
+        with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute("SELECT * FROM enforcement_sources ORDER BY created_at")
+            rows = cur.fetchall()
+        return [dict(r) for r in rows]
+
+    def get_enforcement_source(self, source_id: str) -> dict | None:
+        with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute(
+                "SELECT * FROM enforcement_sources WHERE source_id = %s",
+                (source_id,),
+            )
+            row = cur.fetchone()
+        return dict(row) if row else None
+
+    def delete_enforcement_source(self, source_id: str):
+        with self.conn.cursor() as cur:
+            cur.execute(
+                "DELETE FROM enforcement_sources WHERE source_id = %s",
+                (source_id,),
+            )
+        self._safe_commit()
+
+    def update_enforcement_source_document(
+        self, source_id: str, s3_key: str, doc_id: str
+    ):
+        with self.conn.cursor() as cur:
+            cur.execute(
+                """UPDATE enforcement_sources
+                   SET has_document = TRUE, s3_key = %s, doc_id = %s,
+                       validation_status = 'pending', updated_at = %s
+                   WHERE source_id = %s""",
+                (s3_key, doc_id, _now(), source_id),
+            )
+        self._safe_commit()
+
+    def update_enforcement_source_summary(
+        self, source_id: str, summary: str, validation_status: str
+    ):
+        with self.conn.cursor() as cur:
+            cur.execute(
+                """UPDATE enforcement_sources
+                   SET summary = %s, validation_status = %s, updated_at = %s
+                   WHERE source_id = %s""",
+                (summary, validation_status, _now(), source_id),
+            )
+        self._safe_commit()
+
+    def seed_enforcement_sources_if_empty(self):
+        with self.conn.cursor() as cur:
+            cur.execute("SELECT COUNT(*) FROM enforcement_sources")
+            count = cur.fetchone()[0]
+        if count > 0:
+            return False
+        from pathlib import Path
+
+        seed_path = Path(__file__).parent / "seed" / "enforcement_sources.json"
+        with open(seed_path) as f:
+            sources = json.load(f)
+        for s in sources:
+            self.upsert_enforcement_source(
+                {
+                    "source_id": s["id"],
+                    "name": s["name"],
+                    "url": s["url"],
+                    "source_type": s.get("type", "press_release"),
+                    "description": s.get("description", ""),
+                }
+            )
+        return True
 
 
 def _now() -> str:

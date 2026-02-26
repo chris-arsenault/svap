@@ -140,6 +140,7 @@ function TopCasesTable({ cases, onNavigate }: { cases: Case[]; onNavigate: (view
 }
 
 const STAGE_NAMES: Record<number, string> = {
+  0: "Fetch enforcement sources",
   1: "Ingest enforcement cases",
   2: "Build vulnerability taxonomy",
   3: "Scan policy catalog",
@@ -189,7 +190,7 @@ function PipelineControls() {
       </div>
       <div className="panel-body">
         <div className="pipeline-controls-stages">
-          {[1, 2, 3, 4, 5, 6].map((stage) => {
+          {[0, 1, 2, 3, 4, 5, 6].map((stage) => {
             const ps = pipeline_status.find((s) => s.stage === stage);
             const status: StageStatus = ps?.status ?? "idle";
             const needsApproval = HUMAN_GATE_STAGES.includes(stage) && status === "pending_review";

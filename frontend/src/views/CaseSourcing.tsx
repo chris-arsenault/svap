@@ -15,17 +15,18 @@ function SourceRegistry({ sources }: { sources: EnforcementSource[] }) {
       <div className="panel-body">
         <div className="source-grid">
           {sources.map((src) => (
-            <div key={src.id} className="source-card">
+            <div key={src.source_id} className="source-card">
               <div className="source-card-header">
                 <div className="source-card-name">{src.name}</div>
-                <a href={src.url} target="_blank" rel="noreferrer" className="source-card-link">
-                  <ExternalLink size={14} />
-                </a>
+                {src.url && (
+                  <a href={src.url} target="_blank" rel="noreferrer" className="source-card-link">
+                    <ExternalLink size={14} />
+                  </a>
+                )}
               </div>
               <div className="source-card-desc">{src.description}</div>
               <div className="source-card-badges">
-                <span className="badge badge-neutral">{src.type.replace("_", " ")}</span>
-                <span className="badge badge-neutral">{src.frequency}</span>
+                <span className="badge badge-neutral">{src.source_type.replace("_", " ")}</span>
               </div>
             </div>
           ))}

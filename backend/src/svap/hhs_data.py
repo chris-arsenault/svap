@@ -82,7 +82,7 @@ def get_dashboard_data(storage, run_id: str) -> dict:
         "case_convergence": build_case_convergence(cases, convergence_matrix),
         "policy_convergence": build_policy_convergence(enriched_policies),
         "policy_catalog": HHS_POLICY_CATALOG,
-        "enforcement_sources": ENFORCEMENT_SOURCES,
+        "enforcement_sources": storage.get_enforcement_sources(),
         "data_sources": HHS_DATA_SOURCES,
         "scanned_programs": SCANNED_PROGRAMS,
     }

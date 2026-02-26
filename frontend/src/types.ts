@@ -3,6 +3,7 @@ export type StageStatus = "idle" | "pending" | "running" | "completed" | "pendin
 export type RiskLevel = "critical" | "high" | "medium" | "low";
 export type ViewId =
   | "dashboard"
+  | "sources"
   | "cases"
   | "policies"
   | "taxonomy"
@@ -75,13 +76,21 @@ export interface DetectionPattern {
   false_positive_risk: string;
 }
 
+export type ValidationStatus = "pending" | "valid" | "invalid" | "error";
+
 export interface EnforcementSource {
-  id: string;
+  source_id: string;
   name: string;
   description: string;
-  url: string;
-  type: string;
-  frequency: string;
+  url: string | null;
+  source_type: string;
+  has_document: boolean;
+  s3_key: string | null;
+  doc_id: string | null;
+  summary: string | null;
+  validation_status: ValidationStatus;
+  created_at: string;
+  updated_at: string;
 }
 
 // Raw data from API/fallback (before computed fields)
@@ -115,6 +124,9 @@ export interface PipelineData extends FallbackData {
   runPipeline: () => Promise<unknown>;
   approveStage: (stage: number) => Promise<unknown>;
   seedPipeline: () => Promise<unknown>;
+  uploadSourceDocument: (sourceId: string, file: File) => Promise<unknown>;
+  createSource: (source: { name: string; url?: string; description?: string }) => Promise<unknown>;
+  deleteSource: (sourceId: string) => Promise<unknown>;
 }
 
 // Common view props

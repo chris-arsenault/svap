@@ -1,6 +1,7 @@
 import React from "react";
 import {
   LayoutDashboard,
+  Database,
   FileSearch,
   FolderTree,
   Tags,
@@ -29,6 +30,7 @@ function isSection(item: NavItem): item is NavSection {
 const NAV_ITEMS: NavItem[] = [
   { section: "Analysis" },
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { id: "sources", label: "Sources", icon: Database },
   { id: "cases", label: "Case Sourcing", icon: FileSearch, countKey: "cases" },
   { id: "policies", label: "Policy Explorer", icon: FolderTree },
   { section: "Pipeline Results" },
@@ -39,6 +41,7 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 const STAGE_NAMES: Record<number, string> = {
+  0: "Source Fetching",
   1: "Case Assembly",
   2: "Taxonomy Extraction",
   3: "Convergence Scoring",

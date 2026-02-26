@@ -121,6 +121,46 @@ export function usePipelineData(token: string): PipelineData {
     return result;
   }, [apiAvailable, fetchDashboard, token]);
 
+  const uploadSourceDocument = useCallback(
+    async (sourceId: string, file: File) => {
+      if (!apiAvailable) throw new Error("API not available");
+      const buffer = await file.arrayBuffer();
+      const bytes = new Uint8Array(buffer);
+      let binary = "";
+      for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+      }
+      const result = await apiPost(
+        "/enforcement-sources/upload",
+        { source_id: sourceId, filename: file.name, content: btoa(binary) },
+        token
+      );
+      await fetchDashboard();
+      return result;
+    },
+    [apiAvailable, fetchDashboard, token]
+  );
+
+  const createSource = useCallback(
+    async (source: { name: string; url?: string; description?: string }) => {
+      if (!apiAvailable) throw new Error("API not available");
+      const result = await apiPost("/enforcement-sources", source, token);
+      await fetchDashboard();
+      return result;
+    },
+    [apiAvailable, fetchDashboard, token]
+  );
+
+  const deleteSource = useCallback(
+    async (sourceId: string) => {
+      if (!apiAvailable) throw new Error("API not available");
+      const result = await apiPost("/enforcement-sources/delete", { source_id: sourceId }, token);
+      await fetchDashboard();
+      return result;
+    },
+    [apiAvailable, fetchDashboard, token]
+  );
+
   return {
     ...data,
     threshold: data.calibration?.threshold ?? 3,
@@ -132,6 +172,9 @@ export function usePipelineData(token: string): PipelineData {
     runPipeline,
     approveStage,
     seedPipeline,
+    uploadSourceDocument,
+    createSource,
+    deleteSource,
   };
 }
 

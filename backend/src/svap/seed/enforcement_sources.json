@@ -1,66 +1,58 @@
 [
   {
-    "id": "oig_newsroom",
-    "name": "HHS OIG Newsroom",
-    "url": "https://oig.hhs.gov/newsroom/",
-    "type": "press_releases",
-    "description": "Official OIG enforcement announcements, audit reports, and data briefs",
-    "frequency": "Weekly"
+    "id": "operation_gold_rush",
+    "name": "Operation Gold Rush — $10.6B DME Fraud",
+    "url": "https://www.justice.gov/usao-edny/pr/11-defendants-indicted-multi-billion-health-care-fraud-scheme-largest-case-loss-amount",
+    "type": "press_release",
+    "description": "11 defendants indicted in multi-billion-dollar transnational DME fraud scheme — largest case by loss amount ever charged by DOJ"
   },
   {
-    "id": "doj_healthcare",
-    "name": "DOJ Healthcare Fraud Unit",
-    "url": "https://www.justice.gov/criminal/criminal-fraud/health-care-fraud-unit",
-    "type": "press_releases",
-    "description": "DOJ Criminal Division healthcare fraud prosecutions and national takedowns",
-    "frequency": "Weekly"
+    "id": "kaiser_risk_adjustment",
+    "name": "Kaiser Permanente MA Risk Adjustment — $556M Settlement",
+    "url": "https://www.justice.gov/opa/pr/kaiser-permanente-affiliates-pay-556m-resolve-false-claims-act-allegations",
+    "type": "press_release",
+    "description": "Kaiser Permanente affiliates pay $556M to resolve False Claims Act allegations of inflated Medicare Advantage risk adjustment diagnoses"
   },
   {
-    "id": "doj_fca",
-    "name": "DOJ False Claims Act Settlements",
-    "url": "https://www.justice.gov/civil/fraud-statistics",
-    "type": "settlements",
-    "description": "Annual FCA statistics and major settlement announcements",
-    "frequency": "Annual"
+    "id": "wound_graft_fraud",
+    "name": "Gehrke/King Wound Graft Fraud — $1.2B",
+    "url": "https://www.justice.gov/opa/pr/wound-graft-company-owners-sentenced-12b-health-care-fraud-and-agree-pay-309m-resolve-civil",
+    "type": "press_release",
+    "description": "Wound graft company owners sentenced for $1.2B health care fraud involving skin substitute products billed without medical necessity"
   },
   {
-    "id": "oig_workplan",
-    "name": "OIG Work Plan",
-    "url": "https://oig.hhs.gov/reports/workplan/",
-    "type": "planned_work",
-    "description": "Active and planned OIG audits, evaluations, and investigations",
-    "frequency": "Ongoing"
+    "id": "done_global_adderall",
+    "name": "Done Global Telehealth Adderall Mill — $100M",
+    "url": "https://www.justice.gov/opa/pr/founderceo-and-clinical-president-digital-health-company-convicted-100m-adderall",
+    "type": "press_release",
+    "description": "CEO and clinical president of digital health company convicted in $100M Adderall distribution and health care fraud scheme"
   },
   {
-    "id": "oig_semiannual",
-    "name": "OIG Semiannual Report",
-    "url": "https://oig.hhs.gov/reports/semiannual/",
-    "type": "summary_report",
-    "description": "Comprehensive summary of OIG enforcement activity and recommendations",
-    "frequency": "Biannual"
+    "id": "arizona_behavioral_health",
+    "name": "Arizona Medicaid Behavioral Health Fraud — $650M",
+    "url": "https://www.justice.gov/usao-az/pr/district-arizona-charges-7-defendants-part-national-health-care-fraud-takedown",
+    "type": "press_release",
+    "description": "District of Arizona charges 7 defendants as part of national health care fraud takedown — $650M in behavioral health fraud targeting AHCCCS Medicaid"
   },
   {
-    "id": "cms_pi",
-    "name": "CMS Program Integrity",
-    "url": "https://www.cms.gov/About-CMS/Components/CPI",
-    "type": "program_data",
-    "description": "Improper payment rates, CERT findings, SMRC referrals",
-    "frequency": "Annual"
+    "id": "california_sham_hospice",
+    "name": "California Sham Hospice Network — $16M",
+    "url": "https://www.justice.gov/opa/pr/four-california-residents-sentenced-prison-connection-16m-hospice-fraud-and-money-laundering",
+    "type": "press_release",
+    "description": "Four California residents sentenced for $16M hospice fraud and money laundering scheme involving sham hospice companies"
   },
   {
-    "id": "gao",
-    "name": "GAO Healthcare Reports",
-    "url": "https://www.gao.gov/topics/health",
-    "type": "audit_reports",
-    "description": "GAO audits including High Risk List updates for Medicare/Medicaid",
-    "frequency": "As published"
+    "id": "aca_marketplace_fraud",
+    "name": "ACA Marketplace Enrollment Fraud — $21B GAO Finding",
+    "url": "https://www.gao.gov/products/gao-26-108742",
+    "type": "audit_report",
+    "description": "GAO report on ACA fraud risks — fictitious applicants approved for coverage and APTC subsidies worth billions"
   },
   {
-    "id": "mfcu",
-    "name": "State MFCU Activity",
-    "url": "https://oig.hhs.gov/fraud/medicaid-fraud-control-units/",
-    "type": "state_enforcement",
-    "description": "Medicaid Fraud Control Unit statistical reports by state",
-    "frequency": "Annual"
+    "id": "teva_copay_kickback",
+    "name": "Teva Pharmaceuticals Copay Kickback — $450M",
+    "url": "https://www.justice.gov/archives/opa/pr/drug-maker-teva-pharmaceuticals-agrees-pay-450m-false-claims-act-settlement-resolve-kickback",
+    "type": "press_release",
+    "description": "Teva Pharmaceuticals pays $450M to resolve kickback allegations involving copay assistance foundations"
   }
 ]

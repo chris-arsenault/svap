@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, type FormEvent } from "react";
 import { PipelineProvider, usePipeline } from "./data/usePipelineData";
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./views/Dashboard";
+import SourcesView from "./views/SourcesView";
 import CaseSourcing from "./views/CaseSourcing";
 import PolicyExplorer from "./views/PolicyExplorer";
 import TaxonomyView from "./views/TaxonomyView";
@@ -19,6 +20,7 @@ type AuthState = {
 
 const VIEWS: Record<ViewId, React.ComponentType<ViewProps>> = {
   dashboard: Dashboard,
+  sources: SourcesView,
   cases: CaseSourcing,
   policies: PolicyExplorer,
   taxonomy: TaxonomyView,
