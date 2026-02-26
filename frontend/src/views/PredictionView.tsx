@@ -24,8 +24,7 @@ function PredictionCard({
   return (
     <div className="panel stagger-in">
       <div
-        className="panel-header"
-        style={{ cursor: "pointer" }}
+        className="panel-header clickable"
         role="button"
         tabIndex={0}
         onClick={() => onToggleId(pred.prediction_id)}
@@ -36,25 +35,16 @@ function PredictionCard({
           }
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div className="prediction-header-left">
           {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
           <div>
-            <h3 style={{ textTransform: "none", letterSpacing: 0 }}>{pred.policy_name}</h3>
-            <div
-              style={{
-                fontSize: 11,
-                color: "var(--text-muted)",
-                fontFamily: "var(--font-body)",
-                textTransform: "none",
-                letterSpacing: 0,
-                marginTop: 2,
-              }}
-            >
+            <h3 className="prediction-policy-name">{pred.policy_name}</h3>
+            <div className="prediction-lifecycle-stage">
               {pred.lifecycle_stage}
             </div>
           </div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div className="prediction-header-right">
           <ScoreBar score={pred.convergence_score} threshold={3} />
           <Badge level={difficultyLevel(pred.detection_difficulty)}>
             {pred.detection_difficulty?.split("\u2014")[0]?.trim() || "Unknown"}
@@ -63,21 +53,21 @@ function PredictionCard({
       </div>
 
       {isExpanded && (
-        <div className="panel-body" style={{ borderTop: "1px solid var(--border-subtle)" }}>
+        <div className="panel-body panel-body-bordered">
           <div className="detail-grid-wide">
             <div>
               <div className="detail-label">Predicted Exploitation Mechanics</div>
-              <div style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7 }}>{pred.mechanics}</div>
+              <div className="prediction-detail-text">{pred.mechanics}</div>
             </div>
             <div>
               <div className="detail-label">Enabling Qualities</div>
-              <div style={{ marginBottom: 12 }}>
+              <div className="mb-3">
                 <QualityTags ids={pred.enabling_qualities} />
               </div>
               <div className="detail-label">Actor Profile</div>
-              <div style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.5 }}>{pred.actor_profile}</div>
+              <div className="prediction-detail-text">{pred.actor_profile}</div>
               <div className="detail-label">Detection Difficulty</div>
-              <div style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.5 }}>
+              <div className="prediction-detail-text">
                 {pred.detection_difficulty}
               </div>
             </div>

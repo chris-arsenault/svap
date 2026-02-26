@@ -1,4 +1,4 @@
-import { useState, useEffect, type FormEvent } from "react";
+import { useState, useEffect, useCallback, type FormEvent } from "react";
 import { PipelineProvider, usePipeline } from "./data/usePipelineData";
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./views/Dashboard";
@@ -29,8 +29,6 @@ const VIEWS: Record<ViewId, React.ComponentType<ViewProps>> = {
 
 export default function App() {
   const [auth, setAuth] = useState<AuthState>({ status: "loading", token: "", username: "" });
-  const [activeView, setActiveView] = useState<ViewId>("dashboard");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
@@ -74,10 +72,10 @@ export default function App() {
     }
   };
 
-  const handleSignOut = () => {
+  const handleSignOut = useCallback(() => {
     signOut();
     setAuth({ status: "signedOut", token: "", username: "" });
-  };
+  }, []);
 
   // Loading state
   if (auth.status === "loading") {
@@ -106,17 +104,29 @@ export default function App() {
   }
 
   // Authenticated — full app
+  return <AuthenticatedApp token={auth.token} username={auth.username} onSignOut={handleSignOut} />;
+}
+
+function AuthenticatedApp({ token, username, onSignOut }: { token: string; username: string; onSignOut: () => void }) {
+  const [activeView, setActiveView] = useState<ViewId>("dashboard");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const handleNavigate = useCallback((view: ViewId) => {
+    setActiveView(view);
+    setSidebarOpen(false);
+  }, []);
+
   const ViewComponent = VIEWS[activeView] || Dashboard;
   return (
-    <PipelineProvider token={auth.token}>
+    <PipelineProvider token={token}>
       <div className={`app-layout ${sidebarOpen ? "sidebar-open" : ""}`}>
         {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
         <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
         <Sidebar
           activeView={activeView}
-          onNavigate={(view) => { setActiveView(view); setSidebarOpen(false); }}
-          onSignOut={handleSignOut}
-          username={auth.username}
+          onNavigate={handleNavigate}
+          onSignOut={onSignOut}
+          username={username}
         />
         <main className="main-content" key={activeView}>
           <button

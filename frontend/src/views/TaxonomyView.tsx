@@ -13,7 +13,7 @@ function QualityCard({
 }) {
   return (
     <div
-      className="stagger-in"
+      className="stagger-in quality-card"
       role="button"
       tabIndex={0}
       onClick={() => onSelectId(quality.quality_id)}
@@ -23,50 +23,40 @@ function QualityCard({
           onSelectId(quality.quality_id);
         }
       }}
+      // eslint-disable-next-line local/no-inline-styles
       style={{
         background: isSelected ? "var(--bg-elevated)" : "var(--bg-card)",
         border: `1px solid ${isSelected ? quality.color : "var(--border-subtle)"}`,
-        borderRadius: "var(--radius-lg)",
-        padding: "var(--sp-5)",
-        cursor: "pointer",
-        transition: "all 0.15s",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+      <div className="quality-card-header">
         <span
+          className="quality-card-id"
+          // eslint-disable-next-line local/no-inline-styles
           style={{
-            fontFamily: "var(--font-mono)",
-            fontSize: 12,
-            fontWeight: 700,
             color: quality.color,
             background: `color-mix(in srgb, ${quality.color} 15%, transparent)`,
-            padding: "2px 8px",
-            borderRadius: 3,
           }}
         >
           {quality.quality_id}
         </span>
-        <span
-          style={{
-            fontSize: 11,
-            color: "var(--text-muted)",
-            marginLeft: "auto",
-            fontFamily: "var(--font-mono)",
-          }}
-        >
+        <span className="quality-card-count">
           {quality.case_count} cases
         </span>
       </div>
-      <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 6 }}>{quality.name}</div>
-      <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.5 }}>{quality.definition}</div>
+      <div className="quality-card-name">{quality.name}</div>
+      <div className="quality-card-def">{quality.definition}</div>
     </div>
   );
 }
 
 function QualityDetail({ quality, matchingCases }: { quality: Quality; matchingCases: Case[] }) {
   return (
+    // eslint-disable-next-line local/no-inline-styles
     <div className="panel" style={{ borderColor: quality.color }}>
+      {/* eslint-disable-next-line local/no-inline-styles */}
       <div className="panel-header" style={{ borderBottomColor: quality.color }}>
+        {/* eslint-disable-next-line local/no-inline-styles */}
         <h3 style={{ color: quality.color }}>
           {quality.quality_id} — {quality.name}
         </h3>
@@ -75,29 +65,20 @@ function QualityDetail({ quality, matchingCases }: { quality: Quality; matchingC
         <div className="detail-grid">
           <div>
             <div className="detail-label">Recognition Test</div>
-            <div style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7 }}>
+            <div className="detail-text">
               {quality.recognition_test}
             </div>
             <div className="detail-label">Exploitation Logic</div>
-            <div style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7 }}>
+            <div className="detail-text">
               {quality.exploitation_logic}
             </div>
           </div>
           <div>
             <div className="detail-label">Cases Exhibiting This Quality</div>
             {matchingCases.map((c) => (
-              <div
-                key={c.case_id}
-                style={{
-                  padding: "8px 12px",
-                  marginBottom: 4,
-                  background: "var(--bg-elevated)",
-                  borderRadius: "var(--radius-sm)",
-                  fontSize: 12,
-                }}
-              >
-                <div style={{ fontWeight: 500, color: "var(--text-primary)" }}>{c.case_name}</div>
-                <div style={{ color: "var(--text-muted)", marginTop: 2 }}>{c.enabling_condition}</div>
+              <div key={c.case_id} className="quality-case-item">
+                <div className="quality-case-item-name">{c.case_name}</div>
+                <div className="quality-case-item-condition">{c.enabling_condition}</div>
               </div>
             ))}
           </div>
@@ -124,14 +105,7 @@ export default function TaxonomyView({ onNavigate: _onNavigate }: ViewProps) {
         </div>
       </div>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-          gap: "var(--sp-4)",
-          marginBottom: "var(--sp-6)",
-        }}
-      >
+      <div className="quality-grid">
         {taxonomy.map((q) => (
           <QualityCard
             key={q.quality_id}

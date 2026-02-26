@@ -9,27 +9,20 @@ function SourceRegistry({ sources }: { sources: EnforcementSource[] }) {
     <div className="panel stagger-in">
       <div className="panel-header">
         <h3>Enforcement Sources</h3>
-        <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{sources.length} sources</span>
+        <span className="panel-count">{sources.length} sources</span>
       </div>
       <div className="panel-body">
         <div className="source-grid">
           {sources.map((src) => (
             <div key={src.id} className="source-card">
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "flex-start",
-                  marginBottom: 8,
-                }}
-              >
-                <div style={{ fontWeight: 600, fontSize: 13 }}>{src.name}</div>
-                <a href={src.url} target="_blank" rel="noreferrer" style={{ color: "var(--accent)", flexShrink: 0 }}>
+              <div className="source-card-header">
+                <div className="source-card-name">{src.name}</div>
+                <a href={src.url} target="_blank" rel="noreferrer" className="source-card-link">
                   <ExternalLink size={14} />
                 </a>
               </div>
-              <div style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 8 }}>{src.description}</div>
-              <div style={{ display: "flex", gap: 8 }}>
+              <div className="source-card-desc">{src.description}</div>
+              <div className="source-card-badges">
                 <span className="badge badge-neutral">{src.type.replace("_", " ")}</span>
                 <span className="badge badge-neutral">{src.frequency}</span>
               </div>
@@ -53,28 +46,28 @@ function CaseRow({
   return (
     <React.Fragment>
       <tr className="detail-row" onClick={() => onToggleId(caseData.case_id)}>
-        <td style={{ color: "var(--text-muted)" }}>
+        <td className="case-row-toggle">
           {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
         </td>
-        <td style={{ fontWeight: 500 }}>{caseData.case_name}</td>
-        <td style={{ fontFamily: "var(--font-mono)", whiteSpace: "nowrap" }}>
+        <td className="td-name">{caseData.case_name}</td>
+        <td className="td-mono">
           {formatDollars(caseData.scale_dollars)}
         </td>
-        <td className="hide-on-mobile" style={{ fontSize: 12, color: "var(--text-secondary)" }}>{caseData.detection_method}</td>
+        <td className="hide-on-mobile case-row-detection">{caseData.detection_method}</td>
         <td>
           <QualityTags ids={caseData.qualities} />
         </td>
       </tr>
       {isExpanded && (
         <tr>
-          <td colSpan={5} style={{ padding: 0 }}>
+          <td colSpan={5} className="case-detail-cell">
             <div className="detail-expand">
               <div className="detail-label">Scheme Mechanics</div>
               <div>{caseData.scheme_mechanics}</div>
               <div className="detail-label">Exploited Policy</div>
               <div>{caseData.exploited_policy}</div>
               <div className="detail-label">Enabling Condition</div>
-              <div style={{ color: "var(--high)" }}>{caseData.enabling_condition}</div>
+              <div className="case-detail-condition">{caseData.enabling_condition}</div>
             </div>
           </td>
         </tr>
@@ -100,13 +93,13 @@ export default function CaseSourcing({ onNavigate: _onNavigate }: ViewProps) {
       <div className="panel stagger-in">
         <div className="panel-header">
           <h3>Case Corpus</h3>
-          <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{cases.length} cases loaded</span>
+          <span className="panel-count">{cases.length} cases loaded</span>
         </div>
         <div className="panel-body dense">
           <table className="data-table">
             <thead>
               <tr>
-                <th style={{ width: 24 }}></th>
+                <th className="th-toggle"></th>
                 <th>Case</th>
                 <th>Scale</th>
                 <th className="hide-on-mobile">Detection</th>

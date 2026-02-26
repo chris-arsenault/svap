@@ -37,12 +37,12 @@ function MetricsRow({
       <div className="metric-card stagger-in">
         <div className="metric-label">Policies Scanned</div>
         <div className="metric-value">{policies}</div>
-        <div className="metric-sub" style={{ color: "var(--critical)" }}>{criticalPolicies} critical risk</div>
+        <div className="metric-sub metric-sub-critical">{criticalPolicies} critical risk</div>
       </div>
       <div className="metric-card stagger-in">
         <div className="metric-label">Detection Patterns</div>
         <div className="metric-value">{detectionPatterns}</div>
-        <div className="metric-sub" style={{ color: "var(--critical)" }}>{criticalPatterns} critical priority</div>
+        <div className="metric-sub metric-sub-critical">{criticalPatterns} critical priority</div>
       </div>
     </div>
   );
@@ -82,7 +82,7 @@ function HighRiskTable({
           <tbody>
             {highRisk.map((p) => (
               <tr key={p.policy_id}>
-                <td style={{ fontWeight: 500 }}>{p.name}</td>
+                <td className="td-name">{p.name}</td>
                 <td>
                   <ScoreBar score={p.convergence_score} threshold={threshold} />
                 </td>
@@ -124,8 +124,8 @@ function TopCasesTable({ cases, onNavigate }: { cases: Case[]; onNavigate: (view
           <tbody>
             {topCases.map((c) => (
               <tr key={c.case_id}>
-                <td style={{ fontWeight: 500, maxWidth: 240 }}>{c.case_name}</td>
-                <td style={{ fontFamily: "var(--font-mono)", whiteSpace: "nowrap" }}>{formatDollars(c.scale_dollars)}</td>
+                <td className="td-case-name">{c.case_name}</td>
+                <td className="td-mono">{formatDollars(c.scale_dollars)}</td>
                 <td>
                   <QualityTags ids={c.qualities} />
                 </td>
@@ -253,8 +253,8 @@ export default function Dashboard({ onNavigate }: ViewProps) {
         <div className="panel-header">
           <h3>Key Calibration Finding</h3>
         </div>
-        <div className="panel-body" style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.7 }}>
-          <strong style={{ color: "var(--text-primary)" }}>
+        <div className="panel-body calibration-text">
+          <strong className="calibration-highlight">
             Every enforcement case exceeding $500M in intended losses scored {"\u2265"}3 vulnerability qualities.
           </strong>{" "}
           The most common qualities in large-scale schemes are V1 (Payment Precedes Verification) and V6 (Expansion

@@ -8,21 +8,21 @@ const PRIORITY_ORDER: RiskLevel[] = ["critical", "high", "medium", "low"];
 
 function PatternDetail({ pat }: { pat: DetectionPattern }) {
   return (
-    <div className="panel-body" style={{ borderTop: "1px solid var(--border-subtle)" }}>
+    <div className="panel-body panel-body-bordered">
       <div className="detail-grid">
         <div>
           <div className="detail-label">Data Source</div>
-          <div style={{ fontSize: 13, color: "var(--accent-bright)", fontFamily: "var(--font-mono)" }}>
+          <div className="pattern-data-source">
             {pat.data_source}
           </div>
           <div className="detail-label">Baseline</div>
-          <div style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.6 }}>{pat.baseline}</div>
+          <div className="pattern-baseline">{pat.baseline}</div>
         </div>
         <div>
           <div className="detail-label">False Positive Risk</div>
-          <div style={{ fontSize: 13, color: "var(--high)", lineHeight: 1.6 }}>{pat.false_positive_risk}</div>
+          <div className="pattern-false-positive">{pat.false_positive_risk}</div>
           <div className="detail-label">Detection Latency</div>
-          <div style={{ fontSize: 13, color: "var(--text-secondary)" }}>{pat.detection_latency}</div>
+          <div className="pattern-latency">{pat.detection_latency}</div>
         </div>
       </div>
     </div>
@@ -40,10 +40,9 @@ function PatternCard({
 }) {
   const handleToggle = () => onToggleId(pat.pattern_id);
   return (
-    <div className="panel stagger-in" style={{ marginBottom: "var(--sp-4)" }}>
+    <div className="panel stagger-in pattern-card">
       <div
-        className="panel-header"
-        style={{ cursor: "pointer" }}
+        className="panel-header clickable"
         role="button"
         tabIndex={0}
         onClick={handleToggle}
@@ -54,41 +53,23 @@ function PatternCard({
           }
         }}
       >
-        <div style={{ display: "flex", alignItems: "flex-start", gap: 12, flex: 1 }}>
-          <div style={{ paddingTop: 2, color: "var(--text-muted)" }}>
+        <div className="pattern-header-left">
+          <div className="pattern-chevron">
             {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
           </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+          <div className="pattern-header-content">
+            <div className="pattern-badge-row">
               <Badge level={pat.priority}>{pat.priority}</Badge>
-              <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--accent-bright)" }}>
+              <span className="pattern-policy-name">
                 {pat.policy_name}
               </span>
             </div>
-            <div
-              style={{
-                fontFamily: "var(--font-body)",
-                fontSize: 13,
-                textTransform: "none",
-                letterSpacing: 0,
-                fontWeight: 400,
-                color: "var(--text-primary)",
-                lineHeight: 1.4,
-              }}
-            >
+            <div className="pattern-anomaly-signal">
               {pat.anomaly_signal}
             </div>
           </div>
         </div>
-        <div
-          style={{
-            fontSize: 11,
-            color: "var(--text-muted)",
-            whiteSpace: "nowrap",
-            flexShrink: 0,
-            fontFamily: "var(--font-mono)",
-          }}
-        >
+        <div className="pattern-detection-latency">
           {pat.detection_latency}
         </div>
       </div>
@@ -129,7 +110,7 @@ export default function DetectionView({ onNavigate: _onNavigate }: ViewProps) {
         </div>
       </div>
 
-      <div className="filter-bar stagger-in" style={{ marginBottom: "var(--sp-5)" }}>
+      <div className="filter-bar filter-bar-mb stagger-in">
         <button className={`btn ${!filterPriority ? "btn-accent" : ""}`} onClick={() => setFilterPriority(null)}>
           All ({detection_patterns.length})
         </button>

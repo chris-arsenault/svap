@@ -42,6 +42,7 @@ export function ScoreBar({ score, max = 8, threshold = 3 }: ScoreBarProps) {
           <div key={i} className={pipClass(i)} />
         ))}
       </div>
+      {/* eslint-disable-next-line local/no-inline-styles */}
       <span className="score-number" style={{ color: scoreColor(score, threshold) }}>
         {score}
       </span>
@@ -54,13 +55,14 @@ export function QualityTag({ id }: { id: string }) {
   const q = qualityMap[id];
   if (!q)
     return (
-      <span className="quality-tag" style={{ borderColor: "var(--border-default)", color: "var(--text-muted)" }}>
+      <span className="quality-tag quality-tag-unknown">
         {id}
       </span>
     );
   return (
     <span
       className="quality-tag"
+      // eslint-disable-next-line local/no-inline-styles
       style={{
         borderColor: q.color,
         color: q.color,
@@ -75,7 +77,7 @@ export function QualityTag({ id }: { id: string }) {
 
 export function QualityTags({ ids }: { ids: string[] }) {
   return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+    <div className="quality-tags-list">
       {ids.map((id) => (
         <QualityTag key={id} id={id} />
       ))}

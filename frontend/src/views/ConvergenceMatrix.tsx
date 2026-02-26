@@ -5,10 +5,12 @@ import type { Case, Policy, Quality, ViewProps } from "../types";
 
 function MatrixCell({ present, color }: { present: boolean; color: string }) {
   if (!present) {
+    // eslint-disable-next-line local/no-inline-styles
     return <span style={{ color: "var(--border-default)", fontSize: 12 }}>{"\u00B7"}</span>;
   }
   return (
     <span
+      // eslint-disable-next-line local/no-inline-styles
       style={{
         display: "inline-block",
         width: 20,
@@ -45,40 +47,23 @@ function MatrixRow({
 
   return (
     <tr key={id}>
-      <td
-        style={{
-          fontWeight: 500,
-          fontSize: 12,
-          position: "sticky",
-          left: 0,
-          background: "var(--bg-card)",
-          zIndex: 1,
-          maxWidth: 200,
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-        }}
-      >
+      <td className="matrix-sticky-name">
         {name}
       </td>
       {!showPolicies && (
-        <td style={{ fontFamily: "var(--font-mono)", fontSize: 11, whiteSpace: "nowrap" }}>
+        <td className="td-mono">
           {formatDollars("scale_dollars" in item ? item.scale_dollars : undefined)}
         </td>
       )}
       {qualities.map((q) => (
-        <td key={q.quality_id} style={{ textAlign: "center", padding: "8px 4px" }}>
+        <td key={q.quality_id} className="matrix-quality-cell">
           <MatrixCell present={qs.includes(q.quality_id)} color={q.color} />
         </td>
       ))}
       <td
-        style={{
-          textAlign: "center",
-          fontFamily: "var(--font-mono)",
-          fontWeight: 700,
-          fontSize: 14,
-          color: scoreColor(score, threshold),
-        }}
+        className="matrix-score-cell"
+        // eslint-disable-next-line local/no-inline-styles
+        style={{ color: scoreColor(score, threshold) }}
       >
         {score}
       </td>
@@ -98,20 +83,7 @@ function MatrixFooter({
   return (
     <tfoot>
       <tr>
-        <td
-          style={{
-            fontFamily: "var(--font-display)",
-            fontSize: 10,
-            fontWeight: 600,
-            textTransform: "uppercase",
-            letterSpacing: "0.06em",
-            color: "var(--text-muted)",
-            position: "sticky",
-            left: 0,
-            background: "var(--bg-card)",
-            zIndex: 1,
-          }}
-        >
+        <td className="matrix-sticky-footer">
           Frequency
         </td>
         {!showPolicies && <td></td>}
@@ -120,10 +92,9 @@ function MatrixFooter({
           return (
             <td
               key={q.quality_id}
+              className="matrix-footer-count"
+              // eslint-disable-next-line local/no-inline-styles
               style={{
-                textAlign: "center",
-                fontFamily: "var(--font-mono)",
-                fontSize: 11,
                 color: count > sorted.length * 0.5 ? q.color : "var(--text-muted)",
               }}
             >
@@ -160,7 +131,7 @@ export default function ConvergenceMatrix({ onNavigate: _onNavigate }: ViewProps
         </div>
       </div>
 
-      <div className="filter-bar stagger-in" style={{ marginBottom: "var(--sp-4)" }}>
+      <div className="filter-bar filter-bar-mb stagger-in">
         <button className={`btn ${!showPolicies ? "btn-accent" : ""}`} onClick={() => setShowPolicies(false)}>
           Cases ({cases.length})
         </button>
@@ -170,28 +141,21 @@ export default function ConvergenceMatrix({ onNavigate: _onNavigate }: ViewProps
       </div>
 
       <div className="panel stagger-in">
-        <div className="panel-body dense" style={{ overflowX: "auto" }}>
+        <div className="panel-body dense panel-body-scroll-x">
           <table className="data-table matrix-table">
             <thead>
               <tr>
-                <th
-                  style={{
-                    minWidth: 200,
-                    position: "sticky",
-                    left: 0,
-                    background: "var(--bg-card)",
-                    zIndex: 2,
-                  }}
-                >
+                <th className="matrix-sticky-header">
                   {showPolicies ? "Policy" : "Case"}
                 </th>
                 {!showPolicies && <th>Scale</th>}
                 {qualities.map((q) => (
-                  <th key={q.quality_id} style={{ textAlign: "center", minWidth: 44 }}>
+                  <th key={q.quality_id} className="matrix-quality-header">
+                    {/* eslint-disable-next-line local/no-inline-styles */}
                     <span style={{ color: q.color }}>{q.quality_id}</span>
                   </th>
                 ))}
-                <th style={{ textAlign: "center" }}>{"\u03A3"}</th>
+                <th className="text-center">{"\u03A3"}</th>
               </tr>
             </thead>
             <tbody>

@@ -43,6 +43,7 @@ function TreeNode({ node, depth = 0, scannedPrograms = EMPTY_PROGRAMS }: TreeNod
       >
         <span className="tree-icon">{treeIcon(isExpandable, expanded)}</span>
         <span
+          // eslint-disable-next-line local/no-inline-styles
           style={{
             fontWeight: depth < 2 ? 600 : 400,
             color: depth === 0 ? "var(--text-primary)" : "var(--text-secondary)",
@@ -51,7 +52,7 @@ function TreeNode({ node, depth = 0, scannedPrograms = EMPTY_PROGRAMS }: TreeNod
           {node.label}
         </span>
         {node.programs && (
-          <span style={{ fontSize: 10, color: "var(--text-muted)", marginLeft: "auto" }}>
+          <span className="tree-program-count">
             {node.programs.length} programs
           </span>
         )}
@@ -87,7 +88,7 @@ function TreeChildren({
           const isScanned = scannedPrograms.includes(prog);
           return (
             <div key={prog} className={isScanned ? "tree-leaf scanned" : "tree-leaf"}>
-              {isScanned && <span style={{ marginRight: 4 }}>{"\u25C6"}</span>}
+              {isScanned && <span className="tree-leaf-icon">{"\u25C6"}</span>}
               {prog}
             </div>
           );
@@ -133,7 +134,7 @@ function ScanResultsTable({
               .sort((a, b) => b.convergence_score - a.convergence_score)
               .map((p) => (
                 <tr key={p.policy_id}>
-                  <td style={{ fontWeight: 500 }}>{p.name}</td>
+                  <td className="td-name">{p.name}</td>
                   <td>
                     <ScoreBar score={p.convergence_score} threshold={threshold} />
                   </td>
@@ -162,23 +163,13 @@ function DataSourcesPanel({ dataSources }: { dataSources: Record<string, unknown
         {Object.entries(dataSources).map(([catKey, cat]) => {
           const category = cat as DataSourceCategory;
           return (
-            <div key={catKey} style={{ marginBottom: 16 }}>
-              <div
-                style={{
-                  fontFamily: "var(--font-display)",
-                  fontSize: 11,
-                  fontWeight: 600,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.06em",
-                  color: "var(--text-muted)",
-                  marginBottom: 6,
-                }}
-              >
+            <div key={catKey} className="datasource-category">
+              <div className="datasource-category-label">
                 {category.label}
               </div>
               {category.sources.map((s) => (
-                <div key={s.id} style={{ fontSize: 12, padding: "4px 0", color: "var(--text-secondary)" }}>
-                  <span style={{ color: "var(--accent-bright)", fontFamily: "var(--font-mono)", fontSize: 11 }}>
+                <div key={s.id} className="datasource-item">
+                  <span className="datasource-item-id">
                     {s.id}
                   </span>
                   {" \u2014 "}
@@ -201,7 +192,7 @@ export default function PolicyExplorer({ onNavigate: _onNavigate }: ViewProps) {
       <div className="view-header stagger-in">
         <h2>Policy Explorer</h2>
         <div className="view-desc">
-          HHS policy catalog — <span style={{ color: "var(--accent-bright)" }}>{"\u25C6"} scanned policies</span> have
+          HHS policy catalog — <span className="scanned-indicator">{"\u25C6"} scanned policies</span> have
           been evaluated against the vulnerability taxonomy
         </div>
       </div>
@@ -210,7 +201,7 @@ export default function PolicyExplorer({ onNavigate: _onNavigate }: ViewProps) {
         <div className="panel stagger-in">
           <div className="panel-header">
             <h3>HHS Policy Catalog</h3>
-            <span style={{ fontSize: 11, color: "var(--text-muted)" }}>{scanned_programs.length} scanned</span>
+            <span className="panel-count">{scanned_programs.length} scanned</span>
           </div>
           <div className="panel-body tree-scroll">
             {Object.entries(policy_catalog).map(([k, node]) => (

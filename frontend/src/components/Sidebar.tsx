@@ -98,13 +98,13 @@ export default function Sidebar({ activeView, onNavigate, onSignOut, username }:
       </nav>
 
       <div className="pipeline-status">
-        <div className="nav-section-label" style={{ padding: "0 0 8px" }}>
+        <div className="nav-section-label pipeline-status-label">
           Pipeline Status
         </div>
         {(pipeline_status || []).map((s) => (
           <div key={s.stage} className="stage-row">
             <StageDot status={s.status} />
-            <span style={{ color: "var(--text-secondary)", fontSize: 11 }}>
+            <span className="stage-row-text">
               {s.stage}. {STAGE_NAMES[s.stage] || `Stage ${s.stage}`}
             </span>
           </div>
