@@ -84,7 +84,8 @@ def _extract_text(html: str) -> str:
     """Extract visible text from HTML content."""
     parser = _HTMLTextExtractor()
     parser.feed(html)
-    return parser.get_text()
+    # Strip NUL bytes — PostgreSQL text columns reject them
+    return parser.get_text().replace("\x00", "")
 
 
 def _store_to_s3(key: str, body_bytes: bytes, content_type: str):

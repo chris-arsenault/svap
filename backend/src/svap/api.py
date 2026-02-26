@@ -439,6 +439,9 @@ def _upload_enforcement_document(event):
     else:
         text = file_bytes.decode("utf-8", errors="replace")
 
+    # Strip NUL bytes — PostgreSQL text columns reject them
+    text = text.replace("\x00", "")
+
     if len(text) < 100:
         raise ApiError(400, "Extracted text too short — document may be empty or unreadable")
 
