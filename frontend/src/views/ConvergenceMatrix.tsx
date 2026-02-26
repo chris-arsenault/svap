@@ -1,28 +1,17 @@
 import React, { useState } from "react";
 import { usePipeline } from "../data/usePipelineData";
-import { formatDollars, scoreColor } from "../components/SharedUI";
+import { formatDollars, scoreColor } from "../utils";
 import type { Case, Policy, Quality, ViewProps } from "../types";
 
 function MatrixCell({ present, color }: { present: boolean; color: string }) {
   if (!present) {
-    // eslint-disable-next-line local/no-inline-styles
-    return <span style={{ color: "var(--border-default)", fontSize: 12 }}>{"\u00B7"}</span>;
+    return <span className="matrix-cell-absent">{"\u00B7"}</span>;
   }
   return (
     <span
+      className="matrix-cell-present"
       // eslint-disable-next-line local/no-inline-styles
-      style={{
-        display: "inline-block",
-        width: 20,
-        height: 20,
-        borderRadius: 3,
-        background: `color-mix(in srgb, ${color} 20%, transparent)`,
-        border: `1px solid ${color}`,
-        lineHeight: "20px",
-        fontSize: 10,
-        fontWeight: 700,
-        color,
-      }}
+      style={{ "--cell-color": color } as React.CSSProperties}
     >
       {"\u2713"}
     </span>

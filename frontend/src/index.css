@@ -1115,6 +1115,19 @@ html, body, #root {
   z-index: 2;
 }
 .matrix-quality-header { text-align: center; min-width: 44px; }
+.matrix-cell-absent { color: var(--border-default); font-size: 12px; }
+.matrix-cell-present {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: 3px;
+  line-height: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--cell-color);
+  background: color-mix(in srgb, var(--cell-color) 20%, transparent);
+  border: 1px solid var(--cell-color);
+}
 
 /* DetectionView */
 .pattern-card { margin-bottom: var(--sp-4); }
@@ -1210,12 +1223,22 @@ html, body, #root {
   margin-bottom: var(--sp-6);
 }
 .quality-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-lg);
   padding: var(--sp-5);
   cursor: pointer;
   transition: all 0.15s;
 }
 .quality-card:hover { background: var(--bg-elevated); }
+.quality-card.selected {
+  background: var(--bg-elevated);
+  border-color: var(--q-color);
+}
+.quality-card-id {
+  color: var(--q-color);
+  background: color-mix(in srgb, var(--q-color) 15%, transparent);
+}
 .quality-card-header {
   display: flex;
   align-items: center;
@@ -1254,8 +1277,14 @@ html, body, #root {
 }
 .quality-case-item-name { font-weight: 500; color: var(--text-primary); }
 .quality-case-item-condition { color: var(--text-muted); margin-top: 2px; }
+.quality-detail-panel { border-color: var(--q-color); }
+.quality-detail-panel .panel-header { border-bottom-color: var(--q-color); }
+.quality-detail-panel h3 { color: var(--q-color); }
 
 /* PolicyExplorer */
+.tree-text-root { font-weight: 600; color: var(--text-primary); }
+.tree-text-branch { font-weight: 600; color: var(--text-secondary); }
+.tree-text-leaf { color: var(--text-secondary); }
 .tree-program-count {
   font-size: 10px;
   color: var(--text-muted);

@@ -13,7 +13,7 @@ function QualityCard({
 }) {
   return (
     <div
-      className="stagger-in quality-card"
+      className={`stagger-in quality-card ${isSelected ? "selected" : ""}`}
       role="button"
       tabIndex={0}
       onClick={() => onSelectId(quality.quality_id)}
@@ -24,20 +24,10 @@ function QualityCard({
         }
       }}
       // eslint-disable-next-line local/no-inline-styles
-      style={{
-        background: isSelected ? "var(--bg-elevated)" : "var(--bg-card)",
-        border: `1px solid ${isSelected ? quality.color : "var(--border-subtle)"}`,
-      }}
+      style={{ "--q-color": quality.color } as React.CSSProperties}
     >
       <div className="quality-card-header">
-        <span
-          className="quality-card-id"
-          // eslint-disable-next-line local/no-inline-styles
-          style={{
-            color: quality.color,
-            background: `color-mix(in srgb, ${quality.color} 15%, transparent)`,
-          }}
-        >
+        <span className="quality-card-id">
           {quality.quality_id}
         </span>
         <span className="quality-card-count">
@@ -52,12 +42,13 @@ function QualityCard({
 
 function QualityDetail({ quality, matchingCases }: { quality: Quality; matchingCases: Case[] }) {
   return (
-    // eslint-disable-next-line local/no-inline-styles
-    <div className="panel" style={{ borderColor: quality.color }}>
-      {/* eslint-disable-next-line local/no-inline-styles */}
-      <div className="panel-header" style={{ borderBottomColor: quality.color }}>
-        {/* eslint-disable-next-line local/no-inline-styles */}
-        <h3 style={{ color: quality.color }}>
+    <div
+      className="panel quality-detail-panel"
+      // eslint-disable-next-line local/no-inline-styles
+      style={{ "--q-color": quality.color } as React.CSSProperties}
+    >
+      <div className="panel-header">
+        <h3>
           {quality.quality_id} — {quality.name}
         </h3>
       </div>

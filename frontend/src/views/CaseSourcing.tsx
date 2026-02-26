@@ -1,7 +1,8 @@
 import React, { useCallback, useState } from "react";
 import { ExternalLink, ChevronDown, ChevronRight } from "lucide-react";
 import { usePipeline } from "../data/usePipelineData";
-import { QualityTags, formatDollars } from "../components/SharedUI";
+import { QualityTags } from "../components/SharedUI";
+import { formatDollars } from "../utils";
 import type { Case, EnforcementSource, ViewProps } from "../types";
 
 function SourceRegistry({ sources }: { sources: EnforcementSource[] }) {

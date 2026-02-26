@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { usePipeline } from "../data/usePipelineData";
-import { ScoreBar, QualityTags, formatDollars, RiskBadge, StageDot } from "../components/SharedUI";
+import { ScoreBar, QualityTags, RiskBadge, StageDot } from "../components/SharedUI";
+import { formatDollars } from "../utils";
 import type { Case, Policy, ViewId, ViewProps, StageStatus } from "../types";
 
 function MetricsRow({

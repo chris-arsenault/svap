@@ -23,6 +23,12 @@ function treeIcon(isExpandable: boolean, expanded: boolean): string {
 
 const EMPTY_PROGRAMS: string[] = [];
 
+function treeTextClass(depth: number): string {
+  if (depth === 0) return "tree-text-root";
+  if (depth < 2) return "tree-text-branch";
+  return "tree-text-leaf";
+}
+
 function TreeNode({ node, depth = 0, scannedPrograms = EMPTY_PROGRAMS }: TreeNodeProps) {
   const [expanded, setExpanded] = useState(depth < 2);
   const isExpandable = !!node.children || !!node.programs;
@@ -42,13 +48,7 @@ function TreeNode({ node, depth = 0, scannedPrograms = EMPTY_PROGRAMS }: TreeNod
         }}
       >
         <span className="tree-icon">{treeIcon(isExpandable, expanded)}</span>
-        <span
-          // eslint-disable-next-line local/no-inline-styles
-          style={{
-            fontWeight: depth < 2 ? 600 : 400,
-            color: depth === 0 ? "var(--text-primary)" : "var(--text-secondary)",
-          }}
-        >
+        <span className={treeTextClass(depth)}>
           {node.label}
         </span>
         {node.programs && (
