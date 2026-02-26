@@ -11,7 +11,7 @@ For the following enforcement document, extract every distinct scheme described.
    - "No cap or prior authorization exists for this billing category"
    - "Clinical eligibility criteria depend on subjective professional judgment rather than objective measures"
    - "The payment rate is the same regardless of actual service intensity delivered"
-5. scale_dollars: Total dollar amount (intended losses, actual losses, or settlement amount)
+5. scale_dollars: Total dollar amount (intended losses, actual losses, or settlement amount). MUST be a plain number in dollars with no text, units, or parentheticals. Examples: 10600000000 for $10.6 billion, 556000000 for $556 million, 16000000 for $16 million.
 6. scale_defendants: Number of defendants charged
 7. scale_duration: How long the scheme operated
 8. detection_method: How was the scheme discovered? (data analytics, whistleblower, routine audit, patient complaint, law enforcement referral, etc.)
@@ -25,7 +25,7 @@ Return ONLY valid JSON. Format:
     "scheme_mechanics": "...",
     "exploited_policy": "...",
     "enabling_condition": "...",
-    "scale_dollars": "...",
+    "scale_dollars": 556000000,
     "scale_defendants": N,
     "scale_duration": "...",
     "detection_method": "..."

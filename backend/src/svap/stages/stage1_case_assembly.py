@@ -10,6 +10,7 @@ Output: Structured cases in the `cases` table
 
 import hashlib
 import json
+import re
 
 from svap.bedrock_client import BedrockClient
 from svap.storage import SVAPStorage
@@ -95,19 +96,21 @@ def _truncate(text: str, max_chars: int) -> str:
     return text[:max_chars] + "\n\n[TRUNCATED — document continues]"
 
 
-def _parse_dollars(val) -> float:
+def _parse_dollars(val) -> float | None:
+    """Parse dollar amounts from LLM output, tolerating messy text."""
     if val is None:
         return None
     if isinstance(val, (int, float)):
         return float(val)
-    # Handle strings like "$10.6 billion", "$900 million"
     text = str(val).lower().replace(",", "").replace("$", "").strip()
     multipliers = {"billion": 1e9, "million": 1e6, "thousand": 1e3}
     for word, mult in multipliers.items():
         if word in text:
-            num = float(text.replace(word, "").strip())
-            return num * mult
-    try:
-        return float(text)
-    except ValueError:
+            match = re.search(r"[\d.]+", text)
+            return float(match.group()) * mult if match else None
+    match = re.search(r"[\d.]+", text)
+    if not match:
         return None
+    return float(match.group())
+
+
