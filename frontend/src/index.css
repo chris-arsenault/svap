@@ -184,6 +184,7 @@ html, body, #root {
 .stage-dot.pending { background: var(--high); }
 .stage-dot.idle { background: var(--border-default); }
 .stage-dot.pending_review { background: var(--high); animation: pulse 1.5s infinite; }
+.stage-dot.failed { background: var(--critical); }
 
 @keyframes pulse {
   0%, 100% { opacity: 1; }
@@ -675,6 +676,7 @@ html, body, #root {
   padding: var(--sp-2) var(--sp-3);
   border-radius: var(--radius-sm);
   font-size: 13px;
+  flex-wrap: wrap;
 }
 
 .pipeline-stage-row .stage-name {
@@ -691,6 +693,23 @@ html, body, #root {
 
 .pipeline-stage-row .stage-status-label.pending_review {
   color: var(--high);
+}
+
+.pipeline-stage-row .stage-status-label.failed {
+  color: var(--critical);
+}
+
+.stage-error {
+  width: 100%;
+  margin-top: 4px;
+  padding: 6px 8px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  line-height: 1.4;
+  color: var(--critical);
+  background: rgba(239, 68, 68, 0.08);
+  border-radius: 4px;
+  word-break: break-word;
 }
 
 .pipeline-header-actions {

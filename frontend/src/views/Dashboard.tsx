@@ -194,6 +194,7 @@ function PipelineControls() {
             const ps = pipeline_status.find((s) => s.stage === stage);
             const status: StageStatus = ps?.status ?? "idle";
             const needsApproval = HUMAN_GATE_STAGES.includes(stage) && status === "pending_review";
+            const errorMsg = ps?.error_message;
             return (
               <div key={stage} className="pipeline-stage-row">
                 <StageDot status={status} />
@@ -207,6 +208,9 @@ function PipelineControls() {
                   >
                     {busy === `approve-${stage}` ? "Approving\u2026" : "Approve"}
                   </button>
+                )}
+                {status === "failed" && errorMsg && (
+                  <div className="stage-error">{errorMsg}</div>
                 )}
               </div>
             );

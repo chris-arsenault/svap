@@ -1,5 +1,5 @@
 // Pipeline stage status
-export type StageStatus = "idle" | "pending" | "running" | "completed" | "pending_review";
+export type StageStatus = "idle" | "pending" | "running" | "completed" | "failed" | "pending_review";
 export type RiskLevel = "critical" | "high" | "medium" | "low";
 export type ViewId =
   | "dashboard"
@@ -14,6 +14,7 @@ export type ViewId =
 export interface PipelineStageStatus {
   stage: number;
   status: StageStatus;
+  error_message?: string | null;
 }
 
 export interface Counts {
