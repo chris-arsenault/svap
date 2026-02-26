@@ -114,22 +114,6 @@ export interface FallbackData {
   scanned_programs: string[];
 }
 
-// Full pipeline data with computed fields and actions
-export interface PipelineData extends FallbackData {
-  threshold: number;
-  qualityMap: Record<string, Quality>;
-  loading: boolean;
-  error: string | null;
-  apiAvailable: boolean;
-  refresh: () => Promise<void>;
-  runPipeline: () => Promise<unknown>;
-  approveStage: (stage: number) => Promise<unknown>;
-  seedPipeline: () => Promise<unknown>;
-  uploadSourceDocument: (sourceId: string, file: File) => Promise<unknown>;
-  createSource: (source: { name: string; url?: string; description?: string }) => Promise<unknown>;
-  deleteSource: (sourceId: string) => Promise<unknown>;
-}
-
 // Common view props
 export interface ViewProps {
   onNavigate: (view: ViewId) => void;

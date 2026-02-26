@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { usePipeline } from "../data/usePipelineData";
+import { useShallow } from "zustand/shallow";
+import { usePipelineStore } from "../data/pipelineStore";
 import { formatDollars, scoreColor } from "../utils";
 import type { Case, Policy, Quality, ViewProps } from "../types";
 
@@ -98,7 +99,14 @@ function MatrixFooter({
 }
 
 export default function ConvergenceMatrix({ onNavigate: _onNavigate }: ViewProps) {
-  const { cases, taxonomy, policies, threshold } = usePipeline();
+  const { cases, taxonomy, policies, threshold } = usePipelineStore(
+    useShallow((s) => ({
+      cases: s.cases,
+      taxonomy: s.taxonomy,
+      policies: s.policies,
+      threshold: s.threshold,
+    })),
+  );
   const [showPolicies, setShowPolicies] = useState(false);
   const data: (Case | Policy)[] = showPolicies ? policies : cases;
   const qualities = taxonomy;

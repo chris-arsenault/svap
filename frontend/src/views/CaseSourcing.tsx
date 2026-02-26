@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { ExternalLink, ChevronDown, ChevronRight } from "lucide-react";
-import { usePipeline } from "../data/usePipelineData";
+import { useShallow } from "zustand/shallow";
+import { usePipelineStore } from "../data/pipelineStore";
 import { QualityTags } from "../components/SharedUI";
 import { formatDollars } from "../utils";
 import type { Case, EnforcementSource, ViewProps } from "../types";
@@ -79,7 +80,12 @@ function CaseRow({
 }
 
 export default function CaseSourcing({ onNavigate: _onNavigate }: ViewProps) {
-  const { cases, enforcement_sources } = usePipeline();
+  const { cases, enforcement_sources } = usePipelineStore(
+    useShallow((s) => ({
+      cases: s.cases,
+      enforcement_sources: s.enforcement_sources,
+    })),
+  );
   const [expandedCase, setExpandedCase] = useState<string | null>(null);
   const toggleCase = useCallback((id: string) => setExpandedCase((prev) => (prev === id ? null : id)), []);
 

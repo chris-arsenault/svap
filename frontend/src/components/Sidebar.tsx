@@ -11,7 +11,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { StageDot } from "./SharedUI";
-import { usePipeline } from "../data/usePipelineData";
+import { usePipelineStatus, useCounts } from "../data/usePipelineSelectors";
 import type { Counts, ViewId } from "../types";
 
 type NavSection = { section: string };
@@ -58,7 +58,8 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ activeView, onNavigate, onSignOut, username }: SidebarProps) {
-  const { pipeline_status, counts } = usePipeline();
+  const pipeline_status = usePipelineStatus();
+  const counts = useCounts();
 
   return (
     <aside className="sidebar">

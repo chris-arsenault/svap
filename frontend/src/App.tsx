@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, type FormEvent } from "react";
-import { PipelineProvider, usePipeline } from "./data/usePipelineData";
+import { usePipelineStore } from "./data/pipelineStore";
+import { useLoading, useError, useRefresh } from "./data/usePipelineSelectors";
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./views/Dashboard";
 import SourcesView from "./views/SourcesView";
@@ -113,6 +114,11 @@ function AuthenticatedApp({ token, username, onSignOut }: { token: string; usern
   const [activeView, setActiveView] = useState<ViewId>("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Initialize the store with the auth token (triggers first fetch)
+  useEffect(() => {
+    usePipelineStore.getState()._setToken(token);
+  }, [token]);
+
   const handleNavigate = useCallback((view: ViewId) => {
     setActiveView(view);
     setSidebarOpen(false);
@@ -120,35 +126,35 @@ function AuthenticatedApp({ token, username, onSignOut }: { token: string; usern
 
   const ViewComponent = VIEWS[activeView] || Dashboard;
   return (
-    <PipelineProvider token={token}>
-      <div className={`app-layout ${sidebarOpen ? "sidebar-open" : ""}`}>
-        {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
-        <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
-        <Sidebar
-          activeView={activeView}
-          onNavigate={handleNavigate}
-          onSignOut={onSignOut}
-          username={username}
-        />
-        <main className="main-content" key={activeView}>
-          <button
-            className="mobile-menu-btn"
-            onClick={() => setSidebarOpen((o) => !o)}
-            aria-label="Toggle menu"
-          >
-            <span className="hamburger-icon" />
-          </button>
-          <ApiGate>
-            <ViewComponent onNavigate={setActiveView} />
-          </ApiGate>
-        </main>
-      </div>
-    </PipelineProvider>
+    <div className={`app-layout ${sidebarOpen ? "sidebar-open" : ""}`}>
+      {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
+      <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
+      <Sidebar
+        activeView={activeView}
+        onNavigate={handleNavigate}
+        onSignOut={onSignOut}
+        username={username}
+      />
+      <main className="main-content" key={activeView}>
+        <button
+          className="mobile-menu-btn"
+          onClick={() => setSidebarOpen((o) => !o)}
+          aria-label="Toggle menu"
+        >
+          <span className="hamburger-icon" />
+        </button>
+        <ApiGate>
+          <ViewComponent onNavigate={setActiveView} />
+        </ApiGate>
+      </main>
+    </div>
   );
 }
 
 function ApiGate({ children }: { children: React.ReactNode }) {
-  const { loading, error, refresh } = usePipeline();
+  const loading = useLoading();
+  const error = useError();
+  const refresh = useRefresh();
 
   if (loading) {
     return (

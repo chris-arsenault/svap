@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { usePipeline } from "../data/usePipelineData";
+import { usePipelineStore } from "../data/pipelineStore";
 import { QualityTags, ScoreBar, Badge } from "../components/SharedUI";
 import type { Prediction, ViewProps } from "../types";
 
@@ -79,7 +79,7 @@ function PredictionCard({
 }
 
 export default function PredictionView({ onNavigate: _onNavigate }: ViewProps) {
-  const { predictions } = usePipeline();
+  const predictions = usePipelineStore((s) => s.predictions);
   const [expandedPred, setExpandedPred] = useState<string | null>(null);
   const togglePred = useCallback((id: string) => setExpandedPred((prev) => (prev === id ? null : id)), []);
 

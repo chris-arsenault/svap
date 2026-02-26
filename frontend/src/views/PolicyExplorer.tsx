@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { usePipeline } from "../data/usePipelineData";
+import { useShallow } from "zustand/shallow";
+import { usePipelineStore } from "../data/pipelineStore";
 import { ScoreBar, QualityTags, RiskBadge } from "../components/SharedUI";
 import type { ViewProps } from "../types";
 
@@ -185,7 +186,15 @@ function DataSourcesPanel({ dataSources }: { dataSources: Record<string, unknown
 }
 
 export default function PolicyExplorer({ onNavigate: _onNavigate }: ViewProps) {
-  const { policies, policy_catalog, scanned_programs, data_sources, threshold } = usePipeline();
+  const { policies, policy_catalog, scanned_programs, data_sources, threshold } = usePipelineStore(
+    useShallow((s) => ({
+      policies: s.policies,
+      policy_catalog: s.policy_catalog,
+      scanned_programs: s.scanned_programs,
+      data_sources: s.data_sources,
+      threshold: s.threshold,
+    })),
+  );
 
   return (
     <div>

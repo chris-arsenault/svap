@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { usePipeline } from "../data/usePipelineData";
+import { useShallow } from "zustand/shallow";
+import { usePipelineStore } from "../data/pipelineStore";
 import { ScoreBar, QualityTags, RiskBadge, StageDot } from "../components/SharedUI";
 import { formatDollars } from "../utils";
 import type { Case, Policy, ViewId, ViewProps, StageStatus } from "../types";
@@ -152,7 +153,17 @@ const STAGE_NAMES: Record<number, string> = {
 const HUMAN_GATE_STAGES = [2, 5];
 
 function PipelineControls() {
-  const { pipeline_status, run_id, apiAvailable, runPipeline, approveStage, seedPipeline, refresh } = usePipeline();
+  const { pipeline_status, run_id, apiAvailable, runPipeline, approveStage, seedPipeline, refresh } = usePipelineStore(
+    useShallow((s) => ({
+      pipeline_status: s.pipeline_status,
+      run_id: s.run_id,
+      apiAvailable: s.apiAvailable,
+      runPipeline: s.runPipeline,
+      approveStage: s.approveStage,
+      seedPipeline: s.seedPipeline,
+      refresh: s.refresh,
+    })),
+  );
   const [busy, setBusy] = useState<string | null>(null);
 
   const wrap = (label: string, fn: () => Promise<unknown>) => async () => {
@@ -222,7 +233,15 @@ function PipelineControls() {
 }
 
 export default function Dashboard({ onNavigate }: ViewProps) {
-  const { cases, taxonomy, policies, detection_patterns, threshold } = usePipeline();
+  const { cases, taxonomy, policies, detection_patterns, threshold } = usePipelineStore(
+    useShallow((s) => ({
+      cases: s.cases,
+      taxonomy: s.taxonomy,
+      policies: s.policies,
+      detection_patterns: s.detection_patterns,
+      threshold: s.threshold,
+    })),
+  );
   const criticalPolicies = policies.filter((p) => p.risk_level === "critical").length;
   const totalFraudDollars = cases.reduce((sum, c) => sum + (c.scale_dollars || 0), 0);
   const criticalPatterns = detection_patterns.filter((p) => p.priority === "critical").length;

@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { usePipeline } from "../data/usePipelineData";
+import { usePipelineStore } from "../data/pipelineStore";
 import { Badge } from "../components/SharedUI";
 import type { DetectionPattern, RiskLevel, ViewProps } from "../types";
 
@@ -80,7 +80,7 @@ function PatternCard({
 }
 
 export default function DetectionView({ onNavigate: _onNavigate }: ViewProps) {
-  const { detection_patterns } = usePipeline();
+  const detection_patterns = usePipelineStore((s) => s.detection_patterns);
   const [expandedPattern, setExpandedPattern] = useState<string | null>(null);
   const [filterPriority, setFilterPriority] = useState<RiskLevel | null>(null);
   const togglePattern = useCallback(

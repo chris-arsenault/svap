@@ -1,6 +1,7 @@
 import React, { useState, useRef, useCallback } from "react";
 import { ExternalLink, Upload, Check, AlertTriangle, Clock, XCircle, Plus, Trash2, ChevronDown, ChevronRight } from "lucide-react";
-import { usePipeline } from "../data/usePipelineData";
+import { usePipelineStore } from "../data/pipelineStore";
+import { useUploadSourceDocument, useDeleteSource, useCreateSource } from "../data/usePipelineSelectors";
 import type { EnforcementSource, ValidationStatus, ViewProps } from "../types";
 
 function StatusBadge({ status, hasDocument }: { status: ValidationStatus; hasDocument: boolean }) {
@@ -26,7 +27,8 @@ function StatusIcon({ status, hasDocument }: { status: ValidationStatus; hasDocu
 }
 
 function SourceRow({ source }: { source: EnforcementSource }) {
-  const { uploadSourceDocument, deleteSource } = usePipeline();
+  const uploadSourceDocument = useUploadSourceDocument();
+  const deleteSource = useDeleteSource();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -111,6 +113,7 @@ function SourceRow({ source }: { source: EnforcementSource }) {
               disabled={uploading}
             >
               <Upload size={12} />
+              {/* eslint-disable-next-line sonarjs/no-nested-conditional */}
               {uploading ? "Uploading..." : source.has_document ? "Replace" : "Upload"}
             </button>
             <button className="btn btn-sm btn-danger" onClick={handleDelete} title="Remove source">
@@ -156,7 +159,7 @@ function SourceRow({ source }: { source: EnforcementSource }) {
 }
 
 function AddSourceForm({ onClose }: { onClose: () => void }) {
-  const { createSource } = usePipeline();
+  const createSource = useCreateSource();
   const [busy, setBusy] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -204,7 +207,7 @@ function AddSourceForm({ onClose }: { onClose: () => void }) {
 }
 
 export default function SourcesView({ onNavigate: _onNavigate }: ViewProps) {
-  const { enforcement_sources } = usePipeline();
+  const enforcement_sources = usePipelineStore((s) => s.enforcement_sources);
   const [showAddForm, setShowAddForm] = useState(false);
 
   const withDoc = enforcement_sources.filter((s) => s.has_document).length;

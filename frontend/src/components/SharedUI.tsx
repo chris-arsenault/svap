@@ -1,5 +1,5 @@
 import React from "react";
-import { usePipeline } from "../data/usePipelineData";
+import { useQuality } from "../data/usePipelineSelectors";
 import { scoreLevel, scoreColor } from "../utils";
 import type { RiskLevel, StageStatus } from "../types";
 
@@ -38,8 +38,7 @@ export function ScoreBar({ score, max = 8, threshold = 3 }: ScoreBarProps) {
 }
 
 export function QualityTag({ id }: { id: string }) {
-  const { qualityMap } = usePipeline();
-  const q = qualityMap[id];
+  const q = useQuality(id);
   if (!q)
     return (
       <span className="quality-tag quality-tag-unknown">
