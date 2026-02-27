@@ -1,0 +1,37 @@
+[
+  {
+    "feed_id": "hhs_oig_enforcement",
+    "name": "HHS OIG Enforcement Actions",
+    "listing_url": "https://oig.hhs.gov/fraud/enforcement/",
+    "content_type": "detail_page",
+    "link_selector": "https://oig\\.hhs\\.gov/fraud/enforcement/.*"
+  },
+  {
+    "feed_id": "doj_healthcare_fraud",
+    "name": "DOJ Healthcare Fraud Unit",
+    "listing_url": "https://www.justice.gov/criminal/criminal-fraud/health-care-fraud-unit",
+    "content_type": "press_release",
+    "link_selector": "https://www\\.justice\\.gov/.*/pr/.*"
+  },
+  {
+    "feed_id": "doj_false_claims",
+    "name": "DOJ False Claims Act Settlements",
+    "listing_url": "https://www.justice.gov/civil/fraud-statistics",
+    "content_type": "settlement",
+    "link_selector": "https://www\\.justice\\.gov/.*/pr/.*"
+  },
+  {
+    "feed_id": "oig_work_plan",
+    "name": "OIG Work Plan",
+    "listing_url": "https://oig.hhs.gov/reports/workplan/",
+    "content_type": "audit_report",
+    "link_selector": "https://oig\\.hhs\\.gov/reports/.*"
+  },
+  {
+    "feed_id": "oig_semiannual",
+    "name": "OIG Semiannual Reports",
+    "listing_url": "https://oig.hhs.gov/reports/semiannual/",
+    "content_type": "audit_report",
+    "link_selector": "https://oig\\.hhs\\.gov/reports/semiannual/.*"
+  }
+]

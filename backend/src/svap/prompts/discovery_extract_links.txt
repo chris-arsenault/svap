@@ -1,0 +1,35 @@
+You are analyzing an enforcement source listing page to identify links to individual enforcement case documents.
+
+The source is: {feed_name}
+Expected content type: {content_type}
+Base URL: {base_url}
+
+Below are the links found on this page (URL and link text), followed by the visible text of the page.
+
+LINKS FOUND:
+{link_list}
+
+PAGE TEXT (abbreviated):
+{page_text}
+
+Identify links that point to INDIVIDUAL enforcement case documents — press releases, indictments, settlement announcements, audit reports, or other documents that describe specific fraud or enforcement actions.
+
+EXCLUDE:
+- Navigation links (home, about, contact, login)
+- Category/archive links that lead to other listing pages
+- Pagination links (next, previous, page numbers)
+- Social media sharing links
+- Links to general program information or policy pages
+- PDF download links for the same listing page
+
+For each qualifying link, return:
+- url: The full URL (resolve relative URLs against the base URL {base_url})
+- title: A descriptive title (from link text or surrounding context)
+- published_date: Publication date if visible near the link (ISO format YYYY-MM-DD, or null)
+
+Return ONLY valid JSON:
+[
+  {{"url": "...", "title": "...", "published_date": "..."}}
+]
+
+If no qualifying links are found, return an empty array: []

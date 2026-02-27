@@ -103,11 +103,11 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
     storage.log_stage_start(run_id, 5)
 
     try:
-        taxonomy = storage.get_taxonomy(run_id)
+        taxonomy = storage.get_approved_taxonomy()
         calibration = storage.get_calibration(run_id)
         threshold = calibration["threshold"] if calibration else 3
 
-        policies = storage.get_policies(run_id)
+        policies = storage.get_policies()
         policy_scores = storage.get_policy_scores(run_id)
 
         policy_profiles = _build_policy_profiles(policy_scores)

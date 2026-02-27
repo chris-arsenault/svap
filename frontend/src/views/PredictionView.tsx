@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { usePipelineStore } from "../data/pipelineStore";
 import { QualityTags, ScoreBar, Badge } from "../components/SharedUI";
-import type { Prediction, ViewProps } from "../types";
+import type { Prediction } from "../types";
 
 const difficultyLevel = (d?: string): "critical" | "high" | "medium" | "neutral" => {
   if (!d) return "neutral";
@@ -78,7 +78,7 @@ function PredictionCard({
   );
 }
 
-export default function PredictionView({ onNavigate: _onNavigate }: ViewProps) {
+export default function PredictionView() {
   const predictions = usePipelineStore((s) => s.predictions);
   const [expandedPred, setExpandedPred] = useState<string | null>(null);
   const togglePred = useCallback((id: string) => setExpandedPred((prev) => (prev === id ? null : id)), []);

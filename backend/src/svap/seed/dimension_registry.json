@@ -1,0 +1,107 @@
+[
+  {
+    "dimension_id": "PAYMENT_MODEL",
+    "name": "Payment Model",
+    "definition": "How money flows between the government payer, intermediaries, and service providers. Whether payment is prospective or retrospective. What data triggers the payment. What determines the payment amount.",
+    "probing_questions": [
+      "Is payment fee-for-service, capitated, bundled, or prospective?",
+      "What data input triggers the payment?",
+      "Is payment issued before or after service verification?",
+      "Are there payment caps per beneficiary, provider, or service category?",
+      "What determines the payment amount — fixed schedule, cost report, negotiated rate?"
+    ],
+    "origin": "seed",
+    "related_quality_ids": ["7e265e80", "1415e4d9", "98878f0f"],
+    "created_by": "seed"
+  },
+  {
+    "dimension_id": "VERIFICATION_STRUCTURE",
+    "name": "Verification Structure",
+    "definition": "Who generates the data that determines payment, and whether there is independent verification before or after payment. The lag between payment and verification, and the verification frequency.",
+    "probing_questions": [
+      "Who generates the data that determines payment?",
+      "Is there independent verification before payment?",
+      "Is there independent verification after payment, and by whom?",
+      "What is the lag between payment and verification?",
+      "How frequently does verification occur?"
+    ],
+    "origin": "seed",
+    "related_quality_ids": ["7e265e80", "02c85e7c"],
+    "created_by": "seed"
+  },
+  {
+    "dimension_id": "ELIGIBILITY_CONTROLS",
+    "name": "Eligibility Controls",
+    "definition": "The barriers to becoming a participating provider, supplier, or plan. Credentialing, licensing, and enrollment requirements. How long enrollment takes. Barriers to beneficiary enrollment or eligibility.",
+    "probing_questions": [
+      "What are the barriers to becoming a participating provider or supplier?",
+      "What credentialing, licensing, or enrollment requirements exist?",
+      "How long does provider enrollment take?",
+      "What are the barriers to beneficiary enrollment or eligibility?",
+      "Are there periodic re-enrollment or re-credentialing requirements?"
+    ],
+    "origin": "seed",
+    "related_quality_ids": ["ecce188f"],
+    "created_by": "seed"
+  },
+  {
+    "dimension_id": "CLINICAL_CRITERIA",
+    "name": "Clinical Criteria",
+    "definition": "What clinical judgments determine eligibility or payment. Whether criteria are based on objective measures or subjective assessment. Who makes the clinical determination.",
+    "probing_questions": [
+      "What clinical judgments determine eligibility or payment?",
+      "Are criteria based on objective measures (lab values, imaging) or subjective assessment?",
+      "Who makes the clinical determination — the treating provider, an independent reviewer, or the patient?",
+      "Is there a second opinion or independent medical review requirement?",
+      "How frequently must clinical eligibility be re-certified?"
+    ],
+    "origin": "seed",
+    "related_quality_ids": ["f192df10"],
+    "created_by": "seed"
+  },
+  {
+    "dimension_id": "SERVICE_DELIVERY_VISIBILITY",
+    "name": "Service Delivery Visibility",
+    "definition": "Where services are delivered and what institutional witnesses or verification mechanisms exist. Whether service delivery can be independently confirmed. Electronic verification systems in place.",
+    "probing_questions": [
+      "Where are services delivered — facility, home, community, telehealth?",
+      "What institutional witnesses or verification mechanisms exist?",
+      "Can service delivery be independently confirmed by someone other than the provider?",
+      "Are there electronic verification systems (EVV, EHR timestamps, GPS)?",
+      "Is there a physical record of the service encounter?"
+    ],
+    "origin": "seed",
+    "related_quality_ids": ["7e265e80", "02c85e7c", "98878f0f"],
+    "created_by": "seed"
+  },
+  {
+    "dimension_id": "CHANGE_VELOCITY",
+    "name": "Change Velocity",
+    "definition": "Whether this is a new or recently expanded program. How enrollment or spending has changed in the last 3-5 years. Whether oversight infrastructure has scaled proportionally. Recent waivers or flexibilities.",
+    "probing_questions": [
+      "Is this a new program or a recently expanded one?",
+      "How has enrollment or spending changed in the last 3-5 years?",
+      "Has oversight infrastructure scaled proportionally with growth?",
+      "Were there recent waivers, flexibilities, or emergency authorities?",
+      "Are there sunset provisions or pending regulatory changes?"
+    ],
+    "origin": "seed",
+    "related_quality_ids": ["1415e4d9", "904a9c85"],
+    "created_by": "seed"
+  },
+  {
+    "dimension_id": "INTERMEDIARY_STRUCTURE",
+    "name": "Intermediary Structure",
+    "definition": "How many entities sit between the government payment and the actual service delivery. What financial flows pass through intermediaries. What is visible to the payer versus opaque.",
+    "probing_questions": [
+      "How many entities sit between the government payer and the service provider?",
+      "What financial flows pass through intermediaries?",
+      "What is visible to the government payer versus opaque?",
+      "Do intermediaries have their own financial incentives that diverge from program goals?",
+      "Are there related-party transactions or common ownership arrangements?"
+    ],
+    "origin": "seed",
+    "related_quality_ids": ["050dee66"],
+    "created_by": "seed"
+  }
+]

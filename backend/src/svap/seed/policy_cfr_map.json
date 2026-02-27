@@ -1,0 +1,95 @@
+{
+  "hospice": {
+    "keywords": ["hospice"],
+    "ecfr": [
+      {"title": 42, "part": "418"}
+    ],
+    "fr_terms": ["hospice conditions of participation", "hospice payment"],
+    "agency_id": "centers-for-medicare-medicaid-services"
+  },
+  "hcbs": {
+    "keywords": ["hcbs", "home community-based", "community-based services", "personal care", "1915(c)", "self-directed"],
+    "ecfr": [
+      {"title": 42, "part": "441", "subpart": "G"},
+      {"title": 42, "part": "441", "subpart": "K"}
+    ],
+    "fr_terms": ["home community-based services waiver", "1915(c) waiver"],
+    "agency_id": "centers-for-medicare-medicaid-services"
+  },
+  "medicare_advantage": {
+    "keywords": ["medicare advantage", "part c", "hcc", "risk adjustment", "ma plan", "managed care"],
+    "ecfr": [
+      {"title": 42, "part": "422"},
+      {"title": 42, "part": "423"}
+    ],
+    "fr_terms": ["medicare advantage risk adjustment", "Part C payment"],
+    "agency_id": "centers-for-medicare-medicaid-services"
+  },
+  "pace": {
+    "keywords": ["pace", "all-inclusive care elderly"],
+    "ecfr": [
+      {"title": 42, "part": "460"}
+    ],
+    "fr_terms": ["PACE program", "all-inclusive care for the elderly"],
+    "agency_id": "centers-for-medicare-medicaid-services"
+  },
+  "340b": {
+    "keywords": ["340b", "drug pricing program"],
+    "ecfr": [
+      {"title": 42, "part": "10"}
+    ],
+    "fr_terms": ["340B drug pricing program"],
+    "agency_id": "health-resources-and-services-administration"
+  },
+  "aco": {
+    "keywords": ["aco", "accountable care", "mssp", "aco reach", "shared savings"],
+    "ecfr": [
+      {"title": 42, "part": "425"}
+    ],
+    "fr_terms": ["Medicare shared savings program", "ACO REACH"],
+    "agency_id": "centers-for-medicare-medicaid-services"
+  },
+  "hospital_at_home": {
+    "keywords": ["hospital at home", "acute hospital care at home", "ahcah"],
+    "ecfr": [
+      {"title": 42, "part": "482"}
+    ],
+    "fr_terms": ["acute hospital care at home waiver"],
+    "agency_id": "centers-for-medicare-medicaid-services"
+  },
+  "dme": {
+    "keywords": ["durable medical equipment", "dme", "prosthetics", "orthotics"],
+    "ecfr": [
+      {"title": 42, "part": "414", "subpart": "D"}
+    ],
+    "fr_terms": ["DMEPOS competitive bidding", "durable medical equipment"],
+    "agency_id": "centers-for-medicare-medicaid-services"
+  },
+  "telehealth": {
+    "keywords": ["telehealth", "telemedicine", "virtual care"],
+    "ecfr": [
+      {"title": 42, "part": "410"},
+      {"title": 42, "part": "414"}
+    ],
+    "fr_terms": ["telehealth services Medicare", "virtual care flexibilities"],
+    "agency_id": "centers-for-medicare-medicaid-services"
+  },
+  "home_health": {
+    "keywords": ["home health", "home health agency", "hha"],
+    "ecfr": [
+      {"title": 42, "part": "484"},
+      {"title": 42, "part": "409", "subpart": "E"}
+    ],
+    "fr_terms": ["home health prospective payment", "home health conditions of participation"],
+    "agency_id": "centers-for-medicare-medicaid-services"
+  },
+  "skilled_nursing": {
+    "keywords": ["skilled nursing", "snf", "nursing facility"],
+    "ecfr": [
+      {"title": 42, "part": "483"},
+      {"title": 42, "part": "413", "subpart": "J"}
+    ],
+    "fr_terms": ["skilled nursing facility prospective payment"],
+    "agency_id": "centers-for-medicare-medicaid-services"
+  }
+}

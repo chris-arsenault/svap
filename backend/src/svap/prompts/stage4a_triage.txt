@@ -1,0 +1,32 @@
+You are a healthcare policy analyst ranking government policies by their structural vulnerability to fraud and exploitation.
+
+You have {n_policies} policies to rank. For each one, estimate how many of the vulnerability qualities in the taxonomy are likely structurally present based on how the policy actually works.
+
+VULNERABILITY TAXONOMY:
+{taxonomy_summary}
+
+KNOWN CASE CORPUS (exploitation patterns already observed):
+{case_summary}
+
+POLICY CATALOG:
+{policy_list}
+
+For each policy, assess:
+1. How many taxonomy qualities are likely structurally present (vulnerability concentration)?
+2. Which specific qualities and why?
+3. What are you uncertain about — what structural details would change your assessment if you knew them?
+
+Rank policies from highest vulnerability concentration to lowest.
+
+Return ONLY valid JSON:
+{{
+  "rankings": [
+    {{
+      "policy_name": "exact policy name from the catalog",
+      "score": 0.85,
+      "rationale": "2-3 sentences explaining which structural properties create vulnerability",
+      "uncertainty": "What you don't know that matters",
+      "likely_qualities": ["<quality_id>", "<quality_id>"]
+    }}
+  ]
+}}

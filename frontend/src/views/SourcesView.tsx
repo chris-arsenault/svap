@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback } from "react";
 import { ExternalLink, Upload, Check, AlertTriangle, Clock, XCircle, Plus, Trash2, ChevronDown, ChevronRight } from "lucide-react";
 import { usePipelineStore } from "../data/pipelineStore";
 import { useUploadSourceDocument, useDeleteSource, useCreateSource } from "../data/usePipelineSelectors";
-import type { EnforcementSource, ValidationStatus, ViewProps } from "../types";
+import type { EnforcementSource, ValidationStatus } from "../types";
 
 function StatusBadge({ status, hasDocument }: { status: ValidationStatus; hasDocument: boolean }) {
   if (!hasDocument) {
@@ -206,7 +206,7 @@ function AddSourceForm({ onClose }: { onClose: () => void }) {
   );
 }
 
-export default function SourcesView({ onNavigate: _onNavigate }: ViewProps) {
+export default function SourcesView() {
   const enforcement_sources = usePipelineStore((s) => s.enforcement_sources);
   const [showAddForm, setShowAddForm] = useState(false);
 

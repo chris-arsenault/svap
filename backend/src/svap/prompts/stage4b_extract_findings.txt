@@ -1,0 +1,40 @@
+You are extracting structural findings from regulatory text about a government policy.
+
+POLICY: {policy_name}
+REGULATORY SOURCE: {source_citation}
+
+STRUCTURAL DIMENSIONS TO LOOK FOR:
+{dimensions_text}
+
+REGULATORY TEXT:
+{source_text}
+
+Extract discrete structural findings from this regulatory text. Each finding must be:
+1. A single factual observation about how the policy works structurally
+2. Tagged to exactly one dimension from the list above
+3. Cited to the specific regulatory provision
+
+Focus on findings that reveal:
+- How money flows (payment triggers, amounts, timing)
+- Who verifies what (data sources, verification timing, independence)
+- What barriers exist (enrollment, credentialing, eligibility)
+- How clinical decisions are made (objective vs. subjective criteria)
+- Where services happen and what's visible to the payer
+- How intermediaries operate between payer and provider
+
+Do NOT fabricate findings. Only report what the regulatory text actually says.
+
+Return ONLY valid JSON:
+{{
+  "findings": [
+    {{
+      "dimension_id": "PAYMENT_MODEL",
+      "observation": "One factual structural observation",
+      "source_citation": "42 CFR 418.302(a)",
+      "source_text_excerpt": "Brief excerpt from the regulation supporting this finding",
+      "confidence": "high"
+    }}
+  ]
+}}
+
+If the text does not contain relevant structural information, return: {{"findings": []}}

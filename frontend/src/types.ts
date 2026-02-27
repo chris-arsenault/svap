@@ -1,16 +1,6 @@
 // Pipeline stage status
 export type StageStatus = "idle" | "pending" | "running" | "completed" | "failed" | "pending_review";
 export type RiskLevel = "critical" | "high" | "medium" | "low";
-export type ViewId =
-  | "dashboard"
-  | "sources"
-  | "cases"
-  | "policies"
-  | "taxonomy"
-  | "matrix"
-  | "predictions"
-  | "detection";
-
 export interface PipelineStageStatus {
   stage: number;
   status: StageStatus;
@@ -114,7 +104,74 @@ export interface FallbackData {
   scanned_programs: string[];
 }
 
-// Common view props
-export interface ViewProps {
-  onNavigate: (view: ViewId) => void;
+// ── Discovery & Research types ───────────────────────────────────────────
+
+export interface SourceFeed {
+  feed_id: string;
+  name: string;
+  listing_url: string;
+  content_type: string;
+  last_checked_at: string | null;
+  enabled: boolean;
 }
+
+export interface SourceCandidate {
+  candidate_id: string;
+  feed_id: string;
+  title: string;
+  url: string;
+  status: string;
+  richness_score: number | null;
+  richness_rationale: string | null;
+  estimated_cases: number | null;
+  discovered_at: string;
+}
+
+export interface Dimension {
+  dimension_id: string;
+  name: string;
+  definition: string;
+  probing_questions: string[];
+  origin: string;
+  related_quality_ids: string[];
+}
+
+export interface TriageResult {
+  policy_id: string;
+  triage_score: number;
+  rationale: string;
+  uncertainty: string;
+  priority_rank: number;
+}
+
+export interface StructuralFinding {
+  finding_id: string;
+  policy_id: string;
+  dimension_id: string;
+  observation: string;
+  source_type: string;
+  source_citation: string;
+  confidence: string;
+  status: string;
+}
+
+export interface QualityAssessment {
+  assessment_id: string;
+  policy_id: string;
+  quality_id: string;
+  present: "yes" | "no" | "uncertain";
+  evidence_finding_ids: string[];
+  confidence: string;
+  rationale: string;
+}
+
+export interface ResearchSession {
+  session_id: string;
+  run_id: string;
+  policy_id: string;
+  status: string;
+  sources_queried: unknown[];
+  started_at: string | null;
+  completed_at: string | null;
+}
+

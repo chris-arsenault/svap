@@ -88,6 +88,26 @@ def _extract_text(html: str) -> str:
     return parser.get_text().replace("\x00", "")
 
 
+def _is_binary_content(text: str) -> bool:
+    """Detect binary/non-readable content (e.g. decoded PDF bytes).
+
+    Checks for PDF header and high ratio of replacement characters or
+    non-printable bytes — indicators that binary content was decoded as text.
+    """
+    if not text:
+        return True
+    sample = text[:2000]
+    if sample.lstrip().startswith("%PDF"):
+        return True
+    # Count non-printable, non-whitespace characters
+    non_printable = sum(
+        1 for c in sample
+        if not c.isprintable() and c not in ("\n", "\r", "\t")
+    )
+    # If >15% of the sample is non-printable, it's binary
+    return non_printable / max(len(sample), 1) > 0.15
+
+
 def _store_to_s3(key: str, body_bytes: bytes, content_type: str):
     """Store a file to the data S3 bucket."""
     if not CONFIG_BUCKET:
@@ -148,6 +168,11 @@ def _fetch_missing_documents(storage, sources, config):
 
             if len(text) < 200:
                 print(f"    Skipped: text too short ({len(text)} chars)")
+                failed += 1
+                continue
+
+            if _is_binary_content(text):
+                print("    Skipped: binary/non-readable content (PDF or image)")
                 failed += 1
                 continue
 
@@ -223,7 +248,6 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
     storage.log_stage_start(run_id, 0)
 
     try:
-        storage.seed_enforcement_sources_if_empty()
         sources = storage.get_enforcement_sources()
 
         fetched, skipped, failed = _fetch_missing_documents(storage, sources, config)

@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { useShallow } from "zustand/shallow";
 import { usePipelineStore } from "../data/pipelineStore";
-import type { Case, Quality, ViewProps } from "../types";
+import type { Case, Quality } from "../types";
 
 function QualityCard({
   quality,
@@ -80,7 +80,7 @@ function QualityDetail({ quality, matchingCases }: { quality: Quality; matchingC
   );
 }
 
-export default function TaxonomyView({ onNavigate: _onNavigate }: ViewProps) {
+export default function TaxonomyView() {
   const { taxonomy, cases } = usePipelineStore(
     useShallow((s) => ({
       taxonomy: s.taxonomy,

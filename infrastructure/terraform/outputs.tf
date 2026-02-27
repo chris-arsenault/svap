@@ -13,6 +13,12 @@ output "rds_endpoint" {
   value       = aws_db_instance.main.endpoint
 }
 
+output "database_url" {
+  description = "PostgreSQL connection string"
+  value       = "postgresql://${aws_db_instance.main.username}:${random_password.db.result}@${aws_db_instance.main.endpoint}/${aws_db_instance.main.db_name}?sslmode=require"
+  sensitive   = true
+}
+
 output "state_machine_arn" {
   description = "Step Functions state machine ARN"
   value       = aws_sfn_state_machine.pipeline.arn

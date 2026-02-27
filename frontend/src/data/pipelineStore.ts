@@ -8,7 +8,19 @@
 
 import { create } from "zustand";
 import { config } from "../config";
-import type { FallbackData, PipelineStageStatus, Quality, Counts } from "../types";
+import type {
+  FallbackData,
+  PipelineStageStatus,
+  Quality,
+  Counts,
+  SourceFeed,
+  SourceCandidate,
+  Dimension,
+  TriageResult,
+  ResearchSession,
+  StructuralFinding,
+  QualityAssessment,
+} from "../types";
 
 const API_BASE = config.apiBaseUrl || "/api";
 
@@ -30,7 +42,8 @@ async function apiPost(path: string, body?: unknown, token?: string): Promise<un
   if (body !== undefined) options.body = JSON.stringify(body);
   const res = await fetch(`${API_BASE}${path}`, options);
   if (!res.ok) throw new Error(`${path} failed: ${res.status}`);
-  return res.json();
+  const text = await res.text();
+  return text ? JSON.parse(text) : {};
 }
 
 function buildQualityMap(taxonomy: Quality[]): Record<string, Quality> {
@@ -62,6 +75,13 @@ export interface PipelineStore {
   data_sources: Record<string, unknown>;
   scanned_programs: string[];
 
+  // Discovery & research slices (loaded on-demand)
+  source_feeds: SourceFeed[];
+  source_candidates: SourceCandidate[];
+  dimensions: Dimension[];
+  triage_results: TriageResult[];
+  research_sessions: ResearchSession[];
+
   // Derived
   threshold: number;
   qualityMap: Record<string, Quality>;
@@ -77,12 +97,25 @@ export interface PipelineStore {
   // Actions
   _setToken: (token: string) => void;
   refresh: () => Promise<void>;
+  updatePipelineStatus: (stages: PipelineStageStatus[]) => void;
   runPipeline: () => Promise<unknown>;
   approveStage: (stage: number) => Promise<unknown>;
   seedPipeline: () => Promise<unknown>;
   uploadSourceDocument: (sourceId: string, file: File) => Promise<unknown>;
   createSource: (source: { name: string; url?: string; description?: string }) => Promise<unknown>;
   deleteSource: (sourceId: string) => Promise<unknown>;
+
+  // Discovery & research actions
+  fetchDiscovery: () => Promise<void>;
+  runDiscoveryFeeds: () => Promise<unknown>;
+  reviewCandidate: (candidateId: string, action: "accept" | "reject") => Promise<unknown>;
+  fetchDimensions: () => Promise<void>;
+  fetchTriageResults: () => Promise<void>;
+  runTriage: () => Promise<unknown>;
+  runDeepResearch: (policyIds?: string[]) => Promise<unknown>;
+  fetchResearchSessions: () => Promise<void>;
+  fetchFindings: (policyId: string) => Promise<StructuralFinding[]>;
+  fetchAssessments: (policyId: string) => Promise<QualityAssessment[]>;
 }
 
 // ── Store ────────────────────────────────────────────────────────────────
@@ -166,6 +199,13 @@ export const usePipelineStore = create<PipelineStore>((set, get) => {
     data_sources: {},
     scanned_programs: [],
 
+    // Discovery & research — empty defaults
+    source_feeds: [],
+    source_candidates: [],
+    dimensions: [],
+    triage_results: [],
+    research_sessions: [],
+
     // Derived
     threshold: 3,
     qualityMap: {},
@@ -186,10 +226,16 @@ export const usePipelineStore = create<PipelineStore>((set, get) => {
 
     refresh: fetchDashboard,
 
+    updatePipelineStatus: (stages: PipelineStageStatus[]) => {
+      set({ pipeline_status: deduplicatePipelineStatus(stages) });
+    },
+
     runPipeline: async () => {
       if (!get().apiAvailable) throw new Error("API not available");
-      const result = await apiPost("/pipeline/run", {}, get()._token);
-      await fetchDashboard();
+      const result = (await apiPost("/pipeline/run", {}, get()._token)) as { run_id?: string };
+      if (result.run_id) {
+        set({ run_id: result.run_id, pipeline_status: [] });
+      }
       return result;
     },
 
@@ -236,6 +282,95 @@ export const usePipelineStore = create<PipelineStore>((set, get) => {
       const result = await apiPost("/enforcement-sources/delete", { source_id: sourceId }, get()._token);
       await refreshSources();
       return result;
+    },
+
+    // ── Discovery & Research actions ────────────────────────────────────
+
+    fetchDiscovery: async () => {
+      const token = get()._token;
+      const headers: Record<string, string> = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+      const [feedsRes, candidatesRes] = await Promise.all([
+        fetch(`${API_BASE}/discovery/feeds`, { headers }),
+        fetch(`${API_BASE}/discovery/candidates`, { headers }),
+      ]);
+      if (feedsRes.ok && candidatesRes.ok) {
+        set({
+          source_feeds: await feedsRes.json(),
+          source_candidates: await candidatesRes.json(),
+        });
+      }
+    },
+
+    runDiscoveryFeeds: async () => {
+      const result = await apiPost("/discovery/run-feeds", {}, get()._token);
+      await get().fetchDiscovery();
+      return result;
+    },
+
+    reviewCandidate: async (candidateId: string, action: "accept" | "reject") => {
+      const result = await apiPost(
+        "/discovery/candidates/review",
+        { candidate_id: candidateId, action },
+        get()._token,
+      );
+      await get().fetchDiscovery();
+      return result;
+    },
+
+    fetchDimensions: async () => {
+      const token = get()._token;
+      const headers: Record<string, string> = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+      const res = await fetch(`${API_BASE}/dimensions`, { headers });
+      if (res.ok) set({ dimensions: await res.json() });
+    },
+
+    fetchTriageResults: async () => {
+      const token = get()._token;
+      const headers: Record<string, string> = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+      const res = await fetch(`${API_BASE}/research/triage`, { headers });
+      if (res.ok) set({ triage_results: await res.json() });
+    },
+
+    runTriage: async () => {
+      const result = await apiPost("/research/triage", {}, get()._token);
+      await get().fetchTriageResults();
+      return result;
+    },
+
+    runDeepResearch: async (policyIds?: string[]) => {
+      const body = policyIds ? { policy_ids: policyIds } : {};
+      const result = await apiPost("/research/deep", body, get()._token);
+      await get().fetchResearchSessions();
+      return result;
+    },
+
+    fetchResearchSessions: async () => {
+      const token = get()._token;
+      const headers: Record<string, string> = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+      const res = await fetch(`${API_BASE}/research/sessions`, { headers });
+      if (res.ok) set({ research_sessions: await res.json() });
+    },
+
+    fetchFindings: async (policyId: string) => {
+      const token = get()._token;
+      const headers: Record<string, string> = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+      const res = await fetch(`${API_BASE}/research/findings/${policyId}`, { headers });
+      if (!res.ok) return [];
+      return res.json();
+    },
+
+    fetchAssessments: async (policyId: string) => {
+      const token = get()._token;
+      const headers: Record<string, string> = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+      const res = await fetch(`${API_BASE}/research/assessments/${policyId}`, { headers });
+      if (!res.ok) return [];
+      return res.json();
     },
   };
 });

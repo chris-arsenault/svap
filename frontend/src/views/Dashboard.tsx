@@ -1,9 +1,10 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useShallow } from "zustand/shallow";
 import { usePipelineStore } from "../data/pipelineStore";
 import { ScoreBar, QualityTags, RiskBadge, StageDot } from "../components/SharedUI";
 import { formatDollars } from "../utils";
-import type { Case, Policy, ViewId, ViewProps, StageStatus } from "../types";
+import type { Case, Policy, StageStatus } from "../types";
 
 function MetricsRow({
   cases,
@@ -53,12 +54,11 @@ function MetricsRow({
 function HighRiskTable({
   policies,
   threshold,
-  onNavigate,
 }: {
   policies: Policy[];
   threshold: number;
-  onNavigate: (view: ViewId) => void;
 }) {
+  const navigate = useNavigate();
   const highRisk = policies
     .filter((p) => p.convergence_score >= threshold)
     .sort((a, b) => b.convergence_score - a.convergence_score);
@@ -67,7 +67,7 @@ function HighRiskTable({
     <div className="panel stagger-in">
       <div className="panel-header">
         <h3>Highest-Risk Policies</h3>
-        <button className="btn" onClick={() => onNavigate("predictions")}>
+        <button className="btn" onClick={() => navigate("/predictions")}>
           View predictions {"\u2192"}
         </button>
       </div>
@@ -103,14 +103,15 @@ function HighRiskTable({
   );
 }
 
-function TopCasesTable({ cases, onNavigate }: { cases: Case[]; onNavigate: (view: ViewId) => void }) {
+function TopCasesTable({ cases }: { cases: Case[] }) {
+  const navigate = useNavigate();
   const topCases = [...cases].sort((a, b) => (b.scale_dollars || 0) - (a.scale_dollars || 0)).slice(0, 5);
 
   return (
     <div className="panel stagger-in">
       <div className="panel-header">
         <h3>Largest Enforcement Cases</h3>
-        <button className="btn" onClick={() => onNavigate("cases")}>
+        <button className="btn" onClick={() => navigate("/cases")}>
           All cases {"\u2192"}
         </button>
       </div>
@@ -232,7 +233,7 @@ function PipelineControls() {
   );
 }
 
-export default function Dashboard({ onNavigate }: ViewProps) {
+export default function Dashboard() {
   const { cases, taxonomy, policies, detection_patterns, threshold } = usePipelineStore(
     useShallow((s) => ({
       cases: s.cases,
@@ -270,8 +271,8 @@ export default function Dashboard({ onNavigate }: ViewProps) {
       />
 
       <div className="split-view">
-        <HighRiskTable policies={policies} threshold={threshold} onNavigate={onNavigate} />
-        <TopCasesTable cases={cases} onNavigate={onNavigate} />
+        <HighRiskTable policies={policies} threshold={threshold} />
+        <TopCasesTable cases={cases} />
       </div>
 
       <div className="panel stagger-in">
@@ -282,9 +283,9 @@ export default function Dashboard({ onNavigate }: ViewProps) {
           <strong className="calibration-highlight">
             Every enforcement case exceeding $500M in intended losses scored {"\u2265"}3 vulnerability qualities.
           </strong>{" "}
-          The most common qualities in large-scale schemes are V1 (Payment Precedes Verification) and V6 (Expansion
-          Outpaces Oversight), appearing in 75%+ of major cases. The V1+V2 combination (pay-before-verify +
-          self-attesting payment basis) appeared together in every $1B+ scheme. Three policies currently score {"\u2265"}5:
+          The most common qualities in large-scale schemes are Payment Precedes Verification and Expansion
+          Outpaces Oversight, appearing in 75%+ of major cases. The pay-before-verify + self-attesting payment basis
+          combination appeared together in every $1B+ scheme. Three policies currently score {"\u2265"}5:
           HCBS, PACE, and Hospital-at-Home — all share the characteristic of services delivered outside institutional
           settings with minimal verification infrastructure.
         </div>

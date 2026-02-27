@@ -36,12 +36,12 @@ import boto3
 import yaml
 
 from svap.orchestrator import _load_config, _run_stage
-from svap.storage import SVAPStorage
+from svap.storage import SVAPStorage, resolve_database_url
 
 logger = logging.getLogger(__name__)
 logger.setLevel(os.environ.get("LOG_LEVEL", "INFO"))
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "")
+DATABASE_URL = resolve_database_url()
 CONFIG_BUCKET = os.environ.get("SVAP_CONFIG_BUCKET", "")
 
 

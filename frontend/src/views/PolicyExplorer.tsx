@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useShallow } from "zustand/shallow";
 import { usePipelineStore } from "../data/pipelineStore";
 import { ScoreBar, QualityTags, RiskBadge } from "../components/SharedUI";
-import type { ViewProps } from "../types";
 
 interface CatalogNode {
   label: string;
@@ -185,7 +184,7 @@ function DataSourcesPanel({ dataSources }: { dataSources: Record<string, unknown
   );
 }
 
-export default function PolicyExplorer({ onNavigate: _onNavigate }: ViewProps) {
+export default function PolicyExplorer() {
   const { policies, policy_catalog, scanned_programs, data_sources, threshold } = usePipelineStore(
     useShallow((s) => ({
       policies: s.policies,

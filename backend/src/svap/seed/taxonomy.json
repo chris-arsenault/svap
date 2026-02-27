@@ -1,6 +1,6 @@
 [
   {
-    "quality_id": "V1",
+    "quality_id": "7e265e80",
     "name": "Payment Precedes Verification",
     "definition": "Money flows to the provider, plan, or beneficiary before an independent party confirms that the billed service was delivered, was medically necessary, or that the beneficiary was eligible.",
     "recognition_test": "1. Is payment issued before an independent party (not the billing entity) confirms the service was actually delivered? 2. Is there a time gap of more than 7 days between payment and any verification activity? 3. Is the government's primary recourse retrospective (audits, overpayment demands) rather than prospective (prior authorization, real-time adjudication)? If YES to any, this quality is likely present.",
@@ -9,10 +9,10 @@
       "Medicare FFS processes 1B+ claims annually and pays first, then audits — enabling Operation Gold Rush's $10.6B in DME claims",
       "ACA advance premium tax credits paid monthly before IRS reconciliation, which was paused 2021-2024"
     ],
-    "color": "var(--v1)"
+    "review_status": "approved"
   },
   {
-    "quality_id": "V2",
+    "quality_id": "02c85e7c",
     "name": "Self-Attesting Payment Basis",
     "definition": "The entity that receives payment is also the entity that generates or controls the data that determines the payment amount, with no independent third-party verification of that data.",
     "recognition_test": "1. Does the entity receiving payment generate the key data input (diagnosis codes, service logs, eligibility determinations) that directly determines how much it gets paid? 2. Is there an independent party that validates this data BEFORE it affects payment? 3. Could the paying entity detect data manipulation without conducting a clinical audit? If the answer to #1 is YES and #2 is NO, this quality is present.",
@@ -22,10 +22,10 @@
       "Hospice providers certify the terminal prognosis that triggers their own per diem payment",
       "ACA applicants self-attest income that determines their own subsidy amount — GAO found 100% of fictitious applications approved"
     ],
-    "color": "var(--v2)"
+    "review_status": "approved"
   },
   {
-    "quality_id": "V3",
+    "quality_id": "1415e4d9",
     "name": "Uncapped New Payment Category",
     "definition": "A new billing code, product category, or reimbursement pathway exists without concurrent volume limits, prior authorization requirements, or spending caps, and has not yet developed a baseline of expected utilization against which anomalies can be measured.",
     "recognition_test": "1. Was this billing code or payment category created or significantly expanded within the last 5 years? 2. Is there NO prior authorization requirement for services in this category? 3. Is there NO annual or per-beneficiary spending cap? 4. Does CMS or the relevant payer lack a historical baseline of 'normal' utilization for this category? If YES to #1 AND any of #2-4, this quality is present.",
@@ -35,10 +35,10 @@
       "COVID telehealth codes with new modifiers and relaxed place-of-service requirements",
       "Done Global exploited newly flexible Schedule II telehealth prescribing rules"
     ],
-    "color": "var(--v3)"
+    "review_status": "approved"
   },
   {
-    "quality_id": "V4",
+    "quality_id": "f192df10",
     "name": "Subjective Clinical Criteria",
     "definition": "The eligibility determination or medical necessity judgment that triggers payment depends on clinical opinion or patient self-report that is inherently difficult to independently verify, rather than on objective, measurable criteria.",
     "recognition_test": "1. Does the payment-triggering determination rely on clinical judgment rather than objective lab values, imaging, or measurable criteria? 2. Could two qualified clinicians reasonably reach opposite conclusions on the same patient? 3. Is patient self-report a primary input to the determination? If YES to #1 AND either #2 or #3, this quality is present.",
@@ -48,10 +48,10 @@
       "ADHD diagnosis in Done Global's telehealth model based on brief screen and self-report",
       "Behavioral health diagnoses in Arizona Medicaid fraud relied on patient self-report and clinical interpretation"
     ],
-    "color": "var(--v4)"
+    "review_status": "approved"
   },
   {
-    "quality_id": "V5",
+    "quality_id": "98878f0f",
     "name": "Payment Disconnected from Delivery",
     "definition": "The payment structure is flat, bundled, or capitated in a way that creates no marginal cost to the provider for reducing service quantity or intensity below what was paid for.",
     "recognition_test": "1. Is the payment amount the same regardless of how many services are actually delivered within the payment period? 2. Does the provider retain more revenue by delivering fewer or less intensive services? 3. Is there no minimum service delivery threshold as a condition of payment? If YES to #1 AND #2, this quality is present.",
@@ -60,10 +60,10 @@
       "Hospice per diem pays the same daily rate whether the patient receives full IDT visits or nothing",
       "MA capitation pays per member per month regardless of service volume — incentivizing under-service while coding for maximum risk adjustment"
     ],
-    "color": "var(--v5)"
+    "review_status": "approved"
   },
   {
-    "quality_id": "V6",
+    "quality_id": "904a9c85",
     "name": "Expansion Outpaces Oversight",
     "definition": "A major policy change has dramatically expanded enrollment, provider participation, or covered services faster than the responsible oversight body has built corresponding monitoring, credentialing, or audit capacity.",
     "recognition_test": "1. Has the program's enrollment, spending, or provider count grown by more than 50% in the last 3-5 years? 2. Has the oversight body's staffing, audit capacity, or monitoring infrastructure grown proportionally? 3. Were recent waivers or emergency flexibilities granted that relaxed normal enrollment screening or oversight requirements? If YES to #1 and NO to #2, or YES to #3, this quality is present.",
@@ -73,10 +73,10 @@
       "ACA enhanced subsidies drove 60%+ enrollment growth but CMS fraud risk assessment unchanged since 2018",
       "Arizona behavioral health spending grew 5x in 2 years; state oversight was not proportional"
     ],
-    "color": "var(--v6)"
+    "review_status": "approved"
   },
   {
-    "quality_id": "V7",
+    "quality_id": "050dee66",
     "name": "Intermediary Opacity",
     "definition": "Financial flows pass through one or more intermediary entities that obscure the economic relationship between the government payment and the ultimate recipient or service, making it difficult to determine whether payments reflect value or constitute disguised kickbacks or profit extraction.",
     "recognition_test": "1. Do payments pass through intermediary entities (PBMs, brokers, foundations, management companies, TPAs) between the government payer and the entity delivering the service? 2. Are the financial terms of these intermediary arrangements opaque to the government payer? 3. Could the intermediary structure be used to disguise payments that would otherwise violate the Anti-Kickback Statute? If YES to #1 AND either #2 or #3, this quality is present.",
@@ -86,10 +86,10 @@
       "PBM spread pricing — CVS Caremark found liable for $290M in inflated Part D prices",
       "ACA broker system enabled unauthorized batch enrollments for commission capture"
     ],
-    "color": "var(--v7)"
+    "review_status": "approved"
   },
   {
-    "quality_id": "V8",
+    "quality_id": "ecce188f",
     "name": "Low Barriers to Billing Entry",
     "definition": "The credentialing, enrollment, or licensing requirements to become an entity that can bill a federal health program are low enough that bad actors can rapidly establish or acquire billing entities, sometimes dozens at once.",
     "recognition_test": "1. Can a new entity begin billing within 90 days of application? 2. Are there no experience, education, or capitalization requirements for the entity's principal operators? 3. Can billing privileges be effectively transferred by acquiring an existing entity? 4. Is there no site visit or in-person verification before billing begins? If YES to two or more, this quality is present.",
@@ -99,6 +99,6 @@
       "Hospice fraud enabled by lack of administrator certification requirements",
       "Sham behavioral health treatment facilities in Arizona required minimal state licensing"
     ],
-    "color": "var(--v8)"
+    "review_status": "approved"
   }
 ]

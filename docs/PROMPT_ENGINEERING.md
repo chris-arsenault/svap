@@ -1,6 +1,6 @@
 # Prompt Engineering Guide
 
-All prompts live in `svap/prompts/` as plain `.txt` files with `{variable}` placeholders. You can modify them without touching any code.
+All prompts live in `backend/src/svap/prompts/` as plain `.txt` files with `{variable}` placeholders. You can modify them without touching any code.
 
 ## General Principles
 
@@ -41,7 +41,7 @@ GOOD enabling condition: "Payment issued before independent verification of serv
 GOOD enabling condition: "Provider self-reports the diagnosis codes that determine its own risk-adjusted payment"
 ```
 
-### Stage 2: `stage2_cluster.txt` and `stage2_refine.txt`
+### Stage 2: `stage2_cluster.txt`, `stage2_refine.txt`, and `stage2_dedup.txt`
 **Key challenge:** Getting the right level of abstraction — specific enough to be useful, general enough to transfer across policies.
 
 If qualities are too specific (e.g., "Medicare FFS pays before audit"), they won't transfer to other policies. If too abstract (e.g., "the system has flaws"), they're useless. The target is the level of "Payment Precedes Verification" — specific enough to apply a recognition test, general enough to apply to any payment system.
@@ -49,6 +49,8 @@ If qualities are too specific (e.g., "Medicare FFS pays before audit"), they won
 The refinement prompt's **independence check** is critical. If two qualities always co-occur, the taxonomy is over-specified. Common merge candidates:
 - "Low provider barriers" and "Rapid enrollment expansion" might merge into a single "Permeable entry" quality
 - "Subjective criteria" and "Self-attesting basis" might merge (but usually shouldn't — they address different structural dimensions)
+
+The deduplication prompt (`stage2_dedup.txt`) runs after refinement and compares each new quality against the existing taxonomy. It determines whether a newly extracted quality is semantically equivalent to an existing one. Two qualities match if they describe the same fundamental structural property, even with different wording or examples. The dedup prompt should err on the side of merging rather than creating near-duplicates.
 
 ### Stage 3: `stage3_score.txt`
 **Key challenge:** Preventing over-scoring. The model tends to be generous — marking qualities as PRESENT when they're only weakly suggested.
@@ -81,11 +83,11 @@ If predictions start sounding like generic fraud descriptions rather than struct
 ANTI-PATTERN: "Providers will submit false claims" — this is generic 
 and doesn't cite a specific quality. REMOVE predictions like this.
 
-GOOD PATTERN: "Because this policy has V1 (payment precedes verification) 
-AND V8 (low barriers), an organized network can rapidly establish multiple 
-billing entities, submit large volumes of claims, collect payment before 
-any audit occurs, then dissolve the entities." — this cites V1+V8 and 
-explains the interaction.
+GOOD PATTERN: "Because this policy has Payment Precedes Verification
+AND Low Barriers to Billing Entry, an organized network can rapidly
+establish multiple billing entities, submit large volumes of claims,
+collect payment before any audit occurs, then dissolve the entities."
+— this cites specific qualities and explains the interaction.
 ```
 
 ### Stage 6: `stage6_detect.txt`

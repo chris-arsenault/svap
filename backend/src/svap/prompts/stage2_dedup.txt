@@ -1,0 +1,31 @@
+You are comparing a newly extracted vulnerability quality against an existing approved taxonomy of structural vulnerability qualities.
+
+NEW QUALITY:
+Name: {new_name}
+Definition: {new_definition}
+Exploitation Logic: {new_exploitation_logic}
+
+EXISTING TAXONOMY:
+{existing_taxonomy}
+
+Determine if the new quality is semantically equivalent to any existing quality in the taxonomy above.
+
+Two qualities are EQUIVALENT if they describe the same fundamental structural property that creates exploitable conditions, even if:
+- They use different terminology or wording
+- They are illustrated with different examples
+- One is more specific than the other (the more general one subsumes the specific one)
+
+Two qualities are NOT equivalent if:
+- They describe different causal mechanisms (different WHY)
+- One could exist without the other in a real policy
+- They require different structural design decisions to mitigate
+
+If equivalent: Return the ID of the matching existing quality and explain your reasoning.
+If novel: Explain why this quality represents a genuinely new structural property not captured by the existing taxonomy.
+
+Return ONLY valid JSON:
+{{
+  "match": true or false,
+  "existing_quality_id": "the matching quality_id if match is true, omit if false",
+  "reasoning": "brief explanation of why this is or is not a match"
+}}

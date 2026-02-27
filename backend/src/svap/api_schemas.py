@@ -8,16 +8,19 @@ policy_scores, etc.). The UI expects enriched objects with computed fields
 
 from collections import defaultdict
 
-QUALITY_COLORS = {
-    "V1": "var(--v1)",
-    "V2": "var(--v2)",
-    "V3": "var(--v3)",
-    "V4": "var(--v4)",
-    "V5": "var(--v5)",
-    "V6": "var(--v6)",
-    "V7": "var(--v7)",
-    "V8": "var(--v8)",
-}
+_COLOR_PALETTE = [
+    "var(--v1)", "var(--v2)", "var(--v3)", "var(--v4)",
+    "var(--v5)", "var(--v6)", "var(--v7)", "var(--v8)",
+]
+
+
+def _quality_color(quality_id: str, all_quality_ids: list[str]) -> str:
+    """Assign color by position in the sorted quality list."""
+    try:
+        idx = all_quality_ids.index(quality_id)
+    except ValueError:
+        idx = 0
+    return _COLOR_PALETTE[idx % len(_COLOR_PALETTE)]
 
 
 def enrich_cases(cases: list[dict], convergence_matrix: list[dict]) -> list[dict]:
@@ -34,13 +37,14 @@ def enrich_cases(cases: list[dict], convergence_matrix: list[dict]) -> list[dict
 
 def enrich_taxonomy(taxonomy: list[dict], convergence_matrix: list[dict]) -> list[dict]:
     """Add `color` and `case_count` to each taxonomy quality."""
+    all_quality_ids = sorted(q["quality_id"] for q in taxonomy)
     quality_case_count = defaultdict(set)
     for row in convergence_matrix:
         if row.get("present"):
             quality_case_count[row["quality_id"]].add(row["case_id"])
 
     for q in taxonomy:
-        q["color"] = QUALITY_COLORS.get(q["quality_id"], "var(--accent)")
+        q["color"] = _quality_color(q["quality_id"], all_quality_ids)
         q["case_count"] = len(quality_case_count.get(q["quality_id"], set()))
         # Parse canonical_examples from JSON string if needed
         if isinstance(q.get("canonical_examples"), str):

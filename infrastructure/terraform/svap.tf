@@ -276,6 +276,18 @@ module "api" {
     "POST /api/pipeline/approve",
     "POST /api/pipeline/seed",
     "GET /api/health",
+    "POST /api/discovery/run-feeds",
+    "GET /api/discovery/candidates",
+    "POST /api/discovery/candidates/review",
+    "GET /api/discovery/feeds",
+    "POST /api/discovery/feeds",
+    "POST /api/research/triage",
+    "POST /api/research/deep",
+    "GET /api/research/triage",
+    "GET /api/research/sessions",
+    "GET /api/research/findings/{policy_id}",
+    "GET /api/research/assessments/{policy_id}",
+    "GET /api/dimensions",
   ]
 
   cors_allow_origins = local.allowed_origins

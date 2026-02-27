@@ -10,7 +10,7 @@
 
 ## Project Overview
 
-SVAP is a 7-stage LLM pipeline (stages 0-6) that analyzes healthcare enforcement actions to predict policy exploitation. Backend is a plain Python Lambda handler (no web framework). Frontend is React + TypeScript + Vite. Infrastructure is Terraform on AWS.
+SVAP is a 7-stage LLM pipeline (stages 0-6) that analyzes enforcement actions to identify structural policy vulnerabilities and predict exploitation patterns. Backend is a plain Python Lambda handler (no web framework). Frontend is React + TypeScript + Vite with Zustand state management and path-based routing. Infrastructure is Terraform on AWS.
 
 ## Code Layout
 
@@ -26,7 +26,8 @@ SVAP is a 7-stage LLM pipeline (stages 0-6) that analyzes healthcare enforcement
 | `backend/src/svap/prompts/` | LLM prompt templates (`.txt` with `{variable}` placeholders) |
 | `backend/src/svap/seed/` | Bootstrap JSON data |
 | `backend/config.yaml` | Pipeline config (model ID, RAG settings, human gates) |
-| `frontend/src/data/usePipelineData.tsx` | Single data hook — Context provider for all views |
+| `frontend/src/data/pipelineStore.ts` | Zustand store — single source of truth for all views |
+| `frontend/src/data/useStatusSubscription.ts` | Polling hook for live pipeline status |
 | `frontend/src/views/` | One file per view (Dashboard, Sources, Cases, etc.) |
 | `infrastructure/terraform/svap.tf` | All AWS resources (VPC, RDS, Lambda, API GW, Step Functions) |
 
@@ -37,8 +38,11 @@ SVAP is a 7-stage LLM pipeline (stages 0-6) that analyzes healthcare enforcement
 - **Two Lambda functions**: `svap-api` (HTTP API) and `svap-stage-runner` (Step Functions invocation). Both share the same codebase.
 - **Default config in two places**: `api.py:_DEFAULT_CONFIG` and `stage_runner.py:_default_config()`. Both must stay in sync.
 - **Bedrock model ID**: Currently `us.anthropic.claude-sonnet-4-6` (inference profile format, not raw model ID).
-- **Human gates**: Stages 2 and 5 require approval via Step Functions task tokens.
+- **Human gates**: Stages 2 and 5 require approval via Step Functions task tokens. Stage 2's gate is conditional — it only fires when novel taxonomy qualities are extracted.
+- **Delta processing**: Stages 1 and 2 are iterative. Stage 1 tracks processed documents; Stage 2 tracks processed cases and semantically deduplicates new qualities against the existing taxonomy.
+- **Global vs per-run tables**: Cases, taxonomy, and policies are global. Scores, predictions, and patterns are per-run.
 - **Auth**: Cognito JWT from shared user pool in `../websites/` repo. Tokens passed as `Authorization: Bearer {jwt}`.
+- **Async operations**: Pipeline run returns 202 Accepted. Frontend polls `GET /api/status` for progress.
 
 ## Development Commands
 
@@ -52,15 +56,22 @@ cd frontend && npx tsc --noEmit && npm run build
 # Local dev servers
 cd backend && python -m svap.dev_server    # :5000
 cd frontend && npm run dev                  # :5173
+
+# Pipeline operations
+make seed          # Reset corpus + load seed data
+make reset         # Full corpus reset
+make runs          # List pipeline runs
 ```
 
 ## Common Gotchas
 
 - Adding an API route requires: handler function in `api.py`, entry in `ROUTES` dict, route string in `svap.tf` API Gateway routes list
 - The `scale_dollars` column is `REAL` — `_parse_dollars()` in `stage1_case_assembly.py` handles messy LLM output
-- `enforcement_sources` table is not tied to a run — it's a global registry with document tracking
+- `enforcement_sources` table is global (no run_id) — it's a registry with document tracking
 - S3 uploads go to `SVAP_CONFIG_BUCKET` under `enforcement-sources/{source_id}/`
-- Frontend `usePipelineData` fetches `/api/dashboard` on mount — this is the single data source for all views
+- `pipelineStore.ts` fetches `/api/dashboard` on mount — this is the single data source for all views
+- `get_pipeline_status()` uses `DISTINCT ON (stage)` to return only the latest status per stage
+- Downstream stages (3-5) use `get_approved_taxonomy()` — only approved qualities affect scoring
 
 ## Documentation Index
 
@@ -68,5 +79,3 @@ cd frontend && npm run dev                  # :5173
 - [Data Model](docs/DATA_MODEL.md) — Database schema, entity relationships
 - [Prompt Engineering](docs/PROMPT_ENGINEERING.md) — Prompt design patterns, template format
 - [Replication Guide](docs/REPLICATION_GUIDE.md) — Reproducing the HHS OIG analysis
-- [Cognito Auth Design](docs/plans/2026-02-25-cognito-auth-design.md) — Authentication architecture
-- [Cognito Auth Plan](docs/plans/2026-02-25-cognito-auth-plan.md) — Auth implementation plan

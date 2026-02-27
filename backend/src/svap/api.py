@@ -35,14 +35,14 @@ from svap.hhs_data import (
     get_data_sources_for_policy,
     get_policy_context,
 )
-from svap.storage import SVAPStorage
+from svap.storage import SVAPStorage, resolve_database_url
 
 logger = logging.getLogger(__name__)
 logger.setLevel(os.environ.get("LOG_LEVEL", "INFO"))
 
 # ── Configuration ────────────────────────────────────────────────────────
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://svap:password@localhost:5432/svap")
+DATABASE_URL = resolve_database_url()
 IS_LAMBDA = bool(os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
 PIPELINE_STATE_MACHINE_ARN = os.environ.get("PIPELINE_STATE_MACHINE_ARN", "")
 CONFIG_BUCKET = os.environ.get("SVAP_CONFIG_BUCKET", "")
@@ -140,6 +140,15 @@ def _ok(body) -> dict:
     }
 
 
+def _accepted(body) -> dict:
+    """202 Accepted — work has been queued, not completed."""
+    return {
+        "statusCode": 202,
+        "headers": {"Content-Type": "application/json"},
+        "body": json.dumps(body, default=str),
+    }
+
+
 def _error(status_code: int, message: str) -> dict:
     """Error response in API Gateway V2 format."""
     return {
@@ -157,24 +166,29 @@ def _error(status_code: int, message: str) -> dict:
 
 def _dashboard(event):
     storage = get_storage()
-    storage.seed_enforcement_sources_if_empty()
     run_id = storage.get_latest_run()
     if not run_id:
+        # No pipeline runs yet — show global corpus data (cases, taxonomy, policies)
+        cases = storage.get_cases()
+        taxonomy = storage.get_taxonomy()
+        policies = storage.get_policies()
+        enriched_taxonomy = enrich_taxonomy(taxonomy, [])
+        enriched_policies = enrich_policies(policies, [], None)
         return {
             "run_id": "",
             "source": "api",
             "pipeline_status": [],
             "counts": {
-                "cases": 0,
-                "taxonomy_qualities": 0,
-                "policies": 0,
+                "cases": len(cases),
+                "taxonomy_qualities": len(taxonomy),
+                "policies": len(policies),
                 "predictions": 0,
                 "detection_patterns": 0,
             },
             "calibration": {"threshold": 3},
-            "cases": [],
-            "taxonomy": [],
-            "policies": [],
+            "cases": enrich_cases(cases, []),
+            "taxonomy": enriched_taxonomy,
+            "policies": enriched_policies,
             "predictions": [],
             "detection_patterns": [],
             "case_convergence": [],
@@ -196,14 +210,14 @@ def _status(event):
 def _list_cases(event):
     storage = get_storage()
     run_id = get_active_run_id(storage)
-    return enrich_cases(storage.get_cases(run_id), storage.get_convergence_matrix(run_id))
+    return enrich_cases(storage.get_cases(), storage.get_convergence_matrix(run_id))
 
 
 def _get_case(event):
     case_id = event["pathParameters"]["case_id"]
     storage = get_storage()
     run_id = get_active_run_id(storage)
-    enriched = enrich_cases(storage.get_cases(run_id), storage.get_convergence_matrix(run_id))
+    enriched = enrich_cases(storage.get_cases(), storage.get_convergence_matrix(run_id))
     case = next((c for c in enriched if c["case_id"] == case_id), None)
     if not case:
         raise ApiError(404, f"Case {case_id} not found")
@@ -213,14 +227,14 @@ def _get_case(event):
 def _list_taxonomy(event):
     storage = get_storage()
     run_id = get_active_run_id(storage)
-    return enrich_taxonomy(storage.get_taxonomy(run_id), storage.get_convergence_matrix(run_id))
+    return enrich_taxonomy(storage.get_taxonomy(), storage.get_convergence_matrix(run_id))
 
 
 def _get_quality(event):
     quality_id = event["pathParameters"]["quality_id"]
     storage = get_storage()
     run_id = get_active_run_id(storage)
-    enriched = enrich_taxonomy(storage.get_taxonomy(run_id), storage.get_convergence_matrix(run_id))
+    enriched = enrich_taxonomy(storage.get_taxonomy(), storage.get_convergence_matrix(run_id))
     quality = next((q for q in enriched if q["quality_id"] == quality_id), None)
     if not quality:
         raise ApiError(404, f"Quality {quality_id} not found")
@@ -249,7 +263,7 @@ def _list_policies(event):
     storage = get_storage()
     run_id = get_active_run_id(storage)
     return enrich_policies(
-        storage.get_policies(run_id),
+        storage.get_policies(),
         storage.get_policy_scores(run_id),
         storage.get_calibration(run_id),
     )
@@ -260,7 +274,7 @@ def _get_policy(event):
     storage = get_storage()
     run_id = get_active_run_id(storage)
 
-    policies = storage.get_policies(run_id)
+    policies = storage.get_policies()
     scores = storage.get_policy_scores(run_id)
     calibration = storage.get_calibration(run_id)
     enriched = enrich_policies(policies, scores, calibration)
@@ -332,13 +346,13 @@ def _run_pipeline(event):
             name=run_id,
             input=json.dumps({"run_id": run_id}),
         )
-        return {
+        return _accepted({
             "status": "started",
             "run_id": run_id,
             "execution_arn": response["executionArn"],
-        }
+        })
 
-    return {"status": "started", "run_id": run_id}
+    return _accepted({"status": "started", "run_id": run_id})
 
 
 def _approve_stage(event):
@@ -387,7 +401,6 @@ def _health(event):
 
 def _list_enforcement_sources(event):
     storage = get_storage()
-    storage.seed_enforcement_sources_if_empty()
     return storage.get_enforcement_sources()
 
 
@@ -445,6 +458,15 @@ def _upload_enforcement_document(event):
     if len(text) < 100:
         raise ApiError(400, "Extracted text too short — document may be empty or unreadable")
 
+    from svap.stages.stage0_source_fetch import _is_binary_content
+
+    if _is_binary_content(text):
+        raise ApiError(
+            400,
+            "Document appears to be binary (PDF/image). "
+            "Upload the text content or an HTML version instead.",
+        )
+
     # Store to S3
     s3_key = f"enforcement-sources/{source_id}/{filename}"
     _upload_to_s3(s3_key, file_bytes, "application/octet-stream")
@@ -496,6 +518,167 @@ def _upload_to_s3(key: str, body: bytes, content_type: str):
     boto3.client("s3").put_object(Bucket=bucket, Key=key, Body=body, ContentType=content_type)
 
 
+# ── Discovery routes ────────────────────────────────────────────────────
+
+
+def _run_discovery(event):
+    """Trigger feed-based case discovery.
+
+    Discovery is independent of pipeline runs — it monitors feeds and ingests
+    new enforcement sources into the global tables.  No pipeline_runs record
+    is created so as not to interfere with get_latest_run().
+    """
+    storage = get_storage()
+    config = _get_config()
+
+    from svap.bedrock_client import BedrockClient
+    from svap.stages import stage0a_discovery
+
+    client = BedrockClient(config)
+    result = stage0a_discovery.run(storage, client, config)
+    return {"status": "completed", **result}
+
+
+def _list_candidates(event):
+    storage = get_storage()
+    qs = event.get("queryStringParameters") or {}
+    return storage.get_candidates(
+        feed_id=qs.get("feed_id"),
+        status=qs.get("status"),
+    )
+
+
+def _review_candidate(event):
+    body = _json_body(event)
+    candidate_id = body.get("candidate_id")
+    action = body.get("action")
+    if action not in ("accept", "reject"):
+        raise ApiError(400, "action must be 'accept' or 'reject'")
+    if not candidate_id:
+        raise ApiError(400, "Missing candidate_id")
+
+    storage = get_storage()
+    candidates = storage.get_candidates(status=None)
+    candidate = next((c for c in candidates if c["candidate_id"] == candidate_id), None)
+    if not candidate:
+        raise ApiError(404, f"Candidate {candidate_id} not found")
+
+    if action == "reject":
+        storage.update_candidate_status(candidate_id, "rejected")
+        return {"status": "rejected", "candidate_id": candidate_id}
+
+    # Accept: check if enforcement source with this URL already exists
+    existing_source = storage.get_enforcement_source_by_url(candidate["url"])
+    if existing_source and existing_source.get("has_document") and existing_source.get("doc_id"):
+        # Reuse existing source — no need to re-fetch and re-ingest
+        storage.update_candidate_ingested(
+            candidate_id, existing_source["source_id"], existing_source["doc_id"]
+        )
+        return {"status": "accepted", "candidate_id": candidate_id}
+
+    from svap.stages.stage0_source_fetch import _extract_text, _fetch_url
+    from svap.stages.stage0a_discovery import _ingest_candidate
+
+    config = _get_config()
+    html = _fetch_url(candidate["url"])
+    text = _extract_text(html)
+    _ingest_candidate(candidate, text, storage, config)
+    return {"status": "accepted", "candidate_id": candidate_id}
+
+
+def _list_feeds(event):
+    storage = get_storage()
+    return storage.get_source_feeds()
+
+
+def _create_feed(event):
+    body = _json_body(event)
+    name = body.get("name", "").strip()
+    listing_url = body.get("listing_url", "").strip()
+    if not name or not listing_url:
+        raise ApiError(400, "Missing required fields: name, listing_url")
+
+    feed_id = re.sub(r"[^a-z0-9_]", "", name.lower().replace(" ", "_"))[:50]
+    storage = get_storage()
+    storage.upsert_source_feed({
+        "feed_id": feed_id,
+        "name": name,
+        "listing_url": listing_url,
+        "content_type": body.get("content_type", "press_release"),
+        "link_selector": body.get("link_selector"),
+    })
+    return {"status": "created", "feed_id": feed_id}
+
+
+# ── Research routes ─────────────────────────────────────────────────────
+
+
+def _run_triage(event):
+    storage = get_storage()
+    run_id = get_active_run_id(storage)
+    config = _get_config()
+
+    from svap.bedrock_client import BedrockClient
+    from svap.stages import stage4a_triage
+
+    client = BedrockClient(config)
+    stage4a_triage.run(storage, client, run_id, config)
+    return {"status": "completed", "run_id": run_id}
+
+
+def _run_deep_research(event):
+    body = _json_body(event)
+    storage = get_storage()
+    run_id = get_active_run_id(storage)
+    config = _get_config()
+
+    from svap.bedrock_client import BedrockClient
+    from svap.stages import stage4b_research
+
+    client = BedrockClient(config)
+    stage4b_research.run(storage, client, run_id, config, policy_ids=body.get("policy_ids"))
+    return {"status": "completed", "run_id": run_id}
+
+
+def _get_triage_results(event):
+    storage = get_storage()
+    run_id = get_active_run_id(storage)
+    return storage.get_triage_results(run_id)
+
+
+def _list_research_sessions(event):
+    storage = get_storage()
+    run_id = get_active_run_id(storage)
+    qs = event.get("queryStringParameters") or {}
+    return storage.get_research_sessions(run_id, status=qs.get("status"))
+
+
+def _get_findings(event):
+    policy_id = event["pathParameters"]["policy_id"]
+    storage = get_storage()
+    run_id = get_active_run_id(storage)
+    return {
+        "policy_id": policy_id,
+        "findings": storage.get_structural_findings(run_id, policy_id),
+    }
+
+
+def _get_assessments(event):
+    policy_id = event["pathParameters"]["policy_id"]
+    storage = get_storage()
+    run_id = get_active_run_id(storage)
+    return {
+        "policy_id": policy_id,
+        "assessments": storage.get_quality_assessments(run_id, policy_id),
+    }
+
+
+def _list_dimensions(event):
+    storage = get_storage()
+    storage.seed_dimensions_if_empty()
+    return storage.get_dimensions()
+
+
 # ── Route table ─────────────────────────────────────────────────────────
 # Keys are the exact routeKey strings from API Gateway V2, matching the
 # routes list in infrastructure/terraform/svap.tf.
@@ -525,6 +708,20 @@ ROUTES = {
     "POST /api/pipeline/approve": _approve_stage,
     "POST /api/pipeline/seed": _seed_pipeline,
     "GET /api/health": _health,
+    # Discovery routes
+    "POST /api/discovery/run-feeds": _run_discovery,
+    "GET /api/discovery/candidates": _list_candidates,
+    "POST /api/discovery/candidates/review": _review_candidate,
+    "GET /api/discovery/feeds": _list_feeds,
+    "POST /api/discovery/feeds": _create_feed,
+    # Research routes
+    "POST /api/research/triage": _run_triage,
+    "POST /api/research/deep": _run_deep_research,
+    "GET /api/research/triage": _get_triage_results,
+    "GET /api/research/sessions": _list_research_sessions,
+    "GET /api/research/findings/{policy_id}": _get_findings,
+    "GET /api/research/assessments/{policy_id}": _get_assessments,
+    "GET /api/dimensions": _list_dimensions,
 }
 
 
@@ -541,7 +738,11 @@ def handler(event, context):
         return _error(404, f"Not found: {route_key}")
 
     try:
-        return _ok(route_fn(event))
+        result = route_fn(event)
+        # Route functions may return a raw API Gateway response (has statusCode)
+        if isinstance(result, dict) and "statusCode" in result:
+            return result
+        return _ok(result)
     except ApiError as e:
         return _error(e.status_code, e.message)
     except Exception:

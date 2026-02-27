@@ -133,6 +133,7 @@ html, body, #root {
   padding: var(--sp-2) var(--sp-4);
   cursor: pointer;
   color: var(--text-secondary);
+  text-decoration: none;
   font-size: 13px;
   transition: all 0.15s ease;
   border-left: 2px solid transparent;

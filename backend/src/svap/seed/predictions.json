@@ -5,7 +5,7 @@
     "policy_name": "HCBS",
     "convergence_score": 6,
     "mechanics": "Shell personal care agencies enroll rapidly in states with minimal provider screening, hire attendants at minimum wage, bill Medicaid for 16+ hour days of personal care services that are never delivered or delivered for minutes. EVV data is fabricated or attendants clock in/out at beneficiary homes without providing services. Beneficiaries are recruited from group homes and assisted living where they already receive care.",
-    "enabling_qualities": ["V1", "V2", "V4", "V5", "V6", "V8"],
+    "enabling_qualities": ["7e265e80", "02c85e7c", "f192df10", "98878f0f", "904a9c85", "ecce188f"],
     "actor_profile": "Organized networks creating multiple shell agencies in high-reimbursement states",
     "detection_difficulty": "Medium — EVV data enables detection but requires cross-referencing with service delivery patterns",
     "lifecycle_stage": "Optimization-phase: sophisticated structural gaming already underway in multiple states"
@@ -16,7 +16,7 @@
     "policy_name": "PACE",
     "convergence_score": 5,
     "mechanics": "PACE organizations enroll dual-eligibles who qualify for nursing facility level of care, receive capitated payments of $4,000-8,000/month, then systematically under-provide services to maximize the spread between payment and cost. Clinical assessments are structured to justify enrollment but minimize documented service needs. Complex organizational structure obscures the gap between payment and delivery.",
-    "enabling_qualities": ["V2", "V4", "V5", "V6", "V7"],
+    "enabling_qualities": ["02c85e7c", "f192df10", "98878f0f", "904a9c85", "050dee66"],
     "actor_profile": "Institutional actors — PACE organizations managed by private equity or profit-maximizing operators",
     "detection_difficulty": "Hard — capitated model makes individual service verification irrelevant; must detect systematic underservice",
     "lifecycle_stage": "Exploration-phase: rapid PACE expansion creating window for new entrants"
@@ -27,7 +27,7 @@
     "policy_name": "Hospital-at-Home",
     "convergence_score": 5,
     "mechanics": "Hospitals bill acute inpatient DRG rates for patients receiving care at home, where verification of acuity level and service intensity is minimal. Patients who could be treated at observation or outpatient level are classified as acute to capture higher payment. Remote monitoring data is curated to support acute classification.",
-    "enabling_qualities": ["V1", "V3", "V4", "V5", "V6"],
+    "enabling_qualities": ["7e265e80", "1415e4d9", "f192df10", "98878f0f", "904a9c85"],
     "actor_profile": "Opportunistic hospital systems expanding AHCAH programs to capture DRG revenue for lower-acuity patients",
     "detection_difficulty": "Hard — no institutional witnesses, acuity determinations are subjective, new category lacks baselines",
     "lifecycle_stage": "Exploration-phase: waiver program recently expanded, few baselines exist"
@@ -38,7 +38,7 @@
     "policy_name": "340B Drug Pricing",
     "convergence_score": 4,
     "mechanics": "Covered entities purchase drugs at 340B discounts (25-50% below wholesale), bill Medicaid or commercial insurance at full price, pocket the spread. Contract pharmacy arrangements extend the program to retail locations far from the entity, generating spread on prescriptions for patients with no connection to the covered entity's mission. Duplicate discounts occur when states also collect Medicaid rebates on 340B-purchased drugs.",
-    "enabling_qualities": ["V2", "V6", "V7", "V8"],
+    "enabling_qualities": ["02c85e7c", "904a9c85", "050dee66", "ecce188f"],
     "actor_profile": "Large health systems and contract pharmacy networks maximizing 340B spread revenue",
     "detection_difficulty": "Medium — requires matching 340B purchase data with billing data across fragmented systems",
     "lifecycle_stage": "Optimization-phase: well-documented gaming already industry-wide"

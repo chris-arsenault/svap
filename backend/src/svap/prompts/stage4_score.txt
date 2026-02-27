@@ -19,8 +19,7 @@ Rules:
 Return ONLY valid JSON:
 {{
   "scores": {{
-    "V1": {{"present": true/false, "evidence": "..."}},
-    "V2": {{"present": true/false, "evidence": "..."}},
+    "<quality_id>": {{"present": true/false, "evidence": "..."}},
     ...
   }}
 }}

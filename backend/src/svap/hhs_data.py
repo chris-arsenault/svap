@@ -45,10 +45,10 @@ def get_dashboard_data(storage, run_id: str) -> dict:
     Queries all pipeline tables, enriches with computed fields,
     and returns the shape expected by usePipelineData.js.
     """
-    # Raw data from storage
-    cases = storage.get_cases(run_id)
-    taxonomy = storage.get_taxonomy(run_id)
-    policies = storage.get_policies(run_id)
+    # Raw data from storage — cases, taxonomy, and policies are global
+    cases = storage.get_cases()
+    taxonomy = storage.get_taxonomy()
+    policies = storage.get_policies()
     predictions = storage.get_predictions(run_id)
     patterns = storage.get_detection_patterns(run_id)
     convergence_matrix = storage.get_convergence_matrix(run_id)

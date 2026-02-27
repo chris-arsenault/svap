@@ -9,7 +9,7 @@
     "scale_defendants": 11,
     "scale_duration": "Multiple years",
     "detection_method": "DOJ Data Analytics Team identified billing anomalies; CMS blocked $4.45B in scheduled payments before reaching defendants",
-    "qualities": ["V1", "V2", "V7", "V8"]
+    "qualities": ["7e265e80", "02c85e7c", "050dee66", "ecce188f"]
   },
   {
     "case_id": "kaiser_ma_01",
@@ -21,7 +21,7 @@
     "scale_defendants": 1,
     "scale_duration": "Multiple years",
     "detection_method": "Whistleblower (qui tam action)",
-    "qualities": ["V2", "V4"]
+    "qualities": ["02c85e7c", "f192df10"]
   },
   {
     "case_id": "wound_graft_01",
@@ -33,7 +33,7 @@
     "scale_defendants": 7,
     "scale_duration": "2019-2023",
     "detection_method": "CMS data analytics identified spending anomaly (Part B skin substitutes went from $256M to $10B in 5 years)",
-    "qualities": ["V1", "V2", "V3", "V4", "V8"]
+    "qualities": ["7e265e80", "02c85e7c", "1415e4d9", "f192df10", "ecce188f"]
   },
   {
     "case_id": "done_global_01",
@@ -45,7 +45,7 @@
     "scale_defendants": 2,
     "scale_duration": "2020-2024",
     "detection_method": "DEA investigation triggered by prescription volume anomalies",
-    "qualities": ["V4", "V5", "V6", "V8"]
+    "qualities": ["f192df10", "98878f0f", "904a9c85", "ecce188f"]
   },
   {
     "case_id": "az_bh_01",
@@ -57,7 +57,7 @@
     "scale_defendants": null,
     "scale_duration": "~2 years",
     "detection_method": "State investigation triggered by spending anomaly (5x increase in 2 years with only 30% enrollment growth)",
-    "qualities": ["V1", "V4", "V5", "V6"]
+    "qualities": ["7e265e80", "f192df10", "98878f0f", "904a9c85"]
   },
   {
     "case_id": "hospice_ca_01",
@@ -69,7 +69,7 @@
     "scale_defendants": 4,
     "scale_duration": "Multiple years",
     "detection_method": "Law enforcement investigation",
-    "qualities": ["V1", "V2", "V4", "V8"]
+    "qualities": ["7e265e80", "02c85e7c", "f192df10", "ecce188f"]
   },
   {
     "case_id": "aca_gao_01",
@@ -81,7 +81,7 @@
     "scale_defendants": null,
     "scale_duration": "2021-2024",
     "detection_method": "GAO covert testing; CMS paused enforcement based on IRS data",
-    "qualities": ["V1", "V2", "V6", "V7"]
+    "qualities": ["7e265e80", "02c85e7c", "904a9c85", "050dee66"]
   },
   {
     "case_id": "teva_copay_01",
@@ -93,6 +93,6 @@
     "scale_defendants": 1,
     "scale_duration": "Multiple years",
     "detection_method": "Whistleblower (qui tam action)",
-    "qualities": ["V5", "V7"]
+    "qualities": ["98878f0f", "050dee66"]
   }
 ]

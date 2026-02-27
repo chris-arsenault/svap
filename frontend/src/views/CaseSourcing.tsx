@@ -4,7 +4,7 @@ import { useShallow } from "zustand/shallow";
 import { usePipelineStore } from "../data/pipelineStore";
 import { QualityTags } from "../components/SharedUI";
 import { formatDollars } from "../utils";
-import type { Case, EnforcementSource, ViewProps } from "../types";
+import type { Case, EnforcementSource } from "../types";
 
 function SourceRegistry({ sources }: { sources: EnforcementSource[] }) {
   return (
@@ -79,7 +79,7 @@ function CaseRow({
   );
 }
 
-export default function CaseSourcing({ onNavigate: _onNavigate }: ViewProps) {
+export default function CaseSourcing() {
   const { cases, enforcement_sources } = usePipelineStore(
     useShallow((s) => ({
       cases: s.cases,

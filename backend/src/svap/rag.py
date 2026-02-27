@@ -34,15 +34,12 @@ class DocumentIngester:
         self.chunk_size = config.get("rag", {}).get("chunk_size", 1500)
         self.chunk_overlap = config.get("rag", {}).get("chunk_overlap", 200)
 
-    def ingest_file(self, filepath: str, doc_type: str = "other", metadata: dict | None = None):
-        """Read a file, store it, and chunk it for retrieval."""
-        path = Path(filepath)
-        text = path.read_text(encoding="utf-8", errors="replace")
-        doc_id = hashlib.sha256(f"{path.name}:{text[:200]}".encode()).hexdigest()[:16]
-
+    def _ingest(self, text: str, filename: str, doc_type: str, metadata: dict | None) -> tuple[str, int]:
+        """Insert document and chunks. Returns (doc_id, n_chunks)."""
+        doc_id = hashlib.sha256(f"{filename}:{text[:200]}".encode()).hexdigest()[:16]
         self.storage.insert_document(
             doc_id=doc_id,
-            filename=path.name,
+            filename=filename,
             doc_type=doc_type,
             full_text=text,
             metadata=metadata,
@@ -51,29 +48,25 @@ class DocumentIngester:
         chunks = self._chunk_text(text)
         for i, chunk_text in enumerate(chunks):
             chunk_id = f"{doc_id}_c{i:04d}"
-            self.storage.insert_chunk(
-                chunk_id=chunk_id,
-                doc_id=doc_id,
-                chunk_index=i,
-                text=chunk_text,
-                token_count=count_tokens(chunk_text),
-            )
-
-        return doc_id, len(chunks)
-
-    def ingest_text(
-        self, text: str, filename: str, doc_type: str = "other", metadata: dict | None = None
-    ):
-        """Ingest raw text directly (no file)."""
-        doc_id = hashlib.sha256(f"{filename}:{text[:200]}".encode()).hexdigest()[:16]
-        self.storage.insert_document(doc_id, filename, doc_type, text, metadata)
-
-        chunks = self._chunk_text(text)
-        for i, chunk_text in enumerate(chunks):
-            chunk_id = f"{doc_id}_c{i:04d}"
             self.storage.insert_chunk(chunk_id, doc_id, i, chunk_text, count_tokens(chunk_text))
 
         return doc_id, len(chunks)
+
+    def ingest_file(self, filepath: str, doc_type: str = "other", metadata: dict | None = None):
+        """Read a file, store it, and chunk it for retrieval."""
+        path = Path(filepath)
+        text = path.read_text(encoding="utf-8", errors="replace")
+        return self._ingest(text, path.name, doc_type, metadata)
+
+    def ingest_text(
+        self,
+        text: str,
+        filename: str,
+        doc_type: str = "other",
+        metadata: dict | None = None,
+    ):
+        """Ingest raw text directly (no file)."""
+        return self._ingest(text, filename, doc_type, metadata)
 
     def ingest_directory(self, dirpath: str, doc_type: str = "other"):
         """Ingest all .txt, .md, and .json files from a directory."""

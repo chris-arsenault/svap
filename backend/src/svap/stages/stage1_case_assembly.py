@@ -27,6 +27,9 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
 
     For each enforcement document, sends it to Claude with the extraction prompt,
     parses the structured output, and stores each case in the database.
+
+    Incremental: documents that already have extracted cases in the database
+    are skipped.
     """
     print("Stage 1: Case Corpus Assembly")
     storage.log_stage_start(run_id, 1)
@@ -39,8 +42,18 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
             storage.log_stage_complete(run_id, 1, {"cases_extracted": 0, "note": "no documents"})
             return
 
-        total_cases = 0
+        # Skip documents that already have extracted cases
+        new_docs = []
+        skipped = 0
         for doc in docs:
+            if storage.cases_exist_for_document(doc["doc_id"]):
+                print(f"  Skipping (cases exist): {doc['filename']}")
+                skipped += 1
+            else:
+                new_docs.append(doc)
+
+        total_cases = 0
+        for doc in new_docs:
             print(f"  Processing: {doc['filename']}")
             prompt = client.render_prompt(
                 "stage1_extract.txt",
@@ -57,7 +70,7 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
 
                 case = {
                     "case_id": case_id,
-                    "source_document": doc["filename"],
+                    "source_doc_id": doc["doc_id"],
                     "case_name": case_data.get("case_name", "Unknown"),
                     "scheme_mechanics": case_data.get("scheme_mechanics", ""),
                     "exploited_policy": case_data.get("exploited_policy", ""),
@@ -68,25 +81,32 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
                     "detection_method": case_data.get("detection_method"),
                     "raw_extraction": case_data,
                 }
-                storage.insert_case(run_id, case)
+                storage.insert_case(case)
                 total_cases += 1
                 print(f"    Extracted: {case['case_name']}")
 
-        storage.log_stage_complete(run_id, 1, {"cases_extracted": total_cases})
-        print(f"  Stage 1 complete: {total_cases} cases extracted from {len(docs)} documents.")
+        storage.log_stage_complete(run_id, 1, {
+            "cases_extracted": total_cases,
+            "documents_processed": len(new_docs),
+            "documents_skipped": skipped,
+        })
+        print(
+            f"  Stage 1 complete: {total_cases} cases from {len(new_docs)} new documents "
+            f"({skipped} unchanged, skipped)."
+        )
 
     except Exception as e:
         storage.log_stage_failed(run_id, 1, str(e))
         raise
 
 
-def load_seed_cases(storage: SVAPStorage, run_id: str, seed_path: str):
+def load_seed_cases(storage: SVAPStorage, seed_path: str):
     """Load pre-extracted cases from a seed JSON file (bypasses LLM extraction)."""
     with open(seed_path) as f:
         cases = json.load(f)
 
     for case_data in cases:
-        storage.insert_case(run_id, case_data)
+        storage.insert_case(case_data)
     print(f"  Loaded {len(cases)} seed cases.")
 
 

@@ -1,4 +1,4 @@
-import React from "react";
+import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
   Database,
@@ -8,36 +8,41 @@ import {
   Grid,
   AlertTriangle,
   Radio,
+  Radar,
+  Microscope,
+  Layers,
   type LucideIcon,
 } from "lucide-react";
 import { StageDot } from "./SharedUI";
 import { usePipelineStatus, useCounts } from "../data/usePipelineSelectors";
-import type { Counts, ViewId } from "../types";
+import type { Counts } from "../types";
 
 type NavSection = { section: string };
-type NavLink = {
-  id: ViewId;
+type NavItem = NavSection | {
+  path: string;
   label: string;
   icon: LucideIcon;
   countKey?: keyof Counts;
 };
-type NavItem = NavSection | NavLink;
 
-function isSection(item: NavItem): item is NavSection {
+function isSection(item: NavSection | NavItem): item is NavSection {
   return "section" in item;
 }
 
 const NAV_ITEMS: NavItem[] = [
   { section: "Analysis" },
-  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { id: "sources", label: "Sources", icon: Database },
-  { id: "cases", label: "Case Sourcing", icon: FileSearch, countKey: "cases" },
-  { id: "policies", label: "Policy Explorer", icon: FolderTree },
+  { path: "/", label: "Dashboard", icon: LayoutDashboard },
+  { path: "/sources", label: "Sources", icon: Database },
+  { path: "/cases", label: "Case Sourcing", icon: FileSearch, countKey: "cases" },
+  { path: "/policies", label: "Policy Explorer", icon: FolderTree },
+  { path: "/discovery", label: "Discovery", icon: Radar },
+  { path: "/research", label: "Research", icon: Microscope },
+  { path: "/dimensions", label: "Dimensions", icon: Layers },
   { section: "Pipeline Results" },
-  { id: "taxonomy", label: "Taxonomy", icon: Tags, countKey: "taxonomy_qualities" },
-  { id: "matrix", label: "Convergence Matrix", icon: Grid },
-  { id: "predictions", label: "Predictions", icon: AlertTriangle, countKey: "predictions" },
-  { id: "detection", label: "Detection Patterns", icon: Radio, countKey: "detection_patterns" },
+  { path: "/taxonomy", label: "Taxonomy", icon: Tags, countKey: "taxonomy_qualities" },
+  { path: "/matrix", label: "Convergence Matrix", icon: Grid },
+  { path: "/predictions", label: "Predictions", icon: AlertTriangle, countKey: "predictions" },
+  { path: "/detection", label: "Detection Patterns", icon: Radio, countKey: "detection_patterns" },
 ];
 
 const STAGE_NAMES: Record<number, string> = {
@@ -45,19 +50,20 @@ const STAGE_NAMES: Record<number, string> = {
   1: "Case Assembly",
   2: "Taxonomy Extraction",
   3: "Convergence Scoring",
+  40: "Policy Triage",
+  41: "Deep Research",
+  42: "Quality Assessment",
   4: "Policy Scanning",
   5: "Exploitation Prediction",
   6: "Detection Patterns",
 };
 
 interface SidebarProps {
-  activeView: ViewId;
-  onNavigate: (view: ViewId) => void;
   onSignOut: () => void;
   username: string;
 }
 
-export default function Sidebar({ activeView, onNavigate, onSignOut, username }: SidebarProps) {
+export default function Sidebar({ onSignOut, username }: SidebarProps) {
   const pipeline_status = usePipelineStatus();
   const counts = useCounts();
 
@@ -78,25 +84,18 @@ export default function Sidebar({ activeView, onNavigate, onSignOut, username }:
           }
           const Icon = item.icon;
           return (
-            <div
-              key={item.id}
-              className={`nav-item ${activeView === item.id ? "active" : ""}`}
-              role="button"
-              tabIndex={0}
-              onClick={() => onNavigate(item.id)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  onNavigate(item.id);
-                }
-              }}
+            <NavLink
+              key={item.path}
+              to={item.path}
+              end={item.path === "/"}
+              className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
             >
               <Icon />
               <span>{item.label}</span>
               {item.countKey && counts?.[item.countKey] > 0 && (
                 <span className="nav-badge">{counts[item.countKey]}</span>
               )}
-            </div>
+            </NavLink>
           );
         })}
       </nav>

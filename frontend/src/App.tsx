@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback, type FormEvent } from "react";
+import { Routes, Route } from "react-router-dom";
 import { usePipelineStore } from "./data/pipelineStore";
 import { useLoading, useError, useRefresh } from "./data/usePipelineSelectors";
+import { useStatusSubscription } from "./data/useStatusSubscription";
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./views/Dashboard";
 import SourcesView from "./views/SourcesView";
@@ -10,24 +12,15 @@ import TaxonomyView from "./views/TaxonomyView";
 import ConvergenceMatrix from "./views/ConvergenceMatrix";
 import PredictionView from "./views/PredictionView";
 import DetectionView from "./views/DetectionView";
+import DiscoveryView from "./views/DiscoveryView";
+import ResearchView from "./views/ResearchView";
+import DimensionRegistryView from "./views/DimensionRegistryView";
 import { signIn, signOut, getSession } from "./auth";
-import type { ViewId, ViewProps } from "./types";
 
 type AuthState = {
   status: "loading" | "signedOut" | "signedIn";
   token: string;
   username: string;
-};
-
-const VIEWS: Record<ViewId, React.ComponentType<ViewProps>> = {
-  dashboard: Dashboard,
-  sources: SourcesView,
-  cases: CaseSourcing,
-  policies: PolicyExplorer,
-  taxonomy: TaxonomyView,
-  matrix: ConvergenceMatrix,
-  predictions: PredictionView,
-  detection: DetectionView,
 };
 
 export default function App() {
@@ -111,7 +104,6 @@ export default function App() {
 }
 
 function AuthenticatedApp({ token, username, onSignOut }: { token: string; username: string; onSignOut: () => void }) {
-  const [activeView, setActiveView] = useState<ViewId>("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Initialize the store with the auth token (triggers first fetch)
@@ -119,23 +111,15 @@ function AuthenticatedApp({ token, username, onSignOut }: { token: string; usern
     usePipelineStore.getState()._setToken(token);
   }, [token]);
 
-  const handleNavigate = useCallback((view: ViewId) => {
-    setActiveView(view);
-    setSidebarOpen(false);
-  }, []);
+  // Poll for pipeline status updates when a run is active
+  useStatusSubscription();
 
-  const ViewComponent = VIEWS[activeView] || Dashboard;
   return (
     <div className={`app-layout ${sidebarOpen ? "sidebar-open" : ""}`}>
       {/* eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */}
       <div className="sidebar-overlay" onClick={() => setSidebarOpen(false)} />
-      <Sidebar
-        activeView={activeView}
-        onNavigate={handleNavigate}
-        onSignOut={onSignOut}
-        username={username}
-      />
-      <main className="main-content" key={activeView}>
+      <Sidebar onSignOut={onSignOut} username={username} />
+      <main className="main-content">
         <button
           className="mobile-menu-btn"
           onClick={() => setSidebarOpen((o) => !o)}
@@ -144,7 +128,19 @@ function AuthenticatedApp({ token, username, onSignOut }: { token: string; usern
           <span className="hamburger-icon" />
         </button>
         <ApiGate>
-          <ViewComponent onNavigate={setActiveView} />
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/sources" element={<SourcesView />} />
+            <Route path="/cases" element={<CaseSourcing />} />
+            <Route path="/policies" element={<PolicyExplorer />} />
+            <Route path="/taxonomy" element={<TaxonomyView />} />
+            <Route path="/matrix" element={<ConvergenceMatrix />} />
+            <Route path="/predictions" element={<PredictionView />} />
+            <Route path="/detection" element={<DetectionView />} />
+            <Route path="/discovery" element={<DiscoveryView />} />
+            <Route path="/research" element={<ResearchView />} />
+            <Route path="/dimensions" element={<DimensionRegistryView />} />
+          </Routes>
         </ApiGate>
       </main>
     </div>

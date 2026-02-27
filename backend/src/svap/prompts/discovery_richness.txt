@@ -1,0 +1,37 @@
+You are evaluating an enforcement document for structural richness — how useful it is for extracting detailed fraud case data for a vulnerability analysis pipeline.
+
+Document title: {title}
+Source URL: {url}
+
+DOCUMENT TEXT (first portion):
+{text_sample}
+
+Score this document on a 0.0 to 1.0 scale for STRUCTURAL RICHNESS. A document is rich if it describes:
+
+1. SCHEME MECHANICS — what the actors operationally did, step by step (not just legal charges)
+2. EXPLOITED POLICY — the specific program, payment model, or regulatory rule that was targeted
+3. ENABLING CONDITION — the structural design property of the policy that made the fraud possible
+4. SCALE — dollar amounts, participant counts, duration, or geographic scope
+
+A document is THIN (low score) if it:
+- Only contains sentencing announcements without scheme detail
+- Describes fraud generically without operational mechanics
+- Presents legal conclusions without explaining how the scheme worked
+- Is a statistical summary without individual case descriptions
+
+Scoring guide:
+- 0.8-1.0: Detailed scheme descriptions with all four elements present
+- 0.6-0.8: Good operational detail but missing one element
+- 0.4-0.6: Some useful detail but mostly surface-level or legal-focused
+- 0.2-0.4: Minimal operational detail, mostly sentencing or procedural
+- 0.0-0.2: No extractable case information
+
+Also estimate how many distinct, extractable fraud cases this document contains. A single press release usually describes 1 case. National takedown summaries may contain 20+.
+
+Return ONLY valid JSON:
+{{
+  "richness_score": 0.0,
+  "rationale": "One paragraph explaining the score",
+  "estimated_cases": 1,
+  "scheme_types": ["brief labels for the types of fraud described"]
+}}

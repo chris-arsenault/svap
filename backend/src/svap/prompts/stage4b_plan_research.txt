@@ -1,0 +1,36 @@
+You are planning regulatory research for a government policy to understand its structural properties for vulnerability analysis.
+
+POLICY: {policy_name}
+DESCRIPTION: {policy_description}
+
+STRUCTURAL DIMENSIONS TO INVESTIGATE:
+{dimensions}
+
+KNOWN CFR REFERENCES FOR THIS POLICY:
+{known_cfr_references}
+
+Plan the research. For each structural dimension, identify which regulatory sources should be consulted. Focus on the sources most likely to reveal how the policy's payment, verification, eligibility, and delivery mechanics actually work.
+
+Available sources:
+1. eCFR (ecfr.gov) — Code of Federal Regulations, organized by title/part/section
+2. Federal Register — Final rules and proposed rules with preamble analysis
+
+Return ONLY valid JSON:
+{{
+  "ecfr_queries": [
+    {{
+      "title": 42,
+      "part": "418",
+      "subpart": null,
+      "rationale": "Why this CFR section is relevant"
+    }}
+  ],
+  "fr_searches": [
+    {{
+      "term": "search query for Federal Register",
+      "rationale": "Why this search is relevant"
+    }}
+  ],
+  "dimensions_covered": ["PAYMENT_MODEL", "VERIFICATION_STRUCTURE"],
+  "dimensions_gap": ["CHANGE_VELOCITY"]
+}}

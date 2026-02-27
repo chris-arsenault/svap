@@ -1,0 +1,22 @@
+You are assessing whether a structural vulnerability quality is present in a policy based on specific structural findings.
+
+QUALITY: {quality_id} — {quality_name}
+DEFINITION: {quality_definition}
+RECOGNITION TEST: {quality_recognition_test}
+
+STRUCTURAL FINDINGS FOR THIS POLICY ({policy_name}):
+{findings_text}
+
+Apply each question in the recognition test to the findings above.
+- A quality is PRESENT (yes) only if specific findings directly support it
+- A quality is ABSENT (no) if findings directly contradict it or clearly show the condition doesn't hold
+- A quality is UNCERTAIN if findings are ambiguous or don't address the recognition test
+- Cite the specific finding IDs that support your assessment
+
+Return ONLY valid JSON:
+{{
+  "present": "yes",
+  "confidence": "high",
+  "reasoning": "Explain how the cited findings support or refute this quality. Be specific.",
+  "finding_ids": ["F_001", "F_007"]
+}}

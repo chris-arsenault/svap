@@ -2,7 +2,7 @@ import React, { useCallback, useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { usePipelineStore } from "../data/pipelineStore";
 import { Badge } from "../components/SharedUI";
-import type { DetectionPattern, RiskLevel, ViewProps } from "../types";
+import type { DetectionPattern, RiskLevel } from "../types";
 
 const PRIORITY_ORDER: RiskLevel[] = ["critical", "high", "medium", "low"];
 
@@ -79,7 +79,7 @@ function PatternCard({
   );
 }
 
-export default function DetectionView({ onNavigate: _onNavigate }: ViewProps) {
+export default function DetectionView() {
   const detection_patterns = usePipelineStore((s) => s.detection_patterns);
   const [expandedPattern, setExpandedPattern] = useState<string | null>(null);
   const [filterPriority, setFilterPriority] = useState<RiskLevel | null>(null);

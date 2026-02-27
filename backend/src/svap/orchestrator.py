@@ -28,16 +28,22 @@ from svap.stages import (
     stage2_taxonomy,
     stage3_scoring,
     stage4_scanning,
+    stage4a_triage,
+    stage4b_research,
+    stage4c_assessment,
     stage5_prediction,
     stage6_detection,
 )
-from svap.storage import SVAPStorage
+from svap.storage import SVAPStorage, resolve_database_url
 
 STAGES = {
     0: stage0_source_fetch,
     1: stage1_case_assembly,
     2: stage2_taxonomy,
     3: stage3_scoring,
+    40: stage4a_triage,
+    41: stage4b_research,
+    42: stage4c_assessment,
     4: stage4_scanning,
     5: stage5_prediction,
     6: stage6_detection,
@@ -53,7 +59,7 @@ def load_config(config_path: str = "config.yaml") -> dict:
 
 def cmd_run(args, config):
     """Run one or more pipeline stages."""
-    storage = SVAPStorage(os.environ.get("DATABASE_URL", config["storage"]["database_url"]))
+    storage = SVAPStorage(resolve_database_url(config))
     from svap.bedrock_client import BedrockClient
 
     client = BedrockClient(config)
@@ -65,26 +71,36 @@ def cmd_run(args, config):
         storage.create_run(run_id, config, notes="CLI run")
     print(f"Run ID: {run_id}")
 
-    stages_to_run = [0, 1, 2, 3, 4, 5, 6] if args.stage == "all" else [int(args.stage)]
+    stage_alias = {"4a": 40, "4b": 41, "4c": 42}
+    if args.stage == "all":
+        stages_to_run = [0, 1, 2, 3, 40, 41, 42, 4, 5, 6]
+    elif args.stage in stage_alias:
+        stages_to_run = [stage_alias[args.stage]]
+    else:
+        stages_to_run = [int(args.stage)]
 
     human_gates = config.get("pipeline", {}).get("human_gates", [2, 5])
 
+    # Sub-stage prerequisites: 4a needs stage 3, 4b needs 4a, 4c needs 4b, stage 4 needs stage 3
+    prereq_map = {40: 3, 41: 40, 42: 41}
+
     for stage_num in stages_to_run:
         # Check prerequisites
-        if stage_num > 0:
-            prev_status = storage.get_stage_status(run_id, stage_num - 1)
+        prereq = prereq_map.get(stage_num, stage_num - 1 if stage_num > 0 else None)
+        if prereq is not None:
+            prev_status = storage.get_stage_status(run_id, prereq)
             if prev_status not in ("completed", "approved"):
                 if prev_status == "pending_review":
-                    print(f"\n⚠ Stage {stage_num - 1} is pending human review.")
+                    print(f"\n⚠ Stage {prereq} is pending human review.")
                     print(
-                        f"  Approve it first: python -m svap.orchestrator approve --stage {stage_num - 1}"
+                        f"  Approve it first: python -m svap.orchestrator approve --stage {prereq}"
                     )
                     break
                 elif prev_status is None:
-                    print(f"\n⚠ Stage {stage_num - 1} has not been run yet. Run it first.")
+                    print(f"\n⚠ Stage {prereq} has not been run yet. Run it first.")
                     break
                 else:
-                    print(f"\n⚠ Stage {stage_num - 1} status is '{prev_status}'. Cannot proceed.")
+                    print(f"\n⚠ Stage {prereq} status is '{prev_status}'. Cannot proceed.")
                     break
 
         print(f"\n{'=' * 60}")
@@ -103,16 +119,14 @@ def cmd_run(args, config):
 
 
 def cmd_seed(args, config):
-    """Load example HHS OIG data to replicate the healthcare fraud analysis."""
-    storage = SVAPStorage(os.environ.get("DATABASE_URL", config["storage"]["database_url"]))
-    result = _seed(storage, config)
+    """Load curated reference data."""
+    storage = SVAPStorage(resolve_database_url(config))
+    result = _seed(storage)
     print("\n  Seed data loaded successfully.")
-    print(f"    Run ID:             {result['run_id']}")
-    print(f"    Cases:              {result['cases']}")
-    print(f"    Taxonomy qualities: {result['taxonomy']}")
-    print(f"    Policies:           {result['policies']}")
-    print(f"    Predictions:        {result['predictions']}")
-    print(f"    Detection patterns: {result['detection_patterns']}")
+    print(f"    Enforcement sources: {result['enforcement_sources']}")
+    print(f"    Source feeds:        {result['source_feeds']}")
+    print(f"    Taxonomy qualities:  {result['taxonomy']}")
+    print(f"    Policies:            {result['policies']}")
     storage.close()
 
 
@@ -122,122 +136,50 @@ def _load_seed_json(filename):
         return json.load(f)
 
 
-def _seed_convergence_scores(storage, run_id, cases):
-    """Insert convergence scores from case qualities."""
-    count = 0
-    for case in cases:
-        for quality_id in case.get("qualities", []):
-            storage.insert_convergence_score(
-                run_id, case["case_id"], quality_id, present=True, evidence="Seed data"
-            )
-            count += 1
-    return count
+def _seed(storage):
+    """Seed curated reference data the pipeline needs to run.
 
-
-def _seed_policy_scores(storage, run_id, policies):
-    """Insert policy scores from policy qualities."""
-    count = 0
-    for policy in policies:
-        for quality_id in policy.get("qualities", []):
-            storage.insert_policy_score(
-                run_id, policy["policy_id"], quality_id, present=True, evidence="Seed data"
-            )
-            count += 1
-    return count
-
-
-def _seed(storage, config=None):
-    """Run the seed operation, populating ALL database tables.
+    Loads: enforcement sources (URLs to fetch), source feeds (listing
+    pages for discovery), taxonomy (vulnerability qualities), and
+    policies (scan targets).  Everything else (cases, scores,
+    predictions, patterns) is produced by the pipeline stages.
 
     Returns a result dict with counts of seeded entities.
     Can be called from the CLI or programmatically (e.g. from the API).
     """
-    if config is None:
-        config = {}
+    # ── Enforcement sources ──────────────────────────────────────
+    print("  Loading enforcement sources...")
+    storage.seed_enforcement_sources_if_empty()
+    sources = storage.get_enforcement_sources()
+    print(f"    Loaded {len(sources)} enforcement sources.")
 
-    run_id = f"seed_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}"
-    storage.create_run(run_id, config, notes="Seeded with HHS OIG example data")
-    print(f"Created run: {run_id}")
+    # ── Source feeds ─────────────────────────────────────────────
+    print("  Loading source feeds...")
+    storage.seed_source_feeds_if_empty()
+    feeds = storage.get_source_feeds()
+    print(f"    Loaded {len(feeds)} source feeds.")
 
-    # ── Stage 1: Cases ─────────────────────────────────────────────
-    print("\n  Loading seed enforcement cases...")
-    cases = _load_seed_json("cases.json")
-    for case in cases:
-        storage.insert_case(run_id, case)
-    print(f"    Loaded {len(cases)} cases.")
-
-    # ── Stage 2: Taxonomy ──────────────────────────────────────────
-    print("  Loading seed vulnerability taxonomy...")
+    # ── Taxonomy ──────────────────────────────────────────────────
+    print("  Loading curated vulnerability taxonomy...")
     taxonomy = _load_seed_json("taxonomy.json")
     for q in taxonomy:
-        q["review_status"] = "approved"
-        storage.insert_quality(run_id, q)
+        q.setdefault("review_status", "approved")
+        storage.insert_quality(q)
     print(f"    Loaded {len(taxonomy)} taxonomy qualities.")
 
-    # ── Stage 3: Convergence scores (case x quality matrix) ────────
-    print("  Loading seed convergence scores...")
-    convergence_count = _seed_convergence_scores(storage, run_id, cases)
-    print(f"    Loaded {convergence_count} convergence scores.")
-
-    # ── Stage 3: Calibration ──────────────────────────────────────
-    print("  Loading seed calibration...")
-    storage.insert_calibration(
-        run_id,
-        threshold=3,
-        notes="Seed calibration: policies scoring >= 3 qualities correspond to documented exploitation cases",
-        freq={},
-        combos={},
-    )
-
-    # ── Stage 4: Policies ─────────────────────────────────────────
-    print("  Loading seed policies...")
+    # ── Policies ──────────────────────────────────────────────────
+    print("  Loading policy scan targets...")
     policies = _load_seed_json("policies.json")
     for p in policies:
-        storage.insert_policy(run_id, p)
+        storage.insert_policy(p)
     print(f"    Loaded {len(policies)} policies.")
 
-    # ── Stage 4: Policy scores (policy x quality matrix) ───────────
-    print("  Loading seed policy scores...")
-    policy_score_count = _seed_policy_scores(storage, run_id, policies)
-    print(f"    Loaded {policy_score_count} policy scores.")
-
-    # ── Stage 5: Predictions ──────────────────────────────────────
-    print("  Loading seed predictions...")
-    predictions = _load_seed_json("predictions.json")
-    for pred in predictions:
-        storage.insert_prediction(run_id, pred)
-    print(f"    Loaded {len(predictions)} predictions.")
-
-    # ── Stage 6: Detection patterns ───────────────────────────────
-    print("  Loading seed detection patterns...")
-    patterns = _load_seed_json("detection_patterns.json")
-    for pattern in patterns:
-        storage.insert_detection_pattern(run_id, pattern)
-    print(f"    Loaded {len(patterns)} detection patterns.")
-
-    # ── Stage log: mark all 6 stages completed ────────────────────
-    _mark_seed_stages_complete(storage, run_id)
-
     return {
-        "run_id": run_id,
-        "cases": len(cases),
+        "enforcement_sources": len(sources),
+        "source_feeds": len(feeds),
         "taxonomy": len(taxonomy),
         "policies": len(policies),
-        "predictions": len(predictions),
-        "detection_patterns": len(patterns),
     }
-
-
-def _mark_seed_stages_complete(storage, run_id):
-    """Mark all stages as completed and approve human gates."""
-    print("  Marking all stages as completed...")
-    for stage in range(0, 7):
-        storage.log_stage_start(run_id, stage)
-        storage.log_stage_complete(run_id, stage, {"source": "seed_data"})
-    for gate_stage in [2, 5]:
-        storage.log_stage_start(run_id, gate_stage)
-        storage.log_stage_pending_review(run_id, gate_stage)
-        storage.approve_stage(run_id, gate_stage)
 
 
 def _load_config(config_path: str = "config.yaml") -> dict:
@@ -259,12 +201,14 @@ def _run_stage(storage, run_id: str, stage: int, config: dict):
     client = BedrockClient(config)
     human_gates = config.get("pipeline", {}).get("human_gates", [2, 5])
 
-    # Check prerequisites
-    if stage > 0:
-        prev_status = storage.get_stage_status(run_id, stage - 1)
+    # Check prerequisites — sub-stages have custom prerequisite mappings
+    prereq_map = {40: 3, 41: 40, 42: 41}
+    prereq = prereq_map.get(stage, stage - 1 if stage > 0 else None)
+    if prereq is not None:
+        prev_status = storage.get_stage_status(run_id, prereq)
         if prev_status not in ("completed", "approved"):
             raise RuntimeError(
-                f"Stage {stage - 1} status is '{prev_status}'. "
+                f"Stage {prereq} status is '{prev_status}'. "
                 f"It must be 'completed' or 'approved' before running stage {stage}."
             )
 
@@ -281,7 +225,7 @@ def _run_stage(storage, run_id: str, stage: int, config: dict):
 
 def cmd_status(args, config):
     """Display current pipeline status."""
-    storage = SVAPStorage(os.environ.get("DATABASE_URL", config["storage"]["database_url"]))
+    storage = SVAPStorage(resolve_database_url(config))
     run_id = storage.get_latest_run()
 
     if not run_id:
@@ -299,6 +243,9 @@ def cmd_status(args, config):
         1: "Case Assembly",
         2: "Taxonomy Extraction",
         3: "Convergence Scoring",
+        40: "Policy Triage (4a)",
+        41: "Deep Research (4b)",
+        42: "Quality Assessment (4c)",
         4: "Policy Scanning",
         5: "Exploitation Prediction",
         6: "Detection Patterns",
@@ -312,7 +259,7 @@ def cmd_status(args, config):
             latest[stage] = s
 
     print("\n  Pipeline Status:")
-    for stage_num in range(0, 7):
+    for stage_num in [0, 1, 2, 3, 40, 41, 42, 4, 5, 6]:
         s = latest.get(stage_num)
         icon = {
             "completed": "✅",
@@ -325,9 +272,9 @@ def cmd_status(args, config):
         print(f"    {icon} Stage {stage_num}: {stage_names[stage_num]} — {status_text}")
 
     # Summary counts
-    cases = storage.get_cases(run_id)
-    taxonomy = storage.get_taxonomy(run_id)
-    policies = storage.get_policies(run_id)
+    cases = storage.get_cases()
+    taxonomy = storage.get_taxonomy()
+    policies = storage.get_policies()
     predictions = storage.get_predictions(run_id)
     patterns = storage.get_detection_patterns(run_id)
 
@@ -343,7 +290,7 @@ def cmd_status(args, config):
 
 def cmd_approve(args, config):
     """Approve a human review gate."""
-    storage = SVAPStorage(os.environ.get("DATABASE_URL", config["storage"]["database_url"]))
+    storage = SVAPStorage(resolve_database_url(config))
     run_id = storage.get_latest_run()
     if not run_id:
         print("No pipeline runs found.")
@@ -366,7 +313,7 @@ def cmd_approve(args, config):
 
 def cmd_ingest(args, config):
     """Ingest documents into the RAG store."""
-    storage = SVAPStorage(os.environ.get("DATABASE_URL", config["storage"]["database_url"]))
+    storage = SVAPStorage(resolve_database_url(config))
     from svap.rag import DocumentIngester
 
     ingester = DocumentIngester(storage, config)
@@ -390,7 +337,7 @@ def cmd_ingest(args, config):
 
 def cmd_export(args, config):
     """Export pipeline results."""
-    storage = SVAPStorage(os.environ.get("DATABASE_URL", config["storage"]["database_url"]))
+    storage = SVAPStorage(resolve_database_url(config))
     run_id = storage.get_latest_run()
     if not run_id:
         print("No pipeline runs found.")
@@ -413,11 +360,11 @@ def cmd_export(args, config):
 def _export_json(storage, run_id, export_dir):
     """Export all pipeline data as JSON files."""
     data = {
-        "cases": storage.get_cases(run_id),
-        "taxonomy": storage.get_taxonomy(run_id),
+        "cases": storage.get_cases(),
+        "taxonomy": storage.get_taxonomy(),
         "convergence_matrix": storage.get_convergence_matrix(run_id),
         "calibration": storage.get_calibration(run_id),
-        "policies": storage.get_policies(run_id),
+        "policies": storage.get_policies(),
         "policy_scores": storage.get_policy_scores(run_id),
         "predictions": storage.get_predictions(run_id),
         "detection_patterns": storage.get_detection_patterns(run_id),
@@ -430,7 +377,7 @@ def _export_json(storage, run_id, export_dir):
 
 def _export_markdown(storage, run_id, export_dir):
     """Export results as a readable Markdown report."""
-    taxonomy = storage.get_taxonomy(run_id)
+    taxonomy = storage.get_taxonomy()
     predictions = storage.get_predictions(run_id)
     patterns = storage.get_detection_patterns(run_id)
     calibration = storage.get_calibration(run_id)

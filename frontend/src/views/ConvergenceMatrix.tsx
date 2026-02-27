@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useShallow } from "zustand/shallow";
 import { usePipelineStore } from "../data/pipelineStore";
 import { formatDollars, scoreColor } from "../utils";
-import type { Case, Policy, Quality, ViewProps } from "../types";
+import type { Case, Policy, Quality } from "../types";
 
 function MatrixCell({ present, color }: { present: boolean; color: string }) {
   if (!present) {
@@ -98,7 +98,7 @@ function MatrixFooter({
   );
 }
 
-export default function ConvergenceMatrix({ onNavigate: _onNavigate }: ViewProps) {
+export default function ConvergenceMatrix() {
   const { cases, taxonomy, policies, threshold } = usePipelineStore(
     useShallow((s) => ({
       cases: s.cases,

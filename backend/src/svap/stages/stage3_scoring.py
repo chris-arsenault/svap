@@ -117,8 +117,8 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
                 f"Run: python -m svap.orchestrator approve --stage 2"
             )
 
-        cases = storage.get_cases(run_id)
-        taxonomy = storage.get_taxonomy(run_id)
+        cases = storage.get_cases()
+        taxonomy = storage.get_approved_taxonomy()
         ctx = ContextAssembler(storage, config)
 
         if not cases or not taxonomy:

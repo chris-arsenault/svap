@@ -48,7 +48,7 @@ def _characterize_policy(storage, client, ctx, run_id, policy):
 
     characterization = client.invoke(prompt, system=SYSTEM_PROMPT_CHARACTERIZE, max_tokens=2048)
     policy["structural_characterization"] = characterization
-    storage.insert_policy(run_id, policy)
+    storage.insert_policy(policy)
 
 
 def _score_policy(storage, client, run_id, policy, taxonomy_context):
@@ -91,7 +91,7 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
     storage.log_stage_start(run_id, 4)
 
     try:
-        taxonomy = storage.get_taxonomy(run_id)
+        taxonomy = storage.get_approved_taxonomy()
         calibration = storage.get_calibration(run_id)
         if not taxonomy:
             raise ValueError("No taxonomy found. Run Stages 1-3 first.")
@@ -100,10 +100,10 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
         taxonomy_context = ctx.format_taxonomy_context(taxonomy)
         threshold = calibration["threshold"] if calibration else 3
 
-        policies = storage.get_policies(run_id)
+        policies = storage.get_policies()
         if not policies:
             print("  No policies pre-loaded. Extracting from policy documents...")
-            policies = _extract_policies_from_docs(storage, client, run_id, config)
+            policies = _extract_policies_from_docs(storage, client, config)
 
         if not policies:
             print("  No policies found. Load policies first.")
@@ -115,12 +115,21 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
         for policy in policies:
             _characterize_policy(storage, client, ctx, run_id, policy)
 
-        policies = storage.get_policies(run_id)
+        policies = storage.get_policies()
 
         # ── 4b: Vulnerability Scoring ───────────────────────────────
-        print(f"  Scoring {len(policies)} policies against {len(taxonomy)} qualities...")
+        # Skip policies already assessed by deep research (Stage 4B/4C)
+        policies_to_score = []
+        for policy in policies:
+            existing = storage.get_quality_assessments(run_id, policy["policy_id"])
+            if existing:
+                print(f"    Skipping {policy['name']} — already assessed via deep research")
+            else:
+                policies_to_score.append(policy)
+
+        print(f"  Scoring {len(policies_to_score)} policies against {len(taxonomy)} qualities...")
         results = [
-            _score_policy(storage, client, run_id, policy, taxonomy_context) for policy in policies
+            _score_policy(storage, client, run_id, policy, taxonomy_context) for policy in policies_to_score
         ]
 
         # ── Report ──────────────────────────────────────────────────
@@ -155,16 +164,16 @@ def _print_ranking(results, threshold):
         print(f"    {marker} {r['policy']}: score={r['convergence_score']}")
 
 
-def load_seed_policies(storage: SVAPStorage, run_id: str, seed_path: str):
+def load_seed_policies(storage: SVAPStorage, seed_path: str):
     """Load pre-defined policies from a seed JSON file."""
     with open(seed_path) as f:
         policies = json.load(f)
     for p in policies:
-        storage.insert_policy(run_id, p)
+        storage.insert_policy(p)
     print(f"  Loaded {len(policies)} seed policies.")
 
 
-def _extract_policies_from_docs(storage, client, run_id, config):
+def _extract_policies_from_docs(storage, client, config):
     """Extract policy descriptions from policy documents in RAG store."""
     docs = storage.get_all_documents(doc_type="policy")
     if not docs:
@@ -191,7 +200,7 @@ DOCUMENT:
                     "description": item.get("description", ""),
                     "source_document": doc["filename"],
                 }
-                storage.insert_policy(run_id, policy)
+                storage.insert_policy(policy)
                 all_policies.append(policy)
         except Exception as e:
             print(f"    Warning: Could not extract policies from {doc['filename']}: {e}")
