@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useShallow } from "zustand/shallow";
 import { usePipelineStore } from "../data/pipelineStore";
-import { Badge, QualityTags } from "../components/SharedUI";
+import { Badge, QualityTag, QualityTags } from "../components/SharedUI";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import type { StructuralFinding, QualityAssessment } from "../types";
 
@@ -274,7 +274,7 @@ export default function ResearchView() {
                         <tbody>
                           {assessments.map((a) => (
                             <tr key={a.assessment_id}>
-                              <td>{a.quality_id}</td>
+                              <td><QualityTag id={a.quality_id} /></td>
                               <td>{presentBadge(a.present)}</td>
                               <td>{confidenceBadge(a.confidence)}</td>
                               <td className="hide-on-mobile">

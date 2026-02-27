@@ -29,7 +29,7 @@ function QualityCard({
     >
       <div className="quality-card-header">
         <span className="quality-card-id">
-          {quality.quality_id}
+          {quality.name}
         </span>
         <span className="quality-card-count">
           {quality.case_count} cases
@@ -50,7 +50,7 @@ function QualityDetail({ quality, matchingCases }: { quality: Quality; matchingC
     >
       <div className="panel-header">
         <h3>
-          {quality.quality_id} — {quality.name}
+          {quality.name}
         </h3>
       </div>
       <div className="panel-body">

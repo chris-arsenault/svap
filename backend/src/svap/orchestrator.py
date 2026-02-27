@@ -275,8 +275,8 @@ def cmd_status(args, config):
     cases = storage.get_cases()
     taxonomy = storage.get_taxonomy()
     policies = storage.get_policies()
-    predictions = storage.get_predictions(run_id)
-    patterns = storage.get_detection_patterns(run_id)
+    predictions = storage.get_predictions()
+    patterns = storage.get_detection_patterns()
 
     print("\n  Data Summary:")
     print(f"    Cases:             {len(cases)}")
@@ -362,12 +362,12 @@ def _export_json(storage, run_id, export_dir):
     data = {
         "cases": storage.get_cases(),
         "taxonomy": storage.get_taxonomy(),
-        "convergence_matrix": storage.get_convergence_matrix(run_id),
-        "calibration": storage.get_calibration(run_id),
+        "convergence_matrix": storage.get_convergence_matrix(),
+        "calibration": storage.get_calibration(),
         "policies": storage.get_policies(),
-        "policy_scores": storage.get_policy_scores(run_id),
-        "predictions": storage.get_predictions(run_id),
-        "detection_patterns": storage.get_detection_patterns(run_id),
+        "policy_scores": storage.get_policy_scores(),
+        "predictions": storage.get_predictions(),
+        "detection_patterns": storage.get_detection_patterns(),
     }
     out_path = export_dir / f"svap_export_{run_id}.json"
     with open(out_path, "w") as f:
@@ -378,9 +378,9 @@ def _export_json(storage, run_id, export_dir):
 def _export_markdown(storage, run_id, export_dir):
     """Export results as a readable Markdown report."""
     taxonomy = storage.get_taxonomy()
-    predictions = storage.get_predictions(run_id)
-    patterns = storage.get_detection_patterns(run_id)
-    calibration = storage.get_calibration(run_id)
+    predictions = storage.get_predictions()
+    patterns = storage.get_detection_patterns()
+    calibration = storage.get_calibration()
 
     lines = ["# SVAP Analysis Report\n", f"Run: {run_id}\n"]
 

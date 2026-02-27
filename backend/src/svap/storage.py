@@ -69,343 +69,499 @@ def _get_connection(database_url: str):
     global _conn
     if _conn is None or _conn.closed:
         _conn = psycopg2.connect(database_url)
+        _conn.autocommit = True
     return _conn
 
 
-SCHEMA_STATEMENTS = [
-    # Pipeline run metadata
-    """CREATE TABLE IF NOT EXISTS pipeline_runs (
-        run_id          TEXT PRIMARY KEY,
-        created_at      TEXT NOT NULL,
-        config_snapshot TEXT NOT NULL,
-        notes           TEXT
-    )""",
-    # Stage execution log
-    """CREATE TABLE IF NOT EXISTS stage_log (
-        id              SERIAL PRIMARY KEY,
-        run_id          TEXT NOT NULL,
-        stage           INTEGER NOT NULL,
-        status          TEXT NOT NULL CHECK(status IN ('running','completed','failed','pending_review','approved')),
-        started_at      TEXT,
-        completed_at    TEXT,
-        error_message   TEXT,
-        metadata        TEXT,
-        task_token       TEXT,
-        FOREIGN KEY (run_id) REFERENCES pipeline_runs(run_id)
-    )""",
-    # Stage 1: Enforcement cases (extracted from documents) — GLOBAL, no run_id
-    """CREATE TABLE IF NOT EXISTS cases (
-        case_id             TEXT PRIMARY KEY,
-        source_doc_id       TEXT,
-        case_name           TEXT NOT NULL,
-        scheme_mechanics    TEXT NOT NULL,
-        exploited_policy    TEXT NOT NULL,
-        enabling_condition  TEXT NOT NULL,
-        scale_dollars       REAL,
-        scale_defendants    INTEGER,
-        scale_duration      TEXT,
-        detection_method    TEXT,
-        raw_extraction      TEXT,
-        created_at          TEXT NOT NULL
-    )""",
-    # Stage 2: Vulnerability taxonomy — GLOBAL, no run_id
-    """CREATE TABLE IF NOT EXISTS taxonomy (
-        quality_id          TEXT PRIMARY KEY,
-        name                TEXT NOT NULL,
-        definition          TEXT NOT NULL,
-        recognition_test    TEXT NOT NULL,
-        exploitation_logic  TEXT NOT NULL,
-        canonical_examples  TEXT,
-        review_status       TEXT DEFAULT 'draft' CHECK(review_status IN ('draft','approved','rejected','revised')),
-        reviewer_notes      TEXT,
-        created_at          TEXT NOT NULL
-    )""",
-    # Stage 2: Taxonomy case processing log — tracks which cases contributed to taxonomy
-    """CREATE TABLE IF NOT EXISTS taxonomy_case_log (
-        case_id             TEXT PRIMARY KEY,
-        processed_at        TEXT NOT NULL,
-        FOREIGN KEY (case_id) REFERENCES cases(case_id)
-    )""",
-    # Stage 3: Convergence scores for known cases
-    """CREATE TABLE IF NOT EXISTS convergence_scores (
-        id                  SERIAL PRIMARY KEY,
-        run_id              TEXT NOT NULL,
-        case_id             TEXT NOT NULL,
-        quality_id          TEXT NOT NULL,
-        present             INTEGER NOT NULL CHECK(present IN (0, 1)),
-        evidence            TEXT,
-        created_at          TEXT NOT NULL,
-        FOREIGN KEY (run_id) REFERENCES pipeline_runs(run_id),
-        FOREIGN KEY (case_id) REFERENCES cases(case_id),
-        FOREIGN KEY (quality_id) REFERENCES taxonomy(quality_id)
-    )""",
-    # Stage 3: Calibration results
-    """CREATE TABLE IF NOT EXISTS calibration (
-        run_id              TEXT PRIMARY KEY,
-        threshold           INTEGER NOT NULL,
-        correlation_notes   TEXT,
-        quality_frequency   TEXT,
-        quality_combinations TEXT,
-        created_at          TEXT NOT NULL,
-        FOREIGN KEY (run_id) REFERENCES pipeline_runs(run_id)
-    )""",
-    # Stage 4: Policies to scan — GLOBAL, no run_id
-    """CREATE TABLE IF NOT EXISTS policies (
-        policy_id           TEXT PRIMARY KEY,
-        name                TEXT NOT NULL,
-        description         TEXT,
-        source_document     TEXT,
-        structural_characterization TEXT,
-        created_at          TEXT NOT NULL
-    )""",
-    # Stage 4: Policy convergence scores
-    """CREATE TABLE IF NOT EXISTS policy_scores (
-        id                  SERIAL PRIMARY KEY,
-        run_id              TEXT NOT NULL,
-        policy_id           TEXT NOT NULL,
-        quality_id          TEXT NOT NULL,
-        present             INTEGER NOT NULL CHECK(present IN (0, 1)),
-        evidence            TEXT,
-        created_at          TEXT NOT NULL,
-        FOREIGN KEY (run_id) REFERENCES pipeline_runs(run_id),
-        FOREIGN KEY (policy_id) REFERENCES policies(policy_id),
-        FOREIGN KEY (quality_id) REFERENCES taxonomy(quality_id)
-    )""",
-    # Stage 5: Exploitation predictions
-    """CREATE TABLE IF NOT EXISTS predictions (
-        prediction_id       TEXT PRIMARY KEY,
-        run_id              TEXT NOT NULL,
-        policy_id           TEXT NOT NULL,
-        convergence_score   INTEGER NOT NULL,
-        mechanics           TEXT NOT NULL,
-        enabling_qualities  TEXT NOT NULL,
-        actor_profile       TEXT,
-        lifecycle_stage     TEXT,
-        detection_difficulty TEXT,
-        review_status       TEXT DEFAULT 'draft',
-        reviewer_notes      TEXT,
-        created_at          TEXT NOT NULL,
-        FOREIGN KEY (run_id) REFERENCES pipeline_runs(run_id),
-        FOREIGN KEY (policy_id) REFERENCES policies(policy_id)
-    )""",
-    # Stage 6: Detection patterns
-    """CREATE TABLE IF NOT EXISTS detection_patterns (
-        pattern_id          TEXT PRIMARY KEY,
-        run_id              TEXT NOT NULL,
-        prediction_id       TEXT NOT NULL,
-        data_source         TEXT NOT NULL,
-        anomaly_signal      TEXT NOT NULL,
-        baseline            TEXT,
-        false_positive_risk TEXT,
-        detection_latency   TEXT,
-        priority            TEXT CHECK(priority IN ('critical','high','medium','low')),
-        implementation_notes TEXT,
-        created_at          TEXT NOT NULL,
-        FOREIGN KEY (run_id) REFERENCES pipeline_runs(run_id),
-        FOREIGN KEY (prediction_id) REFERENCES predictions(prediction_id)
-    )""",
-    # RAG: Document store for source documents
-    """CREATE TABLE IF NOT EXISTS documents (
-        doc_id              TEXT PRIMARY KEY,
-        filename            TEXT,
-        doc_type            TEXT CHECK(doc_type IN ('enforcement','policy','guidance','report','other')),
-        full_text           TEXT NOT NULL,
-        metadata            TEXT,
-        created_at          TEXT NOT NULL
-    )""",
-    # RAG: Document chunks for retrieval
-    """CREATE TABLE IF NOT EXISTS chunks (
-        chunk_id            TEXT PRIMARY KEY,
-        doc_id              TEXT NOT NULL,
-        chunk_index         INTEGER NOT NULL,
-        text                TEXT NOT NULL,
-        token_count         INTEGER,
-        FOREIGN KEY (doc_id) REFERENCES documents(doc_id)
-    )""",
-    # Enforcement source registry (mutable, not tied to a run)
-    """CREATE TABLE IF NOT EXISTS enforcement_sources (
-        source_id         TEXT PRIMARY KEY,
-        name              TEXT NOT NULL,
-        url               TEXT,
-        source_type       TEXT NOT NULL DEFAULT 'press_release',
-        description       TEXT,
-        has_document      BOOLEAN NOT NULL DEFAULT FALSE,
-        s3_key            TEXT,
-        doc_id            TEXT,
-        summary           TEXT,
-        validation_status TEXT DEFAULT 'pending'
-            CHECK(validation_status IN ('pending','valid','invalid','error')),
-        created_at        TEXT NOT NULL,
-        updated_at        TEXT NOT NULL
-    )""",
-    # Unique indexes for upsert conflict targets
-    "CREATE UNIQUE INDEX IF NOT EXISTS uq_convergence ON convergence_scores(run_id, case_id, quality_id)",
-    "CREATE UNIQUE INDEX IF NOT EXISTS uq_policy_score ON policy_scores(run_id, policy_id, quality_id)",
-    # ── Sourcing Agents: Dimension Registry ──────────────────────
-    """CREATE TABLE IF NOT EXISTS dimension_registry (
-        dimension_id        TEXT PRIMARY KEY,
-        name                TEXT NOT NULL,
-        definition          TEXT NOT NULL,
-        probing_questions   TEXT,
-        origin              TEXT NOT NULL CHECK(origin IN ('case_derived','policy_derived','manual','seed')),
-        related_quality_ids TEXT,
-        created_at          TEXT NOT NULL,
-        created_by          TEXT
-    )""",
-    # ── Sourcing Agents: Structural Findings ─────────────────────
-    """CREATE TABLE IF NOT EXISTS structural_findings (
-        finding_id          TEXT PRIMARY KEY,
-        run_id              TEXT NOT NULL,
-        policy_id           TEXT NOT NULL,
-        dimension_id        TEXT,
-        observation         TEXT NOT NULL,
-        source_type         TEXT NOT NULL DEFAULT 'llm_knowledge',
-        source_citation     TEXT,
-        source_text         TEXT,
-        confidence          TEXT NOT NULL DEFAULT 'medium'
-            CHECK(confidence IN ('high','medium','low')),
-        status              TEXT NOT NULL DEFAULT 'active'
-            CHECK(status IN ('active','stale','superseded')),
-        stale_reason        TEXT,
-        created_at          TEXT NOT NULL,
-        created_by          TEXT,
-        FOREIGN KEY (run_id) REFERENCES pipeline_runs(run_id),
-        FOREIGN KEY (policy_id) REFERENCES policies(policy_id),
-        FOREIGN KEY (dimension_id) REFERENCES dimension_registry(dimension_id)
-    )""",
-    # ── Sourcing Agents: Quality Assessments ─────────────────────
-    """CREATE TABLE IF NOT EXISTS quality_assessments (
-        assessment_id       TEXT PRIMARY KEY,
-        run_id              TEXT NOT NULL,
-        policy_id           TEXT NOT NULL,
-        quality_id          TEXT NOT NULL,
-        taxonomy_version    TEXT,
-        present             TEXT NOT NULL DEFAULT 'uncertain'
-            CHECK(present IN ('yes','no','uncertain')),
-        evidence_finding_ids TEXT,
-        confidence          TEXT NOT NULL DEFAULT 'medium'
-            CHECK(confidence IN ('high','medium','low')),
-        rationale           TEXT,
-        created_at          TEXT NOT NULL,
-        FOREIGN KEY (run_id) REFERENCES pipeline_runs(run_id),
-        FOREIGN KEY (policy_id) REFERENCES policies(policy_id),
-        FOREIGN KEY (quality_id) REFERENCES taxonomy(quality_id)
-    )""",
-    "CREATE UNIQUE INDEX IF NOT EXISTS uq_quality_assessment ON quality_assessments(run_id, policy_id, quality_id)",
-    # ── Sourcing Agents: Source Feeds ────────────────────────────
-    """CREATE TABLE IF NOT EXISTS source_feeds (
-        feed_id             TEXT PRIMARY KEY,
-        name                TEXT NOT NULL,
-        listing_url         TEXT NOT NULL UNIQUE,
-        content_type        TEXT NOT NULL DEFAULT 'press_release',
-        link_selector       TEXT,
-        last_checked_at     TEXT,
-        last_entry_url      TEXT,
-        enabled             BOOLEAN DEFAULT TRUE,
-        created_at          TEXT NOT NULL,
-        updated_at          TEXT NOT NULL
-    )""",
-    # ── Sourcing Agents: Source Candidates ────────────────────────
-    """CREATE TABLE IF NOT EXISTS source_candidates (
-        candidate_id        TEXT PRIMARY KEY,
-        feed_id             TEXT,
-        title               TEXT NOT NULL,
-        url                 TEXT NOT NULL UNIQUE,
-        discovered_at       TEXT NOT NULL,
-        published_date      TEXT,
-        status              TEXT NOT NULL DEFAULT 'discovered'
-            CHECK(status IN ('discovered','fetched','scored','accepted','rejected','ingested','error')),
-        richness_score      REAL,
-        richness_rationale  TEXT,
-        estimated_cases     INTEGER,
-        source_id           TEXT,
-        doc_id              TEXT,
-        reviewed_by         TEXT DEFAULT 'auto',
-        created_at          TEXT NOT NULL,
-        updated_at          TEXT NOT NULL,
-        FOREIGN KEY (feed_id) REFERENCES source_feeds(feed_id)
-    )""",
-    # ── Sourcing Agents: Triage Results ──────────────────────────
-    """CREATE TABLE IF NOT EXISTS triage_results (
-        id                  SERIAL PRIMARY KEY,
-        run_id              TEXT NOT NULL,
-        policy_id           TEXT NOT NULL,
-        triage_score        REAL NOT NULL,
-        rationale           TEXT NOT NULL,
-        uncertainty         TEXT,
-        priority_rank       INTEGER NOT NULL,
-        created_at          TEXT NOT NULL,
-        FOREIGN KEY (run_id) REFERENCES pipeline_runs(run_id),
-        FOREIGN KEY (policy_id) REFERENCES policies(policy_id)
-    )""",
-    "CREATE UNIQUE INDEX IF NOT EXISTS uq_triage ON triage_results(run_id, policy_id)",
-    # ── Sourcing Agents: Research Sessions ───────────────────────
-    """CREATE TABLE IF NOT EXISTS research_sessions (
-        session_id          TEXT PRIMARY KEY,
-        run_id              TEXT NOT NULL,
-        policy_id           TEXT NOT NULL,
-        status              TEXT NOT NULL DEFAULT 'pending'
-            CHECK(status IN ('pending','researching','findings_complete','assessment_complete','failed')),
-        sources_queried     TEXT,
-        started_at          TEXT,
-        completed_at        TEXT,
-        error_message       TEXT,
-        trigger             TEXT DEFAULT 'initial'
-            CHECK(trigger IN ('initial','taxonomy_change','regulatory_change','manual')),
-        FOREIGN KEY (run_id) REFERENCES pipeline_runs(run_id),
-        FOREIGN KEY (policy_id) REFERENCES policies(policy_id)
-    )""",
-    # ── Sourcing Agents: Regulatory Source Cache ─────────────────
-    """CREATE TABLE IF NOT EXISTS regulatory_sources (
-        source_id           TEXT PRIMARY KEY,
-        source_type         TEXT NOT NULL,
-        url                 TEXT NOT NULL,
-        title               TEXT,
-        cfr_reference       TEXT,
-        full_text           TEXT NOT NULL,
-        fetched_at          TEXT NOT NULL,
-        metadata            TEXT
-    )""",
-    # ── ALTER existing tables for sourcing agents ────────────────
-    "ALTER TABLE policies ADD COLUMN IF NOT EXISTS lifecycle_status TEXT DEFAULT 'cataloged'",
-    "ALTER TABLE policies ADD COLUMN IF NOT EXISTS lifecycle_updated_at TEXT",
-    "ALTER TABLE enforcement_sources ADD COLUMN IF NOT EXISTS candidate_id TEXT",
-    "ALTER TABLE enforcement_sources ADD COLUMN IF NOT EXISTS feed_id TEXT",
-    # ── Data integrity ──────────────────────────────────────────
-    "CREATE UNIQUE INDEX IF NOT EXISTS uq_enforcement_source_url ON enforcement_sources(url) WHERE url IS NOT NULL",
-    # ── Migration: drop run_id from global tables ────────────
-    "ALTER TABLE cases DROP COLUMN IF EXISTS run_id",
-    "ALTER TABLE cases ADD COLUMN IF NOT EXISTS source_doc_id TEXT",
-    "ALTER TABLE taxonomy DROP COLUMN IF EXISTS run_id",
-    "ALTER TABLE policies DROP COLUMN IF EXISTS run_id",
-    # ── Migration: drop dedup/traceability columns from documents ──
-    "ALTER TABLE documents DROP COLUMN IF EXISTS content_hash",
-    "ALTER TABLE documents DROP COLUMN IF EXISTS source_id",
-    "ALTER TABLE documents DROP COLUMN IF EXISTS last_processed_run",
+def _migrate(conn):
+    """Run pending schema migrations inside an explicit transaction.
+
+    With autocommit=True on the connection, we need BEGIN/COMMIT for
+    multi-statement atomicity. The pg_try_advisory_xact_lock auto-releases
+    on COMMIT/ROLLBACK so there are no stale locks on Lambda timeout.
+    """
+    old_autocommit = conn.autocommit
+    try:
+        conn.autocommit = False
+        with conn.cursor() as cur:
+            cur.execute("SET lock_timeout = '5s'")
+            cur.execute("SET statement_timeout = '30s'")
+
+            cur.execute("SELECT pg_try_advisory_xact_lock(42)")
+            acquired = cur.fetchone()[0]
+            if not acquired:
+                try:
+                    cur.execute("SELECT version FROM _svap_schema WHERE id = 1")
+                    row = cur.fetchone()
+                    if row and row[0] >= SCHEMA_VERSION:
+                        conn.commit()
+                        return
+                except Exception:
+                    conn.rollback()
+                print("  Migration: another instance holds the lock, skipping")
+                return
+
+            try:
+                cur.execute(
+                    "CREATE TABLE IF NOT EXISTS _svap_schema ("
+                    "  id INTEGER PRIMARY KEY DEFAULT 1 CHECK(id = 1),"
+                    "  version INTEGER NOT NULL DEFAULT 0"
+                    ")"
+                )
+                cur.execute(
+                    "INSERT INTO _svap_schema (id, version) VALUES (1, 0) "
+                    "ON CONFLICT (id) DO NOTHING"
+                )
+                cur.execute("SELECT version FROM _svap_schema WHERE id = 1")
+                current = cur.fetchone()[0]
+
+                if current >= SCHEMA_VERSION:
+                    conn.commit()
+                    return
+
+                for version, statements in MIGRATIONS:
+                    if version <= current:
+                        continue
+                    print(f"  Migration: applying v{version} ({len(statements)} statements)")
+                    for stmt in statements:
+                        cur.execute(stmt)
+
+                cur.execute(
+                    "UPDATE _svap_schema SET version = %s WHERE id = 1",
+                    (SCHEMA_VERSION,),
+                )
+                conn.commit()
+                print(f"  Migration: schema now at v{SCHEMA_VERSION}")
+            except Exception:
+                conn.rollback()
+                raise
+    finally:
+        conn.autocommit = old_autocommit
+
+
+# ── Schema migrations ────────────────────────────────────────────────────
+#
+# Each migration is a (version, statements) tuple. Versions are monotonic.
+# On cold start the manager checks `_svap_schema.version` (one SELECT).
+# Only migrations newer than the stored version are executed.
+#
+# To add a migration: append a new entry with version = SCHEMA_VERSION + 1,
+# then bump SCHEMA_VERSION to match.
+
+SCHEMA_VERSION = 5
+
+MIGRATIONS: list[tuple[int, list[str]]] = [
+    # ── v1: Initial schema (all tables) ──────────────────────────────
+    (1, [
+        """CREATE TABLE IF NOT EXISTS pipeline_runs (
+            run_id          TEXT PRIMARY KEY,
+            created_at      TEXT NOT NULL,
+            config_snapshot TEXT NOT NULL,
+            notes           TEXT
+        )""",
+        """CREATE TABLE IF NOT EXISTS stage_log (
+            id              SERIAL PRIMARY KEY,
+            run_id          TEXT NOT NULL,
+            stage           INTEGER NOT NULL,
+            status          TEXT NOT NULL CHECK(status IN ('running','completed','failed','pending_review','approved')),
+            started_at      TEXT,
+            completed_at    TEXT,
+            error_message   TEXT,
+            metadata        TEXT,
+            task_token       TEXT,
+            FOREIGN KEY (run_id) REFERENCES pipeline_runs(run_id)
+        )""",
+        """CREATE TABLE IF NOT EXISTS cases (
+            case_id             TEXT PRIMARY KEY,
+            source_doc_id       TEXT,
+            case_name           TEXT NOT NULL,
+            scheme_mechanics    TEXT NOT NULL,
+            exploited_policy    TEXT NOT NULL,
+            enabling_condition  TEXT NOT NULL,
+            scale_dollars       REAL,
+            scale_defendants    INTEGER,
+            scale_duration      TEXT,
+            detection_method    TEXT,
+            raw_extraction      TEXT,
+            created_at          TEXT NOT NULL
+        )""",
+        """CREATE TABLE IF NOT EXISTS taxonomy (
+            quality_id          TEXT PRIMARY KEY,
+            name                TEXT NOT NULL,
+            definition          TEXT NOT NULL,
+            recognition_test    TEXT NOT NULL,
+            exploitation_logic  TEXT NOT NULL,
+            canonical_examples  TEXT,
+            review_status       TEXT DEFAULT 'draft' CHECK(review_status IN ('draft','approved','rejected','revised')),
+            reviewer_notes      TEXT,
+            created_at          TEXT NOT NULL
+        )""",
+        """CREATE TABLE IF NOT EXISTS taxonomy_case_log (
+            case_id             TEXT PRIMARY KEY,
+            processed_at        TEXT NOT NULL,
+            FOREIGN KEY (case_id) REFERENCES cases(case_id)
+        )""",
+        """CREATE TABLE IF NOT EXISTS convergence_scores (
+            id                  SERIAL PRIMARY KEY,
+            run_id              TEXT NOT NULL,
+            case_id             TEXT NOT NULL,
+            quality_id          TEXT NOT NULL,
+            present             INTEGER NOT NULL CHECK(present IN (0, 1)),
+            evidence            TEXT,
+            created_at          TEXT NOT NULL,
+            FOREIGN KEY (run_id) REFERENCES pipeline_runs(run_id),
+            FOREIGN KEY (case_id) REFERENCES cases(case_id),
+            FOREIGN KEY (quality_id) REFERENCES taxonomy(quality_id)
+        )""",
+        """CREATE TABLE IF NOT EXISTS calibration (
+            run_id              TEXT PRIMARY KEY,
+            threshold           INTEGER NOT NULL,
+            correlation_notes   TEXT,
+            quality_frequency   TEXT,
+            quality_combinations TEXT,
+            created_at          TEXT NOT NULL,
+            FOREIGN KEY (run_id) REFERENCES pipeline_runs(run_id)
+        )""",
+        """CREATE TABLE IF NOT EXISTS policies (
+            policy_id           TEXT PRIMARY KEY,
+            name                TEXT NOT NULL,
+            description         TEXT,
+            source_document     TEXT,
+            structural_characterization TEXT,
+            created_at          TEXT NOT NULL
+        )""",
+        """CREATE TABLE IF NOT EXISTS policy_scores (
+            id                  SERIAL PRIMARY KEY,
+            run_id              TEXT NOT NULL,
+            policy_id           TEXT NOT NULL,
+            quality_id          TEXT NOT NULL,
+            present             INTEGER NOT NULL CHECK(present IN (0, 1)),
+            evidence            TEXT,
+            created_at          TEXT NOT NULL,
+            FOREIGN KEY (run_id) REFERENCES pipeline_runs(run_id),
+            FOREIGN KEY (policy_id) REFERENCES policies(policy_id),
+            FOREIGN KEY (quality_id) REFERENCES taxonomy(quality_id)
+        )""",
+        """CREATE TABLE IF NOT EXISTS predictions (
+            prediction_id       TEXT PRIMARY KEY,
+            run_id              TEXT NOT NULL,
+            policy_id           TEXT NOT NULL,
+            convergence_score   INTEGER NOT NULL,
+            mechanics           TEXT NOT NULL,
+            enabling_qualities  TEXT NOT NULL,
+            actor_profile       TEXT,
+            lifecycle_stage     TEXT,
+            detection_difficulty TEXT,
+            review_status       TEXT DEFAULT 'draft',
+            reviewer_notes      TEXT,
+            created_at          TEXT NOT NULL,
+            FOREIGN KEY (run_id) REFERENCES pipeline_runs(run_id),
+            FOREIGN KEY (policy_id) REFERENCES policies(policy_id)
+        )""",
+        """CREATE TABLE IF NOT EXISTS detection_patterns (
+            pattern_id          TEXT PRIMARY KEY,
+            run_id              TEXT NOT NULL,
+            prediction_id       TEXT NOT NULL,
+            data_source         TEXT NOT NULL,
+            anomaly_signal      TEXT NOT NULL,
+            baseline            TEXT,
+            false_positive_risk TEXT,
+            detection_latency   TEXT,
+            priority            TEXT CHECK(priority IN ('critical','high','medium','low')),
+            implementation_notes TEXT,
+            created_at          TEXT NOT NULL,
+            FOREIGN KEY (run_id) REFERENCES pipeline_runs(run_id),
+            FOREIGN KEY (prediction_id) REFERENCES predictions(prediction_id)
+        )""",
+        """CREATE TABLE IF NOT EXISTS documents (
+            doc_id              TEXT PRIMARY KEY,
+            filename            TEXT,
+            doc_type            TEXT CHECK(doc_type IN ('enforcement','policy','guidance','report','other')),
+            full_text           TEXT NOT NULL,
+            metadata            TEXT,
+            created_at          TEXT NOT NULL
+        )""",
+        """CREATE TABLE IF NOT EXISTS chunks (
+            chunk_id            TEXT PRIMARY KEY,
+            doc_id              TEXT NOT NULL,
+            chunk_index         INTEGER NOT NULL,
+            text                TEXT NOT NULL,
+            token_count         INTEGER,
+            FOREIGN KEY (doc_id) REFERENCES documents(doc_id)
+        )""",
+        """CREATE TABLE IF NOT EXISTS enforcement_sources (
+            source_id         TEXT PRIMARY KEY,
+            name              TEXT NOT NULL,
+            url               TEXT,
+            source_type       TEXT NOT NULL DEFAULT 'press_release',
+            description       TEXT,
+            has_document      BOOLEAN NOT NULL DEFAULT FALSE,
+            s3_key            TEXT,
+            doc_id            TEXT,
+            summary           TEXT,
+            validation_status TEXT DEFAULT 'pending'
+                CHECK(validation_status IN ('pending','valid','invalid','error')),
+            created_at        TEXT NOT NULL,
+            updated_at        TEXT NOT NULL
+        )""",
+        "CREATE UNIQUE INDEX IF NOT EXISTS uq_convergence ON convergence_scores(run_id, case_id, quality_id)",
+        "CREATE UNIQUE INDEX IF NOT EXISTS uq_policy_score ON policy_scores(run_id, policy_id, quality_id)",
+        """CREATE TABLE IF NOT EXISTS dimension_registry (
+            dimension_id        TEXT PRIMARY KEY,
+            name                TEXT NOT NULL,
+            definition          TEXT NOT NULL,
+            probing_questions   TEXT,
+            origin              TEXT NOT NULL CHECK(origin IN ('case_derived','policy_derived','manual','seed')),
+            related_quality_ids TEXT,
+            created_at          TEXT NOT NULL,
+            created_by          TEXT
+        )""",
+        """CREATE TABLE IF NOT EXISTS structural_findings (
+            finding_id          TEXT PRIMARY KEY,
+            run_id              TEXT NOT NULL,
+            policy_id           TEXT NOT NULL,
+            dimension_id        TEXT,
+            observation         TEXT NOT NULL,
+            source_type         TEXT NOT NULL DEFAULT 'llm_knowledge',
+            source_citation     TEXT,
+            source_text         TEXT,
+            confidence          TEXT NOT NULL DEFAULT 'medium'
+                CHECK(confidence IN ('high','medium','low')),
+            status              TEXT NOT NULL DEFAULT 'active'
+                CHECK(status IN ('active','stale','superseded')),
+            stale_reason        TEXT,
+            created_at          TEXT NOT NULL,
+            created_by          TEXT,
+            FOREIGN KEY (run_id) REFERENCES pipeline_runs(run_id),
+            FOREIGN KEY (policy_id) REFERENCES policies(policy_id),
+            FOREIGN KEY (dimension_id) REFERENCES dimension_registry(dimension_id)
+        )""",
+        """CREATE TABLE IF NOT EXISTS quality_assessments (
+            assessment_id       TEXT PRIMARY KEY,
+            run_id              TEXT NOT NULL,
+            policy_id           TEXT NOT NULL,
+            quality_id          TEXT NOT NULL,
+            taxonomy_version    TEXT,
+            present             TEXT NOT NULL DEFAULT 'uncertain'
+                CHECK(present IN ('yes','no','uncertain')),
+            evidence_finding_ids TEXT,
+            confidence          TEXT NOT NULL DEFAULT 'medium'
+                CHECK(confidence IN ('high','medium','low')),
+            rationale           TEXT,
+            created_at          TEXT NOT NULL,
+            FOREIGN KEY (run_id) REFERENCES pipeline_runs(run_id),
+            FOREIGN KEY (policy_id) REFERENCES policies(policy_id),
+            FOREIGN KEY (quality_id) REFERENCES taxonomy(quality_id)
+        )""",
+        "CREATE UNIQUE INDEX IF NOT EXISTS uq_quality_assessment ON quality_assessments(run_id, policy_id, quality_id)",
+        """CREATE TABLE IF NOT EXISTS source_feeds (
+            feed_id             TEXT PRIMARY KEY,
+            name                TEXT NOT NULL,
+            listing_url         TEXT NOT NULL UNIQUE,
+            content_type        TEXT NOT NULL DEFAULT 'press_release',
+            link_selector       TEXT,
+            last_checked_at     TEXT,
+            last_entry_url      TEXT,
+            enabled             BOOLEAN DEFAULT TRUE,
+            created_at          TEXT NOT NULL,
+            updated_at          TEXT NOT NULL
+        )""",
+        """CREATE TABLE IF NOT EXISTS source_candidates (
+            candidate_id        TEXT PRIMARY KEY,
+            feed_id             TEXT,
+            title               TEXT NOT NULL,
+            url                 TEXT NOT NULL UNIQUE,
+            discovered_at       TEXT NOT NULL,
+            published_date      TEXT,
+            status              TEXT NOT NULL DEFAULT 'discovered'
+                CHECK(status IN ('discovered','fetched','scored','accepted','rejected','ingested','error')),
+            richness_score      REAL,
+            richness_rationale  TEXT,
+            estimated_cases     INTEGER,
+            source_id           TEXT,
+            doc_id              TEXT,
+            reviewed_by         TEXT DEFAULT 'auto',
+            created_at          TEXT NOT NULL,
+            updated_at          TEXT NOT NULL,
+            FOREIGN KEY (feed_id) REFERENCES source_feeds(feed_id)
+        )""",
+        """CREATE TABLE IF NOT EXISTS triage_results (
+            id                  SERIAL PRIMARY KEY,
+            run_id              TEXT NOT NULL,
+            policy_id           TEXT NOT NULL,
+            triage_score        REAL NOT NULL,
+            rationale           TEXT NOT NULL,
+            uncertainty         TEXT,
+            priority_rank       INTEGER NOT NULL,
+            created_at          TEXT NOT NULL,
+            FOREIGN KEY (run_id) REFERENCES pipeline_runs(run_id),
+            FOREIGN KEY (policy_id) REFERENCES policies(policy_id)
+        )""",
+        "CREATE UNIQUE INDEX IF NOT EXISTS uq_triage ON triage_results(run_id, policy_id)",
+        """CREATE TABLE IF NOT EXISTS research_sessions (
+            session_id          TEXT PRIMARY KEY,
+            run_id              TEXT NOT NULL,
+            policy_id           TEXT NOT NULL,
+            status              TEXT NOT NULL DEFAULT 'pending'
+                CHECK(status IN ('pending','researching','findings_complete','assessment_complete','failed')),
+            sources_queried     TEXT,
+            started_at          TEXT,
+            completed_at        TEXT,
+            error_message       TEXT,
+            trigger             TEXT DEFAULT 'initial'
+                CHECK(trigger IN ('initial','taxonomy_change','regulatory_change','manual')),
+            FOREIGN KEY (run_id) REFERENCES pipeline_runs(run_id),
+            FOREIGN KEY (policy_id) REFERENCES policies(policy_id)
+        )""",
+        """CREATE TABLE IF NOT EXISTS regulatory_sources (
+            source_id           TEXT PRIMARY KEY,
+            source_type         TEXT NOT NULL,
+            url                 TEXT NOT NULL,
+            title               TEXT,
+            cfr_reference       TEXT,
+            full_text           TEXT NOT NULL,
+            fetched_at          TEXT NOT NULL,
+            metadata            TEXT
+        )""",
+        "ALTER TABLE policies ADD COLUMN IF NOT EXISTS lifecycle_status TEXT DEFAULT 'cataloged'",
+        "ALTER TABLE policies ADD COLUMN IF NOT EXISTS lifecycle_updated_at TEXT",
+        "ALTER TABLE enforcement_sources ADD COLUMN IF NOT EXISTS candidate_id TEXT",
+        "ALTER TABLE enforcement_sources ADD COLUMN IF NOT EXISTS feed_id TEXT",
+        "CREATE UNIQUE INDEX IF NOT EXISTS uq_enforcement_source_url ON enforcement_sources(url) WHERE url IS NOT NULL",
+    ]),
+    # ── v2: Drop legacy columns ──────────────────────────────────────
+    (2, [
+        "ALTER TABLE cases DROP COLUMN IF EXISTS run_id",
+        "ALTER TABLE cases ADD COLUMN IF NOT EXISTS source_doc_id TEXT",
+        "ALTER TABLE taxonomy DROP COLUMN IF EXISTS run_id",
+        "ALTER TABLE policies DROP COLUMN IF EXISTS run_id",
+        "ALTER TABLE documents DROP COLUMN IF EXISTS content_hash",
+        "ALTER TABLE documents DROP COLUMN IF EXISTS source_id",
+        "ALTER TABLE documents DROP COLUMN IF EXISTS last_processed_run",
+    ]),
+    # ── v3: Remove run_id scoping — data is corpus-level ────────────
+    (3, [
+        # Drop FK constraints on run_id (provenance only, no referential enforcement)
+        "ALTER TABLE convergence_scores DROP CONSTRAINT IF EXISTS convergence_scores_run_id_fkey",
+        "ALTER TABLE policy_scores DROP CONSTRAINT IF EXISTS policy_scores_run_id_fkey",
+        "ALTER TABLE predictions DROP CONSTRAINT IF EXISTS predictions_run_id_fkey",
+        "ALTER TABLE detection_patterns DROP CONSTRAINT IF EXISTS detection_patterns_run_id_fkey",
+        "ALTER TABLE structural_findings DROP CONSTRAINT IF EXISTS structural_findings_run_id_fkey",
+        "ALTER TABLE quality_assessments DROP CONSTRAINT IF EXISTS quality_assessments_run_id_fkey",
+        "ALTER TABLE triage_results DROP CONSTRAINT IF EXISTS triage_results_run_id_fkey",
+        "ALTER TABLE research_sessions DROP CONSTRAINT IF EXISTS research_sessions_run_id_fkey",
+        # Deduplicate: keep row with highest id per natural key
+        """DELETE FROM convergence_scores a USING convergence_scores b
+           WHERE a.case_id = b.case_id AND a.quality_id = b.quality_id AND a.id < b.id""",
+        """DELETE FROM policy_scores a USING policy_scores b
+           WHERE a.policy_id = b.policy_id AND a.quality_id = b.quality_id AND a.id < b.id""",
+        """DELETE FROM quality_assessments a USING quality_assessments b
+           WHERE a.policy_id = b.policy_id AND a.quality_id = b.quality_id
+             AND a.assessment_id < b.assessment_id""",
+        """DELETE FROM triage_results a USING triage_results b
+           WHERE a.policy_id = b.policy_id AND a.id < b.id""",
+        # Rebuild UNIQUE indexes without run_id
+        "DROP INDEX IF EXISTS uq_convergence",
+        "CREATE UNIQUE INDEX uq_convergence ON convergence_scores(case_id, quality_id)",
+        "DROP INDEX IF EXISTS uq_policy_score",
+        "CREATE UNIQUE INDEX uq_policy_score ON policy_scores(policy_id, quality_id)",
+        "DROP INDEX IF EXISTS uq_quality_assessment",
+        "CREATE UNIQUE INDEX uq_quality_assessment ON quality_assessments(policy_id, quality_id)",
+        "DROP INDEX IF EXISTS uq_triage",
+        "CREATE UNIQUE INDEX uq_triage ON triage_results(policy_id)",
+        # Calibration: convert from per-run PK to single-row table
+        """CREATE TABLE IF NOT EXISTS calibration_new (
+            id                  INTEGER PRIMARY KEY DEFAULT 1 CHECK(id = 1),
+            run_id              TEXT,
+            threshold           INTEGER NOT NULL,
+            correlation_notes   TEXT,
+            quality_frequency   TEXT,
+            quality_combinations TEXT,
+            created_at          TEXT NOT NULL
+        )""",
+        """INSERT INTO calibration_new (id, run_id, threshold, correlation_notes,
+           quality_frequency, quality_combinations, created_at)
+           SELECT 1, run_id, threshold, correlation_notes, quality_frequency,
+                  quality_combinations, created_at
+           FROM calibration ORDER BY created_at DESC LIMIT 1
+           ON CONFLICT (id) DO NOTHING""",
+        "DROP TABLE IF EXISTS calibration",
+        "ALTER TABLE calibration_new RENAME TO calibration",
+    ]),
+    # ── v4: Stage processing log for incremental delta detection ──
+    (4, [
+        """CREATE TABLE IF NOT EXISTS stage_processing_log (
+            stage        INTEGER NOT NULL,
+            entity_id    TEXT NOT NULL,
+            input_hash   TEXT NOT NULL,
+            run_id       TEXT,
+            processed_at TEXT NOT NULL,
+            PRIMARY KEY (stage, entity_id)
+        )""",
+    ]),
+    # ── v5: Lineage junction tables + FK constraints ─────────────
+    (5, [
+        # Junction: prediction → qualities (replaces JSON blob)
+        """CREATE TABLE IF NOT EXISTS prediction_qualities (
+            prediction_id  TEXT NOT NULL REFERENCES predictions(prediction_id) ON DELETE CASCADE,
+            quality_id     TEXT NOT NULL REFERENCES taxonomy(quality_id),
+            PRIMARY KEY (prediction_id, quality_id)
+        )""",
+        # Junction: assessment → findings (replaces JSON blob)
+        """CREATE TABLE IF NOT EXISTS assessment_findings (
+            assessment_id  TEXT NOT NULL REFERENCES quality_assessments(assessment_id) ON DELETE CASCADE,
+            finding_id     TEXT NOT NULL REFERENCES structural_findings(finding_id),
+            PRIMARY KEY (assessment_id, finding_id)
+        )""",
+        # FK: cases.source_doc_id → documents.doc_id
+        """DO $$ BEGIN
+            ALTER TABLE cases ADD CONSTRAINT cases_source_doc_fkey
+                FOREIGN KEY (source_doc_id) REFERENCES documents(doc_id);
+        EXCEPTION WHEN duplicate_object THEN NULL;
+        END $$""",
+        # FK: enforcement_sources.doc_id → documents.doc_id
+        """DO $$ BEGIN
+            ALTER TABLE enforcement_sources ADD CONSTRAINT enforcement_sources_doc_fkey
+                FOREIGN KEY (doc_id) REFERENCES documents(doc_id);
+        EXCEPTION WHEN duplicate_object THEN NULL;
+        END $$""",
+        # Backfill prediction_qualities from predictions.enabling_qualities JSON
+        """INSERT INTO prediction_qualities (prediction_id, quality_id)
+           SELECT p.prediction_id, elem.value
+           FROM predictions p,
+                json_array_elements_text(p.enabling_qualities::json) AS elem(value)
+           WHERE p.enabling_qualities IS NOT NULL
+             AND p.enabling_qualities != '[]'
+             AND p.enabling_qualities != ''
+           ON CONFLICT DO NOTHING""",
+        # Backfill assessment_findings from quality_assessments.evidence_finding_ids JSON
+        """INSERT INTO assessment_findings (assessment_id, finding_id)
+           SELECT qa.assessment_id, elem.value
+           FROM quality_assessments qa,
+                json_array_elements_text(qa.evidence_finding_ids::json) AS elem(value)
+           WHERE qa.evidence_finding_ids IS NOT NULL
+             AND qa.evidence_finding_ids != '[]'
+             AND qa.evidence_finding_ids != ''
+           ON CONFLICT DO NOTHING""",
+    ]),
 ]
 
 
 class SVAPStorage:
     """PostgreSQL-backed storage for all pipeline state."""
 
+    _schema_ready = False
+
     def __init__(self, database_url: str):
         self.database_url = database_url
         self.conn = _get_connection(database_url)
-        self._init_schema()
+        if not SVAPStorage._schema_ready:
+            _migrate(self.conn)
+            SVAPStorage._schema_ready = True
 
     def _safe_commit(self):
-        """Commit, or rollback on error to avoid 'aborted transaction' state."""
-        try:
-            self.conn.commit()
-        except Exception:
-            self.conn.rollback()
-            raise
-
-    def _init_schema(self):
-        with self.conn.cursor() as cur:
-            for stmt in SCHEMA_STATEMENTS:
-                cur.execute(stmt)
-        self.conn.commit()
+        """No-op. Connection uses autocommit=True; each statement commits itself."""
+        pass
 
     def close(self):
         # No-op: keep module-level connection alive for Lambda warm starts
@@ -427,6 +583,102 @@ class SVAPStorage:
             cur.execute("SELECT run_id FROM pipeline_runs ORDER BY created_at DESC LIMIT 1")
             row = cur.fetchone()
         return row["run_id"] if row else None
+
+    def list_runs(self) -> list[dict]:
+        """Return all pipeline runs with their latest stage status summary."""
+        with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute(
+                "SELECT r.run_id, r.created_at, r.notes "
+                "FROM pipeline_runs r ORDER BY r.created_at DESC"
+            )
+            runs = [dict(r) for r in cur.fetchall()]
+
+            for run in runs:
+                cur.execute(
+                    "SELECT DISTINCT ON (stage) stage, status "
+                    "FROM stage_log WHERE run_id = %s ORDER BY stage, id DESC",
+                    (run["run_id"],),
+                )
+                run["stages"] = [dict(r) for r in cur.fetchall()]
+        return runs
+
+    def delete_run(self, run_id: str):
+        """Delete a pipeline run's execution records. Corpus data is preserved."""
+        old = self.conn.autocommit
+        try:
+            self.conn.autocommit = False
+            with self.conn.cursor() as cur:
+                cur.execute("DELETE FROM stage_log WHERE run_id = %s", (run_id,))
+                cur.execute("DELETE FROM pipeline_runs WHERE run_id = %s", (run_id,))
+            self.conn.commit()
+        except Exception:
+            self.conn.rollback()
+            raise
+        finally:
+            self.conn.autocommit = old
+
+    # ── Processing log (delta detection) ─────────────────────────────
+
+    def get_processing_hashes(self, stage: int) -> dict[str, str]:
+        """Get all stored input hashes for a stage. Returns {entity_id: input_hash}."""
+        with self.conn.cursor() as cur:
+            cur.execute(
+                "SELECT entity_id, input_hash FROM stage_processing_log WHERE stage = %s",
+                (stage,),
+            )
+            rows = cur.fetchall()
+        return {r[0]: r[1] for r in rows}
+
+    def record_processing(self, stage: int, entity_id: str, input_hash: str, run_id: str):
+        """Record that an entity was processed with a given input hash."""
+        with self.conn.cursor() as cur:
+            cur.execute(
+                """INSERT INTO stage_processing_log (stage, entity_id, input_hash, run_id, processed_at)
+                   VALUES (%s, %s, %s, %s, %s)
+                   ON CONFLICT (stage, entity_id) DO UPDATE SET
+                       input_hash = EXCLUDED.input_hash,
+                       run_id = EXCLUDED.run_id,
+                       processed_at = EXCLUDED.processed_at""",
+                (stage, entity_id, input_hash, run_id, _now()),
+            )
+        self._safe_commit()
+
+    def delete_predictions_for_policy(self, policy_id: str):
+        """Delete predictions + cascaded detection patterns + stage 6 log for a policy.
+
+        Uses explicit transaction for atomicity (connection is autocommit).
+        detection_patterns and prediction_qualities cascade from predictions FK.
+        """
+        old = self.conn.autocommit
+        try:
+            self.conn.autocommit = False
+            with self.conn.cursor() as cur:
+                cur.execute(
+                    "SELECT prediction_id FROM predictions WHERE policy_id = %s",
+                    (policy_id,),
+                )
+                pred_ids = [r[0] for r in cur.fetchall()]
+                if pred_ids:
+                    cur.execute(
+                        "DELETE FROM stage_processing_log WHERE stage = 6 AND entity_id = ANY(%s)",
+                        (pred_ids,),
+                    )
+                cur.execute("DELETE FROM predictions WHERE policy_id = %s", (policy_id,))
+            self.conn.commit()
+        except Exception:
+            self.conn.rollback()
+            raise
+        finally:
+            self.conn.autocommit = old
+
+    def delete_patterns_for_prediction(self, prediction_id: str):
+        """Delete all detection patterns for a prediction."""
+        with self.conn.cursor() as cur:
+            cur.execute(
+                "DELETE FROM detection_patterns WHERE prediction_id = %s",
+                (prediction_id,),
+            )
+        self._safe_commit()
 
     # ── Stage log ───────────────────────────────────────────────────
 
@@ -647,7 +899,8 @@ class SVAPStorage:
                 """INSERT INTO convergence_scores
                 (run_id, case_id, quality_id, present, evidence, created_at)
                 VALUES (%s, %s, %s, %s, %s, %s)
-                ON CONFLICT (run_id, case_id, quality_id) DO UPDATE SET
+                ON CONFLICT (case_id, quality_id) DO UPDATE SET
+                    run_id = EXCLUDED.run_id,
                     present = EXCLUDED.present,
                     evidence = EXCLUDED.evidence,
                     created_at = EXCLUDED.created_at""",
@@ -655,16 +908,14 @@ class SVAPStorage:
             )
         self._safe_commit()
 
-    def get_convergence_matrix(self, run_id: str) -> list[dict]:
+    def get_convergence_matrix(self) -> list[dict]:
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             cur.execute(
                 """SELECT c.case_name, c.case_id, c.scale_dollars,
                           cs.quality_id, cs.present, cs.evidence
                    FROM convergence_scores cs
                    JOIN cases c ON cs.case_id = c.case_id
-                   WHERE cs.run_id=%s
-                   ORDER BY c.case_id, cs.quality_id""",
-                (run_id,),
+                   ORDER BY c.case_id, cs.quality_id"""
             )
             rows = cur.fetchall()
         return [dict(r) for r in rows]
@@ -673,9 +924,10 @@ class SVAPStorage:
         with self.conn.cursor() as cur:
             cur.execute(
                 """INSERT INTO calibration
-                (run_id, threshold, correlation_notes, quality_frequency, quality_combinations, created_at)
-                VALUES (%s, %s, %s, %s, %s, %s)
-                ON CONFLICT (run_id) DO UPDATE SET
+                (id, run_id, threshold, correlation_notes, quality_frequency, quality_combinations, created_at)
+                VALUES (1, %s, %s, %s, %s, %s, %s)
+                ON CONFLICT (id) DO UPDATE SET
+                    run_id = EXCLUDED.run_id,
                     threshold = EXCLUDED.threshold,
                     correlation_notes = EXCLUDED.correlation_notes,
                     quality_frequency = EXCLUDED.quality_frequency,
@@ -685,9 +937,9 @@ class SVAPStorage:
             )
         self._safe_commit()
 
-    def get_calibration(self, run_id: str) -> dict | None:
+    def get_calibration(self) -> dict | None:
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-            cur.execute("SELECT * FROM calibration WHERE run_id=%s", (run_id,))
+            cur.execute("SELECT * FROM calibration WHERE id = 1")
             row = cur.fetchone()
         return dict(row) if row else None
 
@@ -731,7 +983,8 @@ class SVAPStorage:
                 """INSERT INTO policy_scores
                 (run_id, policy_id, quality_id, present, evidence, created_at)
                 VALUES (%s, %s, %s, %s, %s, %s)
-                ON CONFLICT (run_id, policy_id, quality_id) DO UPDATE SET
+                ON CONFLICT (policy_id, quality_id) DO UPDATE SET
+                    run_id = EXCLUDED.run_id,
                     present = EXCLUDED.present,
                     evidence = EXCLUDED.evidence,
                     created_at = EXCLUDED.created_at""",
@@ -739,15 +992,13 @@ class SVAPStorage:
             )
         self._safe_commit()
 
-    def get_policy_scores(self, run_id: str) -> list[dict]:
+    def get_policy_scores(self) -> list[dict]:
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             cur.execute(
                 """SELECT p.name, p.policy_id, ps.quality_id, ps.present, ps.evidence
                    FROM policy_scores ps
                    JOIN policies p ON ps.policy_id = p.policy_id
-                   WHERE ps.run_id=%s
-                   ORDER BY p.policy_id, ps.quality_id""",
-                (run_id,),
+                   ORDER BY p.policy_id, ps.quality_id"""
             )
             rows = cur.fetchall()
         return [dict(r) for r in rows]
@@ -755,46 +1006,62 @@ class SVAPStorage:
     # ── Stage 5: Predictions ────────────────────────────────────────
 
     def insert_prediction(self, run_id: str, pred: dict):
-        with self.conn.cursor() as cur:
-            cur.execute(
-                """INSERT INTO predictions
-                (prediction_id, run_id, policy_id, convergence_score, mechanics,
-                 enabling_qualities, actor_profile, lifecycle_stage,
-                 detection_difficulty, review_status, created_at)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, 'draft', %s)
-                ON CONFLICT (prediction_id) DO UPDATE SET
-                    run_id = EXCLUDED.run_id,
-                    policy_id = EXCLUDED.policy_id,
-                    convergence_score = EXCLUDED.convergence_score,
-                    mechanics = EXCLUDED.mechanics,
-                    enabling_qualities = EXCLUDED.enabling_qualities,
-                    actor_profile = EXCLUDED.actor_profile,
-                    lifecycle_stage = EXCLUDED.lifecycle_stage,
-                    detection_difficulty = EXCLUDED.detection_difficulty,
-                    review_status = EXCLUDED.review_status,
-                    created_at = EXCLUDED.created_at""",
-                (
-                    pred["prediction_id"],
-                    run_id,
-                    pred["policy_id"],
-                    pred["convergence_score"],
-                    pred["mechanics"],
-                    json.dumps(pred["enabling_qualities"]),
-                    pred.get("actor_profile"),
-                    pred.get("lifecycle_stage"),
-                    pred.get("detection_difficulty"),
-                    _now(),
-                ),
-            )
-        self._safe_commit()
+        qualities = pred.get("enabling_qualities", [])
+        if isinstance(qualities, str):
+            qualities = json.loads(qualities)
+        old = self.conn.autocommit
+        try:
+            self.conn.autocommit = False
+            with self.conn.cursor() as cur:
+                cur.execute(
+                    """INSERT INTO predictions
+                    (prediction_id, run_id, policy_id, convergence_score, mechanics,
+                     enabling_qualities, actor_profile, lifecycle_stage,
+                     detection_difficulty, review_status, created_at)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, 'draft', %s)
+                    ON CONFLICT (prediction_id) DO UPDATE SET
+                        run_id = EXCLUDED.run_id,
+                        policy_id = EXCLUDED.policy_id,
+                        convergence_score = EXCLUDED.convergence_score,
+                        mechanics = EXCLUDED.mechanics,
+                        enabling_qualities = EXCLUDED.enabling_qualities,
+                        actor_profile = EXCLUDED.actor_profile,
+                        lifecycle_stage = EXCLUDED.lifecycle_stage,
+                        detection_difficulty = EXCLUDED.detection_difficulty,
+                        review_status = EXCLUDED.review_status,
+                        created_at = EXCLUDED.created_at""",
+                    (
+                        pred["prediction_id"],
+                        run_id,
+                        pred["policy_id"],
+                        pred["convergence_score"],
+                        pred["mechanics"],
+                        json.dumps(qualities),
+                        pred.get("actor_profile"),
+                        pred.get("lifecycle_stage"),
+                        pred.get("detection_difficulty"),
+                        _now(),
+                    ),
+                )
+                for qid in qualities:
+                    cur.execute(
+                        "INSERT INTO prediction_qualities (prediction_id, quality_id) "
+                        "VALUES (%s, %s) ON CONFLICT DO NOTHING",
+                        (pred["prediction_id"], qid),
+                    )
+            self.conn.commit()
+        except Exception:
+            self.conn.rollback()
+            raise
+        finally:
+            self.conn.autocommit = old
 
-    def get_predictions(self, run_id: str) -> list[dict]:
+    def get_predictions(self) -> list[dict]:
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             cur.execute(
                 """SELECT pr.*, p.name as policy_name
                    FROM predictions pr JOIN policies p ON pr.policy_id = p.policy_id
-                   WHERE pr.run_id=%s ORDER BY pr.convergence_score DESC""",
-                (run_id,),
+                   ORDER BY pr.convergence_score DESC"""
             )
             rows = cur.fetchall()
         return [dict(r) for r in rows]
@@ -836,19 +1103,96 @@ class SVAPStorage:
             )
         self._safe_commit()
 
-    def get_detection_patterns(self, run_id: str) -> list[dict]:
+    def get_detection_patterns(self) -> list[dict]:
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             cur.execute(
                 """SELECT dp.*, pr.mechanics as prediction_mechanics, p.name as policy_name
                    FROM detection_patterns dp
                    JOIN predictions pr ON dp.prediction_id = pr.prediction_id
                    JOIN policies p ON pr.policy_id = p.policy_id
-                   WHERE dp.run_id=%s
-                   ORDER BY dp.priority, dp.detection_latency""",
-                (run_id,),
+                   ORDER BY dp.priority, dp.detection_latency"""
             )
             rows = cur.fetchall()
         return [dict(r) for r in rows]
+
+    # ── Lineage ──────────────────────────────────────────────────────
+
+    def get_detection_lineage(self, pattern_id: str) -> dict | None:
+        """Trace a detection pattern back through the full evidence chain.
+
+        Returns: {
+            pattern: {...},
+            prediction: {...},
+            policy: {...},
+            qualities: [{quality, cases: [{case, enforcement_source}]}],
+        }
+        """
+        with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            # Pattern → prediction → policy
+            cur.execute(
+                """SELECT dp.*, pr.prediction_id, pr.mechanics, pr.actor_profile,
+                          pr.detection_difficulty, pr.convergence_score,
+                          p.policy_id, p.name AS policy_name, p.description AS policy_description
+                   FROM detection_patterns dp
+                   JOIN predictions pr ON dp.prediction_id = pr.prediction_id
+                   JOIN policies p ON pr.policy_id = p.policy_id
+                   WHERE dp.pattern_id = %s""",
+                (pattern_id,),
+            )
+            row = cur.fetchone()
+            if not row:
+                return None
+            row = dict(row)
+
+            # Qualities via junction table
+            cur.execute(
+                """SELECT t.quality_id, t.name, t.definition, t.recognition_test
+                   FROM prediction_qualities pq
+                   JOIN taxonomy t ON pq.quality_id = t.quality_id
+                   WHERE pq.prediction_id = %s
+                   ORDER BY t.quality_id""",
+                (row["prediction_id"],),
+            )
+            qualities = []
+            for q in cur.fetchall():
+                q = dict(q)
+                # Cases where this quality was observed
+                cur.execute(
+                    """SELECT c.case_id, c.case_name, c.exploited_policy,
+                              c.scheme_mechanics, c.source_doc_id,
+                              es.name AS source_name, es.url AS source_url
+                       FROM convergence_scores cs
+                       JOIN cases c ON cs.case_id = c.case_id
+                       LEFT JOIN enforcement_sources es ON c.source_doc_id = es.doc_id
+                       WHERE cs.quality_id = %s AND cs.present = 1
+                       ORDER BY c.case_name""",
+                    (q["quality_id"],),
+                )
+                q["cases"] = [dict(c) for c in cur.fetchall()]
+                qualities.append(q)
+
+            return {
+                "pattern": {
+                    "pattern_id": row["pattern_id"],
+                    "data_source": row["data_source"],
+                    "anomaly_signal": row["anomaly_signal"],
+                    "baseline": row["baseline"],
+                    "priority": row["priority"],
+                },
+                "prediction": {
+                    "prediction_id": row["prediction_id"],
+                    "mechanics": row["mechanics"],
+                    "actor_profile": row["actor_profile"],
+                    "detection_difficulty": row["detection_difficulty"],
+                    "convergence_score": row["convergence_score"],
+                },
+                "policy": {
+                    "policy_id": row["policy_id"],
+                    "name": row["policy_name"],
+                    "description": row["policy_description"],
+                },
+                "qualities": qualities,
+            }
 
     # ── RAG: Documents ──────────────────────────────────────────────
 
@@ -1174,16 +1518,16 @@ class SVAPStorage:
         self._safe_commit()
 
     def get_structural_findings(
-        self, run_id: str, policy_id: str, status: str = "active"
+        self, policy_id: str, status: str = "active"
     ) -> list[dict]:
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             cur.execute(
                 """SELECT sf.*, dr.name as dimension_name
                    FROM structural_findings sf
                    LEFT JOIN dimension_registry dr ON sf.dimension_id = dr.dimension_id
-                   WHERE sf.run_id=%s AND sf.policy_id=%s AND sf.status=%s
+                   WHERE sf.policy_id=%s AND sf.status=%s
                    ORDER BY sf.dimension_id, sf.created_at""",
-                (run_id, policy_id, status),
+                (policy_id, status),
             )
             rows = cur.fetchall()
         return [dict(r) for r in rows]
@@ -1199,48 +1543,69 @@ class SVAPStorage:
     # ── Quality Assessments ────────────────────────────────────────
 
     def upsert_quality_assessment(self, run_id: str, assessment: dict):
-        with self.conn.cursor() as cur:
-            cur.execute(
-                """INSERT INTO quality_assessments
-                (assessment_id, run_id, policy_id, quality_id, taxonomy_version,
-                 present, evidence_finding_ids, confidence, rationale, created_at)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                ON CONFLICT (run_id, policy_id, quality_id) DO UPDATE SET
-                    assessment_id = EXCLUDED.assessment_id,
-                    taxonomy_version = EXCLUDED.taxonomy_version,
-                    present = EXCLUDED.present,
-                    evidence_finding_ids = EXCLUDED.evidence_finding_ids,
-                    confidence = EXCLUDED.confidence,
-                    rationale = EXCLUDED.rationale,
-                    created_at = EXCLUDED.created_at""",
-                (
-                    assessment["assessment_id"],
-                    run_id,
-                    assessment["policy_id"],
-                    assessment["quality_id"],
-                    assessment.get("taxonomy_version"),
-                    assessment.get("present", "uncertain"),
-                    json.dumps(assessment.get("evidence_finding_ids", [])),
-                    assessment.get("confidence", "medium"),
-                    assessment.get("rationale"),
-                    _now(),
-                ),
-            )
-        self._safe_commit()
+        finding_ids = assessment.get("evidence_finding_ids", [])
+        if isinstance(finding_ids, str):
+            finding_ids = json.loads(finding_ids)
+        old = self.conn.autocommit
+        try:
+            self.conn.autocommit = False
+            with self.conn.cursor() as cur:
+                cur.execute(
+                    """INSERT INTO quality_assessments
+                    (assessment_id, run_id, policy_id, quality_id, taxonomy_version,
+                     present, evidence_finding_ids, confidence, rationale, created_at)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (policy_id, quality_id) DO UPDATE SET
+                        assessment_id = EXCLUDED.assessment_id,
+                        run_id = EXCLUDED.run_id,
+                        taxonomy_version = EXCLUDED.taxonomy_version,
+                        present = EXCLUDED.present,
+                        evidence_finding_ids = EXCLUDED.evidence_finding_ids,
+                        confidence = EXCLUDED.confidence,
+                        rationale = EXCLUDED.rationale,
+                        created_at = EXCLUDED.created_at""",
+                    (
+                        assessment["assessment_id"],
+                        run_id,
+                        assessment["policy_id"],
+                        assessment["quality_id"],
+                        assessment.get("taxonomy_version"),
+                        assessment.get("present", "uncertain"),
+                        json.dumps(finding_ids),
+                        assessment.get("confidence", "medium"),
+                        assessment.get("rationale"),
+                        _now(),
+                    ),
+                )
+                cur.execute(
+                    "DELETE FROM assessment_findings WHERE assessment_id = %s",
+                    (assessment["assessment_id"],),
+                )
+                for fid in finding_ids:
+                    cur.execute(
+                        "INSERT INTO assessment_findings (assessment_id, finding_id) "
+                        "VALUES (%s, %s) ON CONFLICT DO NOTHING",
+                        (assessment["assessment_id"], fid),
+                    )
+            self.conn.commit()
+        except Exception:
+            self.conn.rollback()
+            raise
+        finally:
+            self.conn.autocommit = old
 
     def get_quality_assessments(
-        self, run_id: str, policy_id: str | None = None
+        self, policy_id: str | None = None
     ) -> list[dict]:
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             if policy_id:
                 cur.execute(
-                    "SELECT * FROM quality_assessments WHERE run_id=%s AND policy_id=%s ORDER BY quality_id",
-                    (run_id, policy_id),
+                    "SELECT * FROM quality_assessments WHERE policy_id=%s ORDER BY quality_id",
+                    (policy_id,),
                 )
             else:
                 cur.execute(
-                    "SELECT * FROM quality_assessments WHERE run_id=%s ORDER BY policy_id, quality_id",
-                    (run_id,),
+                    "SELECT * FROM quality_assessments ORDER BY policy_id, quality_id"
                 )
             rows = cur.fetchall()
         return [dict(r) for r in rows]
@@ -1421,7 +1786,8 @@ class SVAPStorage:
                 """INSERT INTO triage_results
                 (run_id, policy_id, triage_score, rationale, uncertainty, priority_rank, created_at)
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
-                ON CONFLICT (run_id, policy_id) DO UPDATE SET
+                ON CONFLICT (policy_id) DO UPDATE SET
+                    run_id = EXCLUDED.run_id,
                     triage_score = EXCLUDED.triage_score,
                     rationale = EXCLUDED.rationale,
                     uncertainty = EXCLUDED.uncertainty,
@@ -1439,15 +1805,13 @@ class SVAPStorage:
             )
         self._safe_commit()
 
-    def get_triage_results(self, run_id: str) -> list[dict]:
+    def get_triage_results(self) -> list[dict]:
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             cur.execute(
                 """SELECT tr.*, p.name as policy_name
                    FROM triage_results tr
                    JOIN policies p ON tr.policy_id = p.policy_id
-                   WHERE tr.run_id=%s
-                   ORDER BY tr.priority_rank""",
-                (run_id,),
+                   ORDER BY tr.priority_rank"""
             )
             rows = cur.fetchall()
         return [dict(r) for r in rows]
@@ -1501,18 +1865,17 @@ class SVAPStorage:
         self._safe_commit()
 
     def get_research_sessions(
-        self, run_id: str, status: str | None = None
+        self, status: str | None = None
     ) -> list[dict]:
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             if status:
                 cur.execute(
-                    "SELECT * FROM research_sessions WHERE run_id=%s AND status=%s ORDER BY started_at",
-                    (run_id, status),
+                    "SELECT * FROM research_sessions WHERE status=%s ORDER BY started_at",
+                    (status,),
                 )
             else:
                 cur.execute(
-                    "SELECT * FROM research_sessions WHERE run_id=%s ORDER BY started_at",
-                    (run_id,),
+                    "SELECT * FROM research_sessions ORDER BY started_at"
                 )
             rows = cur.fetchall()
         return [dict(r) for r in rows]

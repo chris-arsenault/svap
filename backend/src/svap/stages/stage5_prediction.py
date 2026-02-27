@@ -13,7 +13,9 @@ Output: Exploitation predictions in the `predictions` table
 """
 
 import hashlib
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
+from svap import delta
 from svap.bedrock_client import BedrockClient
 from svap.storage import SVAPStorage
 
@@ -40,12 +42,8 @@ def _build_policy_profiles(policy_scores):
     return profiles
 
 
-def _predict_for_policy(
-    storage, client, run_id, policy_id, profile, policy, quality_lookup, policy_scores
-):
-    """Generate exploitation predictions for a single high-risk policy."""
-    print(f"    Predicting: {profile['name']} (score={profile['count']})")
-
+def _build_prompt(client, policy_id, profile, policy, quality_lookup, policy_scores):
+    """Build the LLM prompt for a single policy. No I/O besides template read."""
     quality_descriptions = []
     for qid in profile["qualities"]:
         q = quality_lookup.get(qid)
@@ -64,7 +62,7 @@ def _predict_for_policy(
             f"- {qid} ({q['name']}): {q['definition']}\n  How it manifests here: {evidence}"
         )
 
-    prompt = client.render_prompt(
+    return client.render_prompt(
         "stage5_predict.txt",
         policy_name=profile["name"],
         policy_description=policy.get("structural_characterization")
@@ -73,13 +71,19 @@ def _predict_for_policy(
         quality_profile="\n".join(quality_descriptions),
     )
 
-    result = client.invoke_json(prompt, system=SYSTEM_PROMPT, temperature=0.3, max_tokens=4096)
-    predictions = result if isinstance(result, list) else result.get("predictions", [result])
 
+def _invoke_llm(client, prompt):
+    """Make the Bedrock call. Thread-safe (boto3 clients are thread-safe)."""
+    return client.invoke_json(prompt, system=SYSTEM_PROMPT, temperature=0.3, max_tokens=4096)
+
+
+def _store_predictions(storage, run_id, policy_id, profile, result):
+    """Parse LLM result and write predictions to DB. Returns count."""
+    predictions = result if isinstance(result, list) else result.get("predictions", [result])
     count = 0
     for i, pred_data in enumerate(predictions):
         pred_id = hashlib.sha256(
-            f"{policy_id}:{i}:{pred_data.get('mechanics', '')[:50]}".encode()
+            f"{policy_id}:pred:{i}".encode()
         ).hexdigest()[:12]
 
         pred = {
@@ -97,6 +101,35 @@ def _predict_for_policy(
     return count
 
 
+def _run_parallel_predictions(storage, client, run_id, jobs, max_concurrency):
+    """Execute LLM calls in parallel and store results. Returns (total, failed)."""
+    print(f"  Submitting {len(jobs)} parallel Bedrock calls (concurrency={max_concurrency})...")
+
+    total_predictions = 0
+    failed_policies = []
+    with ThreadPoolExecutor(max_workers=max_concurrency) as executor:
+        future_to_policy = {
+            executor.submit(_invoke_llm, client, prompt): (policy_id, profile, h)
+            for policy_id, profile, h, prompt in jobs
+        }
+        for future in as_completed(future_to_policy):
+            policy_id, profile, h = future_to_policy[future]
+            try:
+                result = future.result()
+                count = _store_predictions(storage, run_id, policy_id, profile, result)
+                storage.record_processing(5, policy_id, h, run_id)
+                total_predictions += count
+                print(f"    {profile['name']}: {count} predictions (total: {total_predictions})")
+            except Exception as e:
+                print(f"    FAILED {profile['name']}: {e}")
+                failed_policies.append(policy_id)
+
+    if failed_policies:
+        print(f"\n  WARNING: {len(failed_policies)} policies failed prediction generation")
+
+    return total_predictions, failed_policies
+
+
 def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
     """Execute Stage 5: Generate exploitation predictions for high-scoring policies."""
     print("Stage 5: Exploitation Prediction")
@@ -104,11 +137,11 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
 
     try:
         taxonomy = storage.get_approved_taxonomy()
-        calibration = storage.get_calibration(run_id)
+        calibration = storage.get_calibration()
         threshold = calibration["threshold"] if calibration else 3
 
         policies = storage.get_policies()
-        policy_scores = storage.get_policy_scores(run_id)
+        policy_scores = storage.get_policy_scores()
 
         policy_profiles = _build_policy_profiles(policy_scores)
         high_risk = {
@@ -120,24 +153,61 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
             storage.log_stage_complete(run_id, 5, {"predictions_generated": 0})
             return
 
-        print(
-            f"  Generating predictions for {len(high_risk)} high-risk policies (threshold={threshold})..."
-        )
-        quality_lookup = {q["quality_id"]: q for q in taxonomy}
-        total_predictions = 0
+        # ── Delta detection ─────────────────────────────────────────
+        cal_fp = delta.calibration_fingerprint(calibration)
+        stored = storage.get_processing_hashes(5)
 
+        to_predict = []
         for policy_id, profile in sorted(high_risk.items(), key=lambda x: -x[1]["count"]):
+            quality_profile = delta.policy_quality_profile(policy_id, policy_scores)
+            h = delta.compute_hash(quality_profile, cal_fp)
+            if stored.get(policy_id) != h:
+                to_predict.append((policy_id, profile, h))
+
+        if not to_predict:
+            print(f"  All {len(high_risk)} high-risk policies unchanged — skipping.")
+            storage.log_stage_complete(run_id, 5, {
+                "predictions_generated": 0,
+                "skipped_unchanged": len(high_risk),
+            })
+            return
+
+        print(
+            f"  {len(to_predict)}/{len(high_risk)} policies changed "
+            f"(threshold={threshold}), generating predictions..."
+        )
+
+        # ── Delete stale data BEFORE LLM calls ─────────────────────
+        for policy_id, _profile, _h in to_predict:
+            storage.delete_predictions_for_policy(policy_id)
+
+        quality_lookup = {q["quality_id"]: q for q in taxonomy}
+        max_concurrency = config.get("pipeline", {}).get("max_concurrency", 5)
+
+        # Build all prompts (fast, sequential)
+        jobs = []
+        for policy_id, profile, h in to_predict:
             policy = next((p for p in policies if p["policy_id"] == policy_id), None)
             if not policy:
                 continue
-            total_predictions += _predict_for_policy(
-                storage, client, run_id, policy_id, profile, policy, quality_lookup, policy_scores
-            )
+            prompt = _build_prompt(client, policy_id, profile, policy, quality_lookup, policy_scores)
+            jobs.append((policy_id, profile, h, prompt))
 
-        storage.log_stage_pending_review(run_id, 5)
-        print(f"\n  Stage 5 complete: {total_predictions} predictions generated.")
-        print("  HUMAN REVIEW REQUIRED before proceeding to Stage 6.")
-        print("    Approve with: python -m svap.orchestrator approve --stage 5")
+        total_predictions, failed_policies = _run_parallel_predictions(
+            storage, client, run_id, jobs, max_concurrency,
+        )
+
+        if total_predictions > 0:
+            storage.log_stage_pending_review(run_id, 5)
+            print(f"\n  Stage 5 complete: {total_predictions} predictions generated.")
+            print("  HUMAN REVIEW REQUIRED before proceeding to Stage 6.")
+            print("    Approve with: python -m svap.orchestrator approve --stage 5")
+        else:
+            storage.log_stage_complete(run_id, 5, {
+                "predictions_generated": 0,
+                "all_failed": len(failed_policies),
+            })
+            print(f"\n  Stage 5 complete: no predictions generated ({len(failed_policies)} failed).")
 
     except Exception as e:
         storage.log_stage_failed(run_id, 5, str(e))

@@ -15,6 +15,7 @@ Output: Convergence matrix + calibration threshold in `convergence_scores` and `
 import json
 from collections import defaultdict
 
+from svap import delta
 from svap.bedrock_client import BedrockClient
 from svap.rag import ContextAssembler
 from svap.storage import SVAPStorage
@@ -126,14 +127,33 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
 
         taxonomy_context = ctx.format_taxonomy_context(taxonomy)
 
-        # ── Score each case ─────────────────────────────────────────
-        print(f"  Scoring {len(cases)} cases against {len(taxonomy)} qualities...")
+        # ── Delta detection ─────────────────────────────────────────
+        tax_fp = delta.taxonomy_fingerprint(taxonomy)
+        stored = storage.get_processing_hashes(3)
+        cases_to_score = []
+        skipped = 0
         for case in cases:
+            h = delta.compute_hash(case["enabling_condition"], tax_fp)
+            if stored.get(case["case_id"]) == h:
+                skipped += 1
+            else:
+                cases_to_score.append((case, h))
+
+        if not cases_to_score:
+            print(f"  All {len(cases)} cases unchanged. Skipping scoring.")
+            storage.log_stage_complete(run_id, 3, {"cases_scored": 0, "skipped": skipped})
+            print("\n  Stage 3 complete (no changes).")
+            return
+
+        # ── Score each case ─────────────────────────────────────────
+        print(f"  Scoring {len(cases_to_score)} cases ({skipped} unchanged)...")
+        for case, h in cases_to_score:
             _score_case(storage, client, run_id, case, taxonomy_context)
+            storage.record_processing(3, case["case_id"], h, run_id)
 
         # ── Calibration analysis ────────────────────────────────────
         print("  Running calibration analysis...")
-        matrix = storage.get_convergence_matrix(run_id)
+        matrix = storage.get_convergence_matrix()
         sorted_cases, quality_freq, quality_combos = _build_calibration_stats(matrix)
         cal_result = _run_calibration(client, sorted_cases)
 

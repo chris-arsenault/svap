@@ -30,6 +30,7 @@ Event shape (after unwrapping):
 
 import logging
 import os
+import time
 import traceback
 
 import boto3
@@ -89,6 +90,10 @@ def handler(event, context):
     # -- Stage mode ---------------------------------------------------------
     try:
         config = _get_config(config_overrides)
+        # Give stages a deadline 60s before Lambda timeout so they can save partial results
+        if context and hasattr(context, "get_remaining_time_in_millis"):
+            remaining_ms = context.get_remaining_time_in_millis()
+            config["_deadline"] = time.time() + (remaining_ms / 1000) - 60
         result = _run_stage(storage, run_id, stage, config)
         return {"status": "completed", "run_id": run_id, "stage": stage, **result}
     except Exception as e:

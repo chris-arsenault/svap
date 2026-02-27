@@ -17,11 +17,13 @@ class BedrockClient:
 
     def __init__(self, config: dict):
         import boto3
+        from botocore.config import Config
 
         self.config = config["bedrock"]
         self.client = boto3.client(
             "bedrock-runtime",
             region_name=self.config["region"],
+            config=Config(read_timeout=300, retries={"max_attempts": 0}),
         )
         self.model_id = self.config["model_id"]
         self.max_tokens = self.config.get("max_tokens", 4096)

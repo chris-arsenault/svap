@@ -220,10 +220,16 @@ data "aws_iam_policy_document" "lambda" {
     actions = [
       "states:StartExecution",
       "states:DescribeExecution",
+      "states:ListExecutions",
+      "states:StopExecution",
       "states:SendTaskSuccess",
       "states:SendTaskFailure",
     ]
-    resources = [aws_sfn_state_machine.pipeline.arn]
+    resources = [
+      aws_sfn_state_machine.pipeline.arn,
+      replace(aws_sfn_state_machine.pipeline.arn, ":stateMachine:", ":execution:"),
+      "${replace(aws_sfn_state_machine.pipeline.arn, ":stateMachine:", ":execution:")}:*",
+    ]
   }
 }
 
@@ -288,6 +294,10 @@ module "api" {
     "GET /api/research/findings/{policy_id}",
     "GET /api/research/assessments/{policy_id}",
     "GET /api/dimensions",
+    "GET /api/management/executions",
+    "POST /api/management/executions/stop",
+    "GET /api/management/runs",
+    "POST /api/management/runs/delete",
   ]
 
   cors_allow_origins = local.allowed_origins
@@ -443,8 +453,9 @@ resource "aws_sfn_state_machine" "pipeline" {
         Next       = "Stage5_ExploitationPrediction"
       }
       Stage5_ExploitationPrediction = {
-        Type     = "Task"
-        Resource = "arn:aws:states:::lambda:invoke"
+        Type           = "Task"
+        Resource       = "arn:aws:states:::lambda:invoke"
+        TimeoutSeconds = 960
         Parameters = {
           FunctionName = aws_lambda_function.stage_runner.arn
           Payload = {
@@ -471,8 +482,9 @@ resource "aws_sfn_state_machine" "pipeline" {
         Next       = "Stage6_DetectionPatterns"
       }
       Stage6_DetectionPatterns = {
-        Type     = "Task"
-        Resource = "arn:aws:states:::lambda:invoke"
+        Type           = "Task"
+        Resource       = "arn:aws:states:::lambda:invoke"
+        TimeoutSeconds = 960
         Parameters = {
           FunctionName = aws_lambda_function.stage_runner.arn
           Payload = {

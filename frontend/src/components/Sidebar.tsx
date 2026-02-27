@@ -2,15 +2,16 @@ import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
   Database,
+  Radar,
   FileSearch,
   FolderTree,
   Tags,
+  Layers,
   Grid,
   AlertTriangle,
   Radio,
-  Radar,
   Microscope,
-  Layers,
+  Settings,
   type LucideIcon,
 } from "lucide-react";
 import { StageDot } from "./SharedUI";
@@ -30,19 +31,29 @@ function isSection(item: NavSection | NavItem): item is NavSection {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { section: "Analysis" },
+  { section: "Overview" },
   { path: "/", label: "Dashboard", icon: LayoutDashboard },
+
+  { section: "Corpus" },
   { path: "/sources", label: "Sources", icon: Database },
-  { path: "/cases", label: "Case Sourcing", icon: FileSearch, countKey: "cases" },
-  { path: "/policies", label: "Policy Explorer", icon: FolderTree },
   { path: "/discovery", label: "Discovery", icon: Radar },
-  { path: "/research", label: "Research", icon: Microscope },
-  { path: "/dimensions", label: "Dimensions", icon: Layers },
-  { section: "Pipeline Results" },
+  { path: "/cases", label: "Cases", icon: FileSearch, countKey: "cases" },
+  { path: "/policies", label: "Policies", icon: FolderTree, countKey: "policies" },
+
+  { section: "Analysis" },
   { path: "/taxonomy", label: "Taxonomy", icon: Tags, countKey: "taxonomy_qualities" },
-  { path: "/matrix", label: "Convergence Matrix", icon: Grid },
+  { path: "/dimensions", label: "Dimensions", icon: Layers },
+  { path: "/matrix", label: "Convergence", icon: Grid },
+
+  { section: "Results" },
   { path: "/predictions", label: "Predictions", icon: AlertTriangle, countKey: "predictions" },
-  { path: "/detection", label: "Detection Patterns", icon: Radio, countKey: "detection_patterns" },
+  { path: "/detection", label: "Detection", icon: Radio, countKey: "detection_patterns" },
+
+  { section: "Research" },
+  { path: "/research", label: "Deep Research", icon: Microscope },
+
+  { section: "System" },
+  { path: "/management", label: "Management", icon: Settings },
 ];
 
 const STAGE_NAMES: Record<number, string> = {

@@ -42,19 +42,20 @@ def get_dashboard_data(storage, run_id: str) -> dict:
     """
     Assemble the full dashboard payload for the React UI.
 
-    Queries all pipeline tables, enriches with computed fields,
-    and returns the shape expected by usePipelineData.js.
+    All pipeline data is global/cumulative (iterative corpus model).
+    run_id is only used for pipeline_status (per-run execution state).
     """
-    # Raw data from storage — cases, taxonomy, and policies are global
+    # All pipeline data is global/cumulative — no run_id scoping
     cases = storage.get_cases()
     taxonomy = storage.get_taxonomy()
     policies = storage.get_policies()
-    predictions = storage.get_predictions(run_id)
-    patterns = storage.get_detection_patterns(run_id)
-    convergence_matrix = storage.get_convergence_matrix(run_id)
-    policy_scores = storage.get_policy_scores(run_id)
-    calibration = storage.get_calibration(run_id)
-    pipeline_status = storage.get_pipeline_status(run_id)
+    pipeline_status = storage.get_pipeline_status(run_id)  # genuinely per-run
+
+    convergence_matrix = storage.get_convergence_matrix()
+    policy_scores = storage.get_policy_scores()
+    calibration = storage.get_calibration()
+    predictions = storage.get_predictions()
+    patterns = storage.get_detection_patterns()
 
     # Enrich with computed fields
     enriched_cases = enrich_cases(cases, convergence_matrix)

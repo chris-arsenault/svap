@@ -145,10 +145,10 @@ const STAGE_NAMES: Record<number, string> = {
   0: "Fetch enforcement sources",
   1: "Ingest enforcement cases",
   2: "Build vulnerability taxonomy",
-  3: "Scan policy catalog",
-  4: "Generate predictions",
-  5: "Design detection patterns",
-  6: "Compile final report",
+  3: "Convergence scoring",
+  4: "Policy scanning",
+  5: "Exploitation prediction",
+  6: "Detection patterns",
 };
 
 const HUMAN_GATE_STAGES = [2, 5];

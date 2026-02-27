@@ -149,7 +149,7 @@ export default function ConvergenceMatrix() {
                 {qualities.map((q) => (
                   <th key={q.quality_id} className="matrix-quality-header">
                     {/* eslint-disable-next-line local/no-inline-styles */}
-                    <span style={{ color: q.color }}>{q.quality_id}</span>
+                    <span style={{ color: q.color }}>{q.name}</span>
                   </th>
                 ))}
                 <th className="text-center">{"\u03A3"}</th>

@@ -17,6 +17,7 @@ Output: structural_findings, research_sessions
 import hashlib
 import time
 
+from svap import delta
 from svap.bedrock_client import BedrockClient
 from svap.regulatory.ecfr_client import ECFRClient, parse_xml_sections
 from svap.regulatory.federal_register_client import FederalRegisterClient
@@ -34,6 +35,31 @@ FINDING_EXTRACTION_SYSTEM = (
     "Each finding must be a single atomic observation about how a policy works "
     "mechanically — not evaluative, not speculative, and cited to the source."
 )
+
+
+def _filter_changed_research(storage, policies_to_research, dimensions):
+    """Return (changed_entries, skipped_count) using delta detection."""
+    dim_fp = delta.compute_hash(":".join(sorted(d["dimension_id"] for d in dimensions)))
+    stored_hashes = storage.get_processing_hashes(41)
+    all_policies = storage.get_policies()
+    changed = []
+    skipped = 0
+    for entry in policies_to_research:
+        policy_id = entry["policy_id"]
+        policy = next((p for p in all_policies if p["policy_id"] == policy_id), None)
+        if not policy:
+            changed.append((entry, None))
+            continue
+        h = delta.compute_hash(
+            policy.get("description", ""),
+            str(entry.get("triage_score", 0)),
+            dim_fp,
+        )
+        if stored_hashes.get(policy_id) == h:
+            skipped += 1
+        else:
+            changed.append((entry, h))
+    return changed, skipped
 
 
 def run(
@@ -58,7 +84,7 @@ def run(
                 {"policy_id": pid} for pid in policy_ids
             ]
         else:
-            triage = storage.get_triage_results(run_id)
+            triage = storage.get_triage_results()
             policies_to_research = triage[:top_n]
 
         if not policies_to_research:
@@ -66,18 +92,32 @@ def run(
             storage.log_stage_complete(run_id, 41, {"policies_researched": 0})
             return
 
+        # Delta detection — per-policy
+        delta_entries, skipped = _filter_changed_research(
+            storage, policies_to_research, dimensions
+        )
+
+        if not delta_entries:
+            print(f"  All {len(policies_to_research)} policies unchanged. Skipping research.")
+            storage.log_stage_complete(run_id, 41, {"policies_researched": 0, "skipped": skipped})
+            return
+
+        print(f"  Researching {len(delta_entries)} policies ({skipped} unchanged)...")
+
         ecfr = ECFRClient()
         fr = FederalRegisterClient()
         researched = 0
 
-        for entry in policies_to_research:
+        for entry, h in delta_entries:
             ok = _research_one_policy(
                 storage, client, ecfr, fr, run_id, entry, dimensions
             )
             if ok:
                 researched += 1
+                if h is not None:
+                    storage.record_processing(41, entry["policy_id"], h, run_id)
 
-        storage.log_stage_complete(run_id, 41, {"policies_researched": researched})
+        storage.log_stage_complete(run_id, 41, {"policies_researched": researched, "skipped": skipped})
         print(f"  Research complete: {researched} policies.")
 
     except Exception as e:
@@ -134,7 +174,7 @@ def _research_one_policy(storage, client, ecfr, fr, run_id, entry, dimensions):
         )
         storage.update_policy_lifecycle(policy_id, "structurally_characterized")
 
-        findings_count = len(storage.get_structural_findings(run_id, policy_id))
+        findings_count = len(storage.get_structural_findings(policy_id))
         print(f"    Complete: {findings_count} findings extracted")
         return True
 

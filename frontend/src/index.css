@@ -1233,6 +1233,7 @@ html, body, #root {
   font-size: 13px;
   color: var(--text-secondary);
   line-height: 1.6;
+  white-space: pre-wrap;
 }
 
 /* TaxonomyView */
@@ -1396,3 +1397,28 @@ html, body, #root {
   font-family: var(--font-mono);
   font-size: 11px;
 }
+
+/* ── Management: Stage chips ─────────────────────────────────────────── */
+.stage-chips {
+  display: flex;
+  gap: 3px;
+}
+.stage-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 20px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+}
+.stage-chip.completed,
+.stage-chip.approved  { background: rgba(74, 222, 128, 0.15); color: var(--severity-low); }
+.stage-chip.running   { background: rgba(91, 141, 239, 0.15); color: var(--accent); }
+.stage-chip.failed    { background: rgba(255, 59, 59, 0.12);  color: var(--severity-critical); }
+.stage-chip.pending_review { background: rgba(240, 192, 64, 0.15); color: var(--severity-medium); }
+.td-muted { color: var(--text-muted); font-size: 12px; }

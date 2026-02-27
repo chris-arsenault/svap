@@ -14,6 +14,7 @@ Output: quality_assessments, policy_scores (backward compat)
 
 import hashlib
 
+from svap import delta
 from svap.bedrock_client import BedrockClient
 from svap.storage import SVAPStorage
 
@@ -22,6 +23,23 @@ ASSESSMENT_SYSTEM = (
     "policy based on specific, cited structural findings. Be conservative — a quality "
     "is present only if findings directly support it. Cite specific finding IDs."
 )
+
+
+def _get_assessable_sessions(storage):
+    """Collect sessions ready for assessment, deduped by policy_id."""
+    sessions_new = storage.get_research_sessions(status="findings_complete")
+    sessions_done = storage.get_research_sessions(status="assessment_complete")
+    seen = set()
+    sessions = []
+    for s in sessions_new:
+        if s["policy_id"] not in seen:
+            seen.add(s["policy_id"])
+            sessions.append(s)
+    for s in sessions_done:
+        if s["policy_id"] not in seen:
+            seen.add(s["policy_id"])
+            sessions.append(s)
+    return sessions
 
 
 def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
@@ -36,24 +54,47 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
             storage.log_stage_complete(run_id, 42, {"policies_assessed": 0})
             return
 
-        # Get policies with completed research
-        sessions = storage.get_research_sessions(run_id, status="findings_complete")
+        sessions = _get_assessable_sessions(storage)
+
         if not sessions:
             print("  No policies with completed research. Run Stage 4B first.")
             storage.log_stage_complete(run_id, 42, {"policies_assessed": 0})
             return
 
-        assessed = 0
+        # Delta detection — per-policy
+        tax_fp = delta.taxonomy_fingerprint(taxonomy)
+        stored_hashes = storage.get_processing_hashes(42)
+
+        # Pre-filter to find which sessions actually need assessment
+        sessions_to_assess = []
+        skipped = 0
         for session in sessions:
             policy_id = session["policy_id"]
-            findings = storage.get_structural_findings(run_id, policy_id)
-
+            findings = storage.get_structural_findings(policy_id)
             if not findings:
-                print(f"  No findings for policy {policy_id}, skipping")
                 continue
+            h = delta.compute_hash(
+                ":".join(sorted(f["finding_id"] for f in findings)),
+                tax_fp,
+            )
+            if stored_hashes.get(policy_id) == h:
+                skipped += 1
+                continue
+            sessions_to_assess.append((session, findings, h))
 
-            policies = storage.get_policies()
-            policy = next((p for p in policies if p["policy_id"] == policy_id), None)
+        if not sessions_to_assess:
+            print(f"  All {len(sessions)} researched policies unchanged. Skipping assessment.")
+            storage.log_stage_complete(run_id, 42, {
+                "policies_assessed": 0,
+                "skipped_unchanged": skipped,
+            })
+            return
+
+        assessed = 0
+        all_policies = storage.get_policies()
+        for session, findings, h in sessions_to_assess:
+            policy_id = session["policy_id"]
+            policy = next((p for p in all_policies if p["policy_id"] == policy_id), None)
             policy_name = policy["name"] if policy else policy_id
 
             print(f"  Assessing: {policy_name} ({len(findings)} findings)")
@@ -76,14 +117,16 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
 
             storage.update_research_session(session["session_id"], "assessment_complete")
             storage.update_policy_lifecycle(policy_id, "fully_assessed")
+            storage.record_processing(42, policy_id, h, run_id)
             assessed += 1
             print(f"    Assessed {len(taxonomy)} qualities")
 
         storage.log_stage_complete(run_id, 42, {
             "policies_assessed": assessed,
+            "skipped": skipped,
             "qualities_per_policy": len(taxonomy),
         })
-        print(f"  Assessment complete: {assessed} policies.")
+        print(f"  Assessment complete: {assessed} policies ({skipped} unchanged).")
 
     except Exception as e:
         storage.log_stage_failed(run_id, 42, str(e))
@@ -126,7 +169,7 @@ def _assess_quality(
     result = client.invoke_json(prompt, system=ASSESSMENT_SYSTEM, temperature=0.1, max_tokens=1000)
 
     assessment_id = hashlib.sha256(
-        f"{run_id}:{policy_id}:{quality['quality_id']}".encode()
+        f"{policy_id}:{quality['quality_id']}".encode()
     ).hexdigest()[:12]
 
     # Validate finding_ids against actual findings

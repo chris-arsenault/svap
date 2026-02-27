@@ -13,6 +13,7 @@
 import { useEffect, useRef } from "react";
 import { usePipelineStore } from "./pipelineStore";
 import { config } from "../config";
+import { getToken } from "../auth";
 import type { PipelineStageStatus } from "../types";
 
 const API_BASE = config.apiBaseUrl || "/api";
@@ -26,23 +27,21 @@ export function useStatusSubscription() {
   const activeRef = useRef(false);
 
   useEffect(() => {
-    // Subscribe to store changes outside of React render cycle
     const unsubscribe = usePipelineStore.subscribe(
       (state) => {
         const shouldPoll = Boolean(state.run_id) && hasRunningStage(state.pipeline_status);
 
         if (shouldPoll && !activeRef.current) {
           activeRef.current = true;
-          startPolling(state.run_id, state._token);
+          startPolling();
         }
       },
     );
 
-    // Check initial state
-    const { run_id, pipeline_status, _token } = usePipelineStore.getState();
+    const { run_id, pipeline_status } = usePipelineStore.getState();
     if (run_id && hasRunningStage(pipeline_status) && !activeRef.current) {
       activeRef.current = true;
-      startPolling(run_id, _token);
+      startPolling();
     }
 
     return () => {
@@ -51,12 +50,15 @@ export function useStatusSubscription() {
     };
   }, []);
 
-  function startPolling(runId: string, token: string) {
+  function startPolling() {
     const poll = async () => {
       while (activeRef.current) {
         try {
+          const token = await getToken();
+          const headers: Record<string, string> = {};
+          if (token) headers["Authorization"] = `Bearer ${token}`;
           const res = await fetch(`${API_BASE}/status`, {
-            headers: token ? { Authorization: `Bearer ${token}` } : {},
+            headers,
             signal: AbortSignal.timeout(8000),
           });
           if (!res.ok) break;
@@ -66,7 +68,6 @@ export function useStatusSubscription() {
 
           usePipelineStore.getState().updatePipelineStatus(stages);
 
-          // Pipeline finished — do a full dashboard refresh for new data
           if (stages.length > 0 && !hasRunningStage(stages)) {
             activeRef.current = false;
             await usePipelineStore.getState().refresh();

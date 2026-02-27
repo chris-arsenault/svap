@@ -29,7 +29,6 @@ from svap.hhs_data import (
     ENFORCEMENT_SOURCES,
     HHS_DATA_SOURCES,
     HHS_POLICY_CATALOG,
-    SCANNED_PROGRAMS,
     flatten_policy_catalog,
     get_dashboard_data,
     get_data_sources_for_policy,
@@ -166,38 +165,7 @@ def _error(status_code: int, message: str) -> dict:
 
 def _dashboard(event):
     storage = get_storage()
-    run_id = storage.get_latest_run()
-    if not run_id:
-        # No pipeline runs yet — show global corpus data (cases, taxonomy, policies)
-        cases = storage.get_cases()
-        taxonomy = storage.get_taxonomy()
-        policies = storage.get_policies()
-        enriched_taxonomy = enrich_taxonomy(taxonomy, [])
-        enriched_policies = enrich_policies(policies, [], None)
-        return {
-            "run_id": "",
-            "source": "api",
-            "pipeline_status": [],
-            "counts": {
-                "cases": len(cases),
-                "taxonomy_qualities": len(taxonomy),
-                "policies": len(policies),
-                "predictions": 0,
-                "detection_patterns": 0,
-            },
-            "calibration": {"threshold": 3},
-            "cases": enrich_cases(cases, []),
-            "taxonomy": enriched_taxonomy,
-            "policies": enriched_policies,
-            "predictions": [],
-            "detection_patterns": [],
-            "case_convergence": [],
-            "policy_convergence": [],
-            "policy_catalog": HHS_POLICY_CATALOG,
-            "enforcement_sources": storage.get_enforcement_sources(),
-            "data_sources": HHS_DATA_SOURCES,
-            "scanned_programs": SCANNED_PROGRAMS,
-        }
+    run_id = storage.get_latest_run() or ""
     return get_dashboard_data(storage, run_id)
 
 
@@ -209,15 +177,13 @@ def _status(event):
 
 def _list_cases(event):
     storage = get_storage()
-    run_id = get_active_run_id(storage)
-    return enrich_cases(storage.get_cases(), storage.get_convergence_matrix(run_id))
+    return enrich_cases(storage.get_cases(), storage.get_convergence_matrix())
 
 
 def _get_case(event):
     case_id = event["pathParameters"]["case_id"]
     storage = get_storage()
-    run_id = get_active_run_id(storage)
-    enriched = enrich_cases(storage.get_cases(), storage.get_convergence_matrix(run_id))
+    enriched = enrich_cases(storage.get_cases(), storage.get_convergence_matrix())
     case = next((c for c in enriched if c["case_id"] == case_id), None)
     if not case:
         raise ApiError(404, f"Case {case_id} not found")
@@ -226,15 +192,13 @@ def _get_case(event):
 
 def _list_taxonomy(event):
     storage = get_storage()
-    run_id = get_active_run_id(storage)
-    return enrich_taxonomy(storage.get_taxonomy(), storage.get_convergence_matrix(run_id))
+    return enrich_taxonomy(storage.get_taxonomy(), storage.get_convergence_matrix())
 
 
 def _get_quality(event):
     quality_id = event["pathParameters"]["quality_id"]
     storage = get_storage()
-    run_id = get_active_run_id(storage)
-    enriched = enrich_taxonomy(storage.get_taxonomy(), storage.get_convergence_matrix(run_id))
+    enriched = enrich_taxonomy(storage.get_taxonomy(), storage.get_convergence_matrix())
     quality = next((q for q in enriched if q["quality_id"] == quality_id), None)
     if not quality:
         raise ApiError(404, f"Quality {quality_id} not found")
@@ -243,48 +207,44 @@ def _get_quality(event):
 
 def _convergence_cases(event):
     storage = get_storage()
-    run_id = get_active_run_id(storage)
     return {
-        "matrix": storage.get_convergence_matrix(run_id),
-        "calibration": storage.get_calibration(run_id),
+        "matrix": storage.get_convergence_matrix(),
+        "calibration": storage.get_calibration(),
     }
 
 
 def _convergence_policies(event):
     storage = get_storage()
-    run_id = get_active_run_id(storage)
     return {
-        "scores": storage.get_policy_scores(run_id),
-        "calibration": storage.get_calibration(run_id),
+        "scores": storage.get_policy_scores(),
+        "calibration": storage.get_calibration(),
     }
 
 
 def _list_policies(event):
     storage = get_storage()
-    run_id = get_active_run_id(storage)
     return enrich_policies(
         storage.get_policies(),
-        storage.get_policy_scores(run_id),
-        storage.get_calibration(run_id),
+        storage.get_policy_scores(),
+        storage.get_calibration(),
     )
 
 
 def _get_policy(event):
     policy_id = event["pathParameters"]["policy_id"]
     storage = get_storage()
-    run_id = get_active_run_id(storage)
 
     policies = storage.get_policies()
-    scores = storage.get_policy_scores(run_id)
-    calibration = storage.get_calibration(run_id)
+    scores = storage.get_policy_scores()
+    calibration = storage.get_calibration()
     enriched = enrich_policies(policies, scores, calibration)
 
     policy = next((p for p in enriched if p["policy_id"] == policy_id), None)
     if not policy:
         raise ApiError(404, f"Policy {policy_id} not found")
 
-    predictions = enrich_predictions(storage.get_predictions(run_id))
-    patterns = storage.get_detection_patterns(run_id)
+    predictions = enrich_predictions(storage.get_predictions())
+    patterns = storage.get_detection_patterns()
 
     policy_scores = [s for s in scores if s["policy_id"] == policy_id]
     policy_predictions = [p for p in predictions if p["policy_id"] == policy_id]
@@ -303,14 +263,12 @@ def _get_policy(event):
 
 def _list_predictions(event):
     storage = get_storage()
-    run_id = get_active_run_id(storage)
-    return enrich_predictions(storage.get_predictions(run_id))
+    return enrich_predictions(storage.get_predictions())
 
 
 def _list_detection_patterns(event):
     storage = get_storage()
-    run_id = get_active_run_id(storage)
-    return storage.get_detection_patterns(run_id)
+    return storage.get_detection_patterns()
 
 
 def _policy_catalog(event):
@@ -642,34 +600,30 @@ def _run_deep_research(event):
 
 def _get_triage_results(event):
     storage = get_storage()
-    run_id = get_active_run_id(storage)
-    return storage.get_triage_results(run_id)
+    return storage.get_triage_results()
 
 
 def _list_research_sessions(event):
     storage = get_storage()
-    run_id = get_active_run_id(storage)
     qs = event.get("queryStringParameters") or {}
-    return storage.get_research_sessions(run_id, status=qs.get("status"))
+    return storage.get_research_sessions(status=qs.get("status"))
 
 
 def _get_findings(event):
     policy_id = event["pathParameters"]["policy_id"]
     storage = get_storage()
-    run_id = get_active_run_id(storage)
     return {
         "policy_id": policy_id,
-        "findings": storage.get_structural_findings(run_id, policy_id),
+        "findings": storage.get_structural_findings(policy_id),
     }
 
 
 def _get_assessments(event):
     policy_id = event["pathParameters"]["policy_id"]
     storage = get_storage()
-    run_id = get_active_run_id(storage)
     return {
         "policy_id": policy_id,
-        "assessments": storage.get_quality_assessments(run_id, policy_id),
+        "assessments": storage.get_quality_assessments(policy_id),
     }
 
 
@@ -677,6 +631,72 @@ def _list_dimensions(event):
     storage = get_storage()
     storage.seed_dimensions_if_empty()
     return storage.get_dimensions()
+
+
+# ── Management ──────────────────────────────────────────────────────────
+
+
+def _list_executions(event):
+    """List Step Functions executions for the pipeline state machine."""
+    if not IS_LAMBDA or not PIPELINE_STATE_MACHINE_ARN:
+        return []
+
+    import boto3
+
+    sfn = boto3.client("stepfunctions")
+    executions = []
+
+    for status_filter in ("RUNNING", "SUCCEEDED", "FAILED", "ABORTED"):
+        resp = sfn.list_executions(
+            stateMachineArn=PIPELINE_STATE_MACHINE_ARN,
+            statusFilter=status_filter,
+            maxResults=5 if status_filter != "RUNNING" else 20,
+        )
+        for ex in resp.get("executions", []):
+            executions.append({
+                "name": ex["name"],
+                "execution_arn": ex["executionArn"],
+                "status": ex["status"],
+                "start_date": ex["startDate"].isoformat(),
+                "stop_date": ex.get("stopDate", "").isoformat() if ex.get("stopDate") else None,
+            })
+
+    executions.sort(key=lambda e: e["start_date"], reverse=True)
+    return executions
+
+
+def _stop_execution(event):
+    """Stop a running Step Functions execution."""
+    body = _json_body(event)
+    execution_arn = body.get("execution_arn", "").strip()
+    if not execution_arn:
+        raise ApiError(400, "Missing required field: execution_arn")
+
+    if not IS_LAMBDA:
+        raise ApiError(400, "Not available outside Lambda")
+
+    import boto3
+
+    sfn = boto3.client("stepfunctions")
+    sfn.stop_execution(executionArn=execution_arn, cause="Stopped via management UI")
+    return {"status": "stopped", "execution_arn": execution_arn}
+
+
+def _list_runs(event):
+    """List all pipeline runs with stage status summary."""
+    storage = get_storage()
+    return storage.list_runs()
+
+
+def _delete_run(event):
+    """Delete a pipeline run and all its per-run data."""
+    body = _json_body(event)
+    run_id = body.get("run_id", "").strip()
+    if not run_id:
+        raise ApiError(400, "Missing required field: run_id")
+    storage = get_storage()
+    storage.delete_run(run_id)
+    return {"status": "deleted", "run_id": run_id}
 
 
 # ── Route table ─────────────────────────────────────────────────────────
@@ -722,6 +742,11 @@ ROUTES = {
     "GET /api/research/findings/{policy_id}": _get_findings,
     "GET /api/research/assessments/{policy_id}": _get_assessments,
     "GET /api/dimensions": _list_dimensions,
+    # Management routes
+    "GET /api/management/executions": _list_executions,
+    "POST /api/management/executions/stop": _stop_execution,
+    "GET /api/management/runs": _list_runs,
+    "POST /api/management/runs/delete": _delete_run,
 }
 
 

@@ -15,6 +15,7 @@ import DetectionView from "./views/DetectionView";
 import DiscoveryView from "./views/DiscoveryView";
 import ResearchView from "./views/ResearchView";
 import DimensionRegistryView from "./views/DimensionRegistryView";
+import ManagementView from "./views/ManagementView";
 import { signIn, signOut, getSession } from "./auth";
 
 type AuthState = {
@@ -140,6 +141,7 @@ function AuthenticatedApp({ token, username, onSignOut }: { token: string; usern
             <Route path="/discovery" element={<DiscoveryView />} />
             <Route path="/research" element={<ResearchView />} />
             <Route path="/dimensions" element={<DimensionRegistryView />} />
+            <Route path="/management" element={<ManagementView />} />
           </Routes>
         </ApiGate>
       </main>

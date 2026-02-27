@@ -54,9 +54,9 @@ export function QualityTag({ id }: { id: string }) {
         color: q.color,
         background: `color-mix(in srgb, ${q.color} 10%, transparent)`,
       }}
-      title={`${q.name}: ${q.definition}`}
+      title={q.definition}
     >
-      {id}
+      {q.name}
     </span>
   );
 }

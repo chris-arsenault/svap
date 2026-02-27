@@ -29,7 +29,9 @@ import psycopg2.extras
 
 from svap.storage import SVAPStorage, resolve_database_url
 
-# Per-run tables, in deletion order (respects FK dependencies)
+# Per-run tables with run_id column, in deletion order (respects FK deps).
+# Junction tables (prediction_qualities, assessment_findings) cascade
+# automatically when their parent rows are deleted.
 PER_RUN_TABLES = [
     "detection_patterns",
     "predictions",
@@ -46,6 +48,9 @@ PER_RUN_TABLES = [
 
 # Global corpus tables, in deletion order
 CORPUS_TABLES = [
+    "prediction_qualities",
+    "assessment_findings",
+    "stage_processing_log",
     "source_candidates",
     "chunks",
     "cases",
@@ -162,18 +167,41 @@ def delete_runs(conn, run_ids, dry_run=False):
     print(f"\nDone. Deleted data for {len(run_ids)} run(s).")
 
 
+def _count_tables(conn, tables):
+    """Count rows per table, tolerating missing tables."""
+    counts = {}
+    with conn.cursor() as cur:
+        for table in tables:
+            try:
+                cur.execute(f"SELECT COUNT(*) FROM {table}")
+                counts[table] = cur.fetchone()[0]
+            except Exception:
+                conn.rollback()
+                counts[table] = 0
+    return counts
+
+
+def _terminate_blocking_connections(conn):
+    """Kill other connections on this database that might hold locks."""
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT pg_terminate_backend(pid) FROM pg_stat_activity "
+            "WHERE pid != pg_backend_pid() AND datname = current_database() "
+            "AND state != 'idle'"
+        )
+        terminated = cur.fetchall()
+    if terminated:
+        print(f"  Terminated {len(terminated)} blocking connection(s)")
+
+
 def delete_corpus(conn, dry_run=False):
     """Delete ALL data: per-run tables + global corpus.
 
     Truncates per-run tables first (they FK into corpus tables),
-    then truncates the global corpus. Also resets enforcement_sources
-    document references so Stage 0 will re-fetch.
+    then truncates the global corpus.
     """
-    counts = {}
-    with conn.cursor() as cur:
-        for table in PER_RUN_TABLES + CORPUS_TABLES:
-            cur.execute(f"SELECT COUNT(*) FROM {table}")
-            counts[table] = cur.fetchone()[0]
+    all_tables = PER_RUN_TABLES + CORPUS_TABLES
+    counts = _count_tables(conn, all_tables)
 
     total = sum(counts.values())
     if total == 0:
@@ -182,7 +210,7 @@ def delete_corpus(conn, dry_run=False):
 
     print(f"\n{'Table':<30} {'Rows':>8}")
     print("-" * 40)
-    for table in PER_RUN_TABLES + CORPUS_TABLES:
+    for table in all_tables:
         if counts[table] > 0:
             print(f"  {table:<28} {counts[table]:>8}")
     print(f"  {'TOTAL':<28} {total:>8}")
@@ -191,8 +219,10 @@ def delete_corpus(conn, dry_run=False):
         print("\n[DRY RUN] No data was deleted.")
         return
 
+    _terminate_blocking_connections(conn)
+
     with conn.cursor() as cur:
-        for table in PER_RUN_TABLES + CORPUS_TABLES:
+        for table in all_tables:
             if counts[table] > 0:
                 cur.execute(f"TRUNCATE {table} CASCADE")
                 print(f"  Truncated {table} ({counts[table]} rows)")

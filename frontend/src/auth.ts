@@ -63,3 +63,9 @@ export const getSession = (): Promise<CognitoUserSession | null> => {
     });
   });
 };
+
+/** Get a fresh JWT token, auto-refreshing if expired. */
+export const getToken = async (): Promise<string | null> => {
+  const session = await getSession();
+  return session?.getIdToken().getJwtToken() ?? null;
+};

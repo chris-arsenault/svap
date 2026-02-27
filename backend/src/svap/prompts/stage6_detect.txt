@@ -12,7 +12,7 @@ DETECTION DIFFICULTY: {detection_difficulty}
 AVAILABLE DATA SOURCES:
 {data_sources}
 
-For each step of the predicted exploitation, design a detection pattern. Generate 3-6 patterns, prioritized from most to least actionable.
+For each step of the predicted exploitation, design a detection pattern. Generate 3-5 patterns, prioritized from most to least actionable. Be specific but concise — each field should be 1-3 sentences, not a paragraph.
 
 For EACH pattern, provide:
 

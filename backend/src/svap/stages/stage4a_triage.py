@@ -10,6 +10,7 @@ Output: triage_results table (ranked policies with scores and rationale)
 """
 
 
+from svap import delta
 from svap.bedrock_client import BedrockClient
 from svap.storage import SVAPStorage
 
@@ -42,6 +43,18 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
             storage.log_stage_complete(run_id, 40, {"policies_triaged": 0})
             return
 
+        # Delta detection — single batch entity
+        h = delta.compute_hash(
+            ":".join(sorted(p["policy_id"] for p in policies)),
+            delta.taxonomy_fingerprint(taxonomy),
+            ":".join(sorted(c["case_id"] for c in cases)),
+        )
+        stored_hashes = storage.get_processing_hashes(40)
+        if stored_hashes.get("triage_batch") == h:
+            print("  Triage inputs unchanged. Skipping.")
+            storage.log_stage_complete(run_id, 40, {"policies_triaged": 0, "skipped": True})
+            return
+
         prompt = client.render_prompt(
             "stage4a_triage.txt",
             n_policies=len(policies),
@@ -71,6 +84,7 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
             stored += 1
             print(f"  #{i + 1}: {entry.get('policy_name', '?')} — score={entry.get('score', 0):.2f}")
 
+        storage.record_processing(40, "triage_batch", h, run_id)
         storage.log_stage_complete(run_id, 40, {
             "policies_triaged": stored,
             "total_rankings": len(rankings),

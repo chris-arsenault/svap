@@ -13,7 +13,9 @@ Output: Detection patterns in the `detection_patterns` table
 """
 
 import hashlib
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
+from svap import delta
 from svap.bedrock_client import BedrockClient
 from svap.rag import ContextAssembler
 from svap.storage import SVAPStorage
@@ -28,11 +30,9 @@ Be concrete. "Monitor for unusual billing patterns" is useless. "Flag providers 
 >16 hours/day of personal care services, where normal P95 is 10 hours/day" is actionable."""
 
 
-def _generate_patterns_for_prediction(storage, client, run_id, pred, data_sources_context):
-    """Generate detection patterns for a single prediction."""
-    print(f"    Generating patterns for: {pred['policy_name']} -- {pred['mechanics'][:80]}...")
-
-    prompt = client.render_prompt(
+def _build_prompt(client, pred, data_sources_context):
+    """Build the LLM prompt for a single prediction. No I/O besides template read."""
+    return client.render_prompt(
         "stage6_detect.txt",
         policy_name=pred["policy_name"],
         prediction_mechanics=pred["mechanics"],
@@ -42,13 +42,19 @@ def _generate_patterns_for_prediction(storage, client, run_id, pred, data_source
         data_sources=data_sources_context,
     )
 
-    result = client.invoke_json(prompt, system=SYSTEM_PROMPT, max_tokens=4096)
-    patterns = result if isinstance(result, list) else result.get("patterns", [result])
 
+def _invoke_llm(client, prompt):
+    """Make the Bedrock call. Thread-safe."""
+    return client.invoke_json(prompt, system=SYSTEM_PROMPT, max_tokens=8192)
+
+
+def _store_patterns(storage, run_id, pred, result):
+    """Parse LLM result and write detection patterns to DB. Returns count."""
+    patterns = result if isinstance(result, list) else result.get("patterns", [result])
     count = 0
     for i, pat_data in enumerate(patterns):
         pat_id = hashlib.sha256(
-            f"{pred['prediction_id']}:{i}:{pat_data.get('anomaly_signal', '')[:50]}".encode()
+            f"{pred['prediction_id']}:pat:{i}".encode()
         ).hexdigest()[:12]
 
         pattern = {
@@ -82,6 +88,42 @@ def _print_pattern_summary(all_patterns):
                 print(f"        Data source: {p['data_source']}")
 
 
+def _get_data_sources_context(storage, config):
+    """Retrieve data source context from RAG or fall back to defaults."""
+    ctx = ContextAssembler(storage, config)
+    context = ctx.retrieve("data sources claims enrollment provider", doc_type="other")
+    return context or _default_data_sources()
+
+
+def _run_parallel_detection(storage, client, run_id, jobs, max_concurrency):
+    """Execute LLM calls in parallel and store results. Returns (total, failed)."""
+    print(f"  Submitting {len(jobs)} parallel Bedrock calls (concurrency={max_concurrency})...")
+
+    total_patterns = 0
+    failed_predictions = []
+    with ThreadPoolExecutor(max_workers=max_concurrency) as executor:
+        future_to_pred = {
+            executor.submit(_invoke_llm, client, prompt): (pred, h)
+            for pred, h, prompt in jobs
+        }
+        for future in as_completed(future_to_pred):
+            pred, h = future_to_pred[future]
+            try:
+                result = future.result()
+                count = _store_patterns(storage, run_id, pred, result)
+                storage.record_processing(6, pred["prediction_id"], h, run_id)
+                total_patterns += count
+                print(f"    {pred['policy_name']}: {count} patterns (total: {total_patterns})")
+            except Exception as e:
+                print(f"    FAILED {pred['policy_name']}: {e}")
+                failed_predictions.append(pred["prediction_id"])
+
+    if failed_predictions:
+        print(f"\n  WARNING: {len(failed_predictions)} predictions failed pattern generation")
+
+    return total_patterns, failed_predictions
+
+
 def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
     """Execute Stage 6: Generate detection patterns for approved predictions."""
     print("Stage 6: Detection Pattern Generation")
@@ -94,29 +136,56 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
                 f"Stage 5 status is '{stage5_status}'. Predictions must be approved first."
             )
 
-        predictions = storage.get_predictions(run_id)
+        predictions = storage.get_predictions()
         if not predictions:
             raise ValueError("No predictions found. Run Stage 5 first.")
 
-        ctx = ContextAssembler(storage, config)
-        data_sources_context = ctx.retrieve(
-            "data sources claims enrollment provider", doc_type="other"
-        )
-        if not data_sources_context:
-            data_sources_context = _default_data_sources()
+        # ── Delta detection ─────────────────────────────────────────
+        stored = storage.get_processing_hashes(6)
 
-        total_patterns = 0
+        to_detect = []
         for pred in predictions:
-            total_patterns += _generate_patterns_for_prediction(
-                storage, client, run_id, pred, data_sources_context
-            )
+            h = delta.compute_hash(pred["mechanics"], pred["enabling_qualities"])
+            if stored.get(pred["prediction_id"]) != h:
+                to_detect.append((pred, h))
 
-        storage.log_stage_complete(run_id, 6, {"patterns_generated": total_patterns})
+        if not to_detect:
+            print(f"  All {len(predictions)} predictions unchanged — skipping.")
+            storage.log_stage_complete(run_id, 6, {
+                "patterns_generated": 0,
+                "skipped_unchanged": len(predictions),
+            })
+            return
 
-        all_patterns = storage.get_detection_patterns(run_id)
+        print(f"  {len(to_detect)}/{len(predictions)} predictions changed, generating patterns...")
+
+        # ── Delete stale patterns BEFORE LLM calls ──────────────────
+        for pred, _h in to_detect:
+            storage.delete_patterns_for_prediction(pred["prediction_id"])
+
+        data_sources_context = _get_data_sources_context(storage, config)
+
+        max_concurrency = config.get("pipeline", {}).get("max_concurrency", 5)
+
+        # Build all prompts (fast, sequential)
+        jobs = []
+        for pred, h in to_detect:
+            prompt = _build_prompt(client, pred, data_sources_context)
+            jobs.append((pred, h, prompt))
+
+        total_patterns, failed_predictions = _run_parallel_detection(
+            storage, client, run_id, jobs, max_concurrency,
+        )
+
+        all_patterns = storage.get_detection_patterns()
         print(f"\n  Stage 6 complete: {total_patterns} detection patterns generated.")
         _print_pattern_summary(all_patterns)
-        print("\n  Export full results: python -m svap.orchestrator export")
+
+        result_meta = {"patterns_generated": total_patterns}
+        if failed_predictions:
+            result_meta["failed_predictions"] = len(failed_predictions)
+
+        storage.log_stage_complete(run_id, 6, result_meta)
 
     except Exception as e:
         storage.log_stage_failed(run_id, 6, str(e))

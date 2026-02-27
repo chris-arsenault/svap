@@ -13,6 +13,7 @@ Output: Scored and ranked policy list in `policies` and `policy_scores` tables
 import hashlib
 import json
 
+from svap import delta
 from svap.bedrock_client import BedrockClient
 from svap.rag import ContextAssembler
 from svap.storage import SVAPStorage
@@ -85,6 +86,21 @@ def _score_policy(storage, client, run_id, policy, taxonomy_context):
     }
 
 
+def _filter_changed_policies(storage, policies, taxonomy):
+    """Return (changed_list, skipped_count) using delta detection."""
+    tax_fp = delta.taxonomy_fingerprint(taxonomy)
+    stored_hashes = storage.get_processing_hashes(4)
+    changed = []
+    skipped = 0
+    for policy in policies:
+        h = delta.compute_hash(policy.get("structural_characterization", ""), tax_fp)
+        if stored_hashes.get(policy["policy_id"]) == h:
+            skipped += 1
+        else:
+            changed.append((policy, h))
+    return changed, skipped
+
+
 def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
     """Execute Stage 4: Characterize and score all policies."""
     print("Stage 4: Policy Corpus Scanning")
@@ -92,7 +108,7 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
 
     try:
         taxonomy = storage.get_approved_taxonomy()
-        calibration = storage.get_calibration(run_id)
+        calibration = storage.get_calibration()
         if not taxonomy:
             raise ValueError("No taxonomy found. Run Stages 1-3 first.")
 
@@ -121,16 +137,30 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
         # Skip policies already assessed by deep research (Stage 4B/4C)
         policies_to_score = []
         for policy in policies:
-            existing = storage.get_quality_assessments(run_id, policy["policy_id"])
+            existing = storage.get_quality_assessments(policy["policy_id"])
             if existing:
                 print(f"    Skipping {policy['name']} — already assessed via deep research")
             else:
                 policies_to_score.append(policy)
 
-        print(f"  Scoring {len(policies_to_score)} policies against {len(taxonomy)} qualities...")
-        results = [
-            _score_policy(storage, client, run_id, policy, taxonomy_context) for policy in policies_to_score
-        ]
+        # Delta detection for scoring
+        delta_policies, skipped = _filter_changed_policies(storage, policies_to_score, taxonomy)
+
+        if not delta_policies:
+            print(f"  All {len(policies_to_score)} scorable policies unchanged. Skipping scoring.")
+            storage.log_stage_complete(run_id, 4, {
+                "policies_scored": 0,
+                "skipped_unchanged": skipped,
+            })
+            print("\n  Stage 4 complete (no changes).")
+            return
+
+        print(f"  Scoring {len(delta_policies)} policies ({skipped} unchanged)...")
+        results = []
+        for policy, h in delta_policies:
+            result = _score_policy(storage, client, run_id, policy, taxonomy_context)
+            storage.record_processing(4, policy["policy_id"], h, run_id)
+            results.append(result)
 
         # ── Report ──────────────────────────────────────────────────
         results.sort(key=lambda x: x["convergence_score"], reverse=True)

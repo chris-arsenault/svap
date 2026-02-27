@@ -8,6 +8,7 @@
 
 import { create } from "zustand";
 import { config } from "../config";
+import { getToken } from "../auth";
 import type {
   FallbackData,
   PipelineStageStatus,
@@ -34,7 +35,8 @@ function deduplicatePipelineStatus(statuses: PipelineStageStatus[]): PipelineSta
   return Object.values(latest).sort((a, b) => a.stage - b.stage);
 }
 
-async function apiPost(path: string, body?: unknown, token?: string): Promise<unknown> {
+async function apiPost(path: string, body?: unknown): Promise<unknown> {
+  const token = await getToken();
   const headers: Record<string, string> = {};
   if (body !== undefined) headers["Content-Type"] = "application/json";
   if (token) headers["Authorization"] = `Bearer ${token}`;
@@ -44,6 +46,13 @@ async function apiPost(path: string, body?: unknown, token?: string): Promise<un
   if (!res.ok) throw new Error(`${path} failed: ${res.status}`);
   const text = await res.text();
   return text ? JSON.parse(text) : {};
+}
+
+async function apiGet(path: string, options?: { signal?: AbortSignal }): Promise<Response> {
+  const token = await getToken();
+  const headers: Record<string, string> = {};
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  return fetch(`${API_BASE}${path}`, { headers, ...options });
 }
 
 function buildQualityMap(taxonomy: Quality[]): Record<string, Quality> {
@@ -124,13 +133,9 @@ export const usePipelineStore = create<PipelineStore>((set, get) => {
   // ── Internal fetch functions ─────────────────────────────────────────
 
   const fetchDashboard = async () => {
-    const token = get()._token;
     set({ loading: true, error: null });
     try {
-      const res = await fetch(`${API_BASE}/dashboard`, {
-        signal: AbortSignal.timeout(10000),
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
+      const res = await apiGet("/dashboard", { signal: AbortSignal.timeout(10000) });
       if (!res.ok) throw new Error(`API returned ${res.status}`);
       const apiData: FallbackData = await res.json();
       const pipeline_status = deduplicatePipelineStatus(apiData.pipeline_status || []);
@@ -169,10 +174,7 @@ export const usePipelineStore = create<PipelineStore>((set, get) => {
   };
 
   const refreshSources = async () => {
-    const token = get()._token;
-    const headers: Record<string, string> = {};
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-    const res = await fetch(`${API_BASE}/enforcement-sources`, { headers });
+    const res = await apiGet("/enforcement-sources");
     if (!res.ok) return;
     const sources = await res.json();
     set({ enforcement_sources: sources });
@@ -232,7 +234,7 @@ export const usePipelineStore = create<PipelineStore>((set, get) => {
 
     runPipeline: async () => {
       if (!get().apiAvailable) throw new Error("API not available");
-      const result = (await apiPost("/pipeline/run", {}, get()._token)) as { run_id?: string };
+      const result = (await apiPost("/pipeline/run", {})) as { run_id?: string };
       if (result.run_id) {
         set({ run_id: result.run_id, pipeline_status: [] });
       }
@@ -241,14 +243,14 @@ export const usePipelineStore = create<PipelineStore>((set, get) => {
 
     approveStage: async (stage: number) => {
       if (!get().apiAvailable) throw new Error("API not available");
-      const result = await apiPost("/pipeline/approve", { stage }, get()._token);
+      const result = await apiPost("/pipeline/approve", { stage });
       await fetchDashboard();
       return result;
     },
 
     seedPipeline: async () => {
       if (!get().apiAvailable) throw new Error("API not available");
-      const result = await apiPost("/pipeline/seed", undefined, get()._token);
+      const result = await apiPost("/pipeline/seed");
       await fetchDashboard();
       return result;
     },
@@ -264,7 +266,6 @@ export const usePipelineStore = create<PipelineStore>((set, get) => {
       const result = await apiPost(
         "/enforcement-sources/upload",
         { source_id: sourceId, filename: file.name, content: btoa(binary) },
-        get()._token,
       );
       await refreshSources();
       return result;
@@ -272,14 +273,14 @@ export const usePipelineStore = create<PipelineStore>((set, get) => {
 
     createSource: async (source: { name: string; url?: string; description?: string }) => {
       if (!get().apiAvailable) throw new Error("API not available");
-      const result = await apiPost("/enforcement-sources", source, get()._token);
+      const result = await apiPost("/enforcement-sources", source);
       await refreshSources();
       return result;
     },
 
     deleteSource: async (sourceId: string) => {
       if (!get().apiAvailable) throw new Error("API not available");
-      const result = await apiPost("/enforcement-sources/delete", { source_id: sourceId }, get()._token);
+      const result = await apiPost("/enforcement-sources/delete", { source_id: sourceId });
       await refreshSources();
       return result;
     },
@@ -287,12 +288,9 @@ export const usePipelineStore = create<PipelineStore>((set, get) => {
     // ── Discovery & Research actions ────────────────────────────────────
 
     fetchDiscovery: async () => {
-      const token = get()._token;
-      const headers: Record<string, string> = {};
-      if (token) headers["Authorization"] = `Bearer ${token}`;
       const [feedsRes, candidatesRes] = await Promise.all([
-        fetch(`${API_BASE}/discovery/feeds`, { headers }),
-        fetch(`${API_BASE}/discovery/candidates`, { headers }),
+        apiGet("/discovery/feeds"),
+        apiGet("/discovery/candidates"),
       ]);
       if (feedsRes.ok && candidatesRes.ok) {
         set({
@@ -303,7 +301,7 @@ export const usePipelineStore = create<PipelineStore>((set, get) => {
     },
 
     runDiscoveryFeeds: async () => {
-      const result = await apiPost("/discovery/run-feeds", {}, get()._token);
+      const result = await apiPost("/discovery/run-feeds", {});
       await get().fetchDiscovery();
       return result;
     },
@@ -312,63 +310,47 @@ export const usePipelineStore = create<PipelineStore>((set, get) => {
       const result = await apiPost(
         "/discovery/candidates/review",
         { candidate_id: candidateId, action },
-        get()._token,
       );
       await get().fetchDiscovery();
       return result;
     },
 
     fetchDimensions: async () => {
-      const token = get()._token;
-      const headers: Record<string, string> = {};
-      if (token) headers["Authorization"] = `Bearer ${token}`;
-      const res = await fetch(`${API_BASE}/dimensions`, { headers });
+      const res = await apiGet("/dimensions");
       if (res.ok) set({ dimensions: await res.json() });
     },
 
     fetchTriageResults: async () => {
-      const token = get()._token;
-      const headers: Record<string, string> = {};
-      if (token) headers["Authorization"] = `Bearer ${token}`;
-      const res = await fetch(`${API_BASE}/research/triage`, { headers });
+      const res = await apiGet("/research/triage");
       if (res.ok) set({ triage_results: await res.json() });
     },
 
     runTriage: async () => {
-      const result = await apiPost("/research/triage", {}, get()._token);
+      const result = await apiPost("/research/triage", {});
       await get().fetchTriageResults();
       return result;
     },
 
     runDeepResearch: async (policyIds?: string[]) => {
       const body = policyIds ? { policy_ids: policyIds } : {};
-      const result = await apiPost("/research/deep", body, get()._token);
+      const result = await apiPost("/research/deep", body);
       await get().fetchResearchSessions();
       return result;
     },
 
     fetchResearchSessions: async () => {
-      const token = get()._token;
-      const headers: Record<string, string> = {};
-      if (token) headers["Authorization"] = `Bearer ${token}`;
-      const res = await fetch(`${API_BASE}/research/sessions`, { headers });
+      const res = await apiGet("/research/sessions");
       if (res.ok) set({ research_sessions: await res.json() });
     },
 
     fetchFindings: async (policyId: string) => {
-      const token = get()._token;
-      const headers: Record<string, string> = {};
-      if (token) headers["Authorization"] = `Bearer ${token}`;
-      const res = await fetch(`${API_BASE}/research/findings/${policyId}`, { headers });
+      const res = await apiGet(`/research/findings/${policyId}`);
       if (!res.ok) return [];
       return res.json();
     },
 
     fetchAssessments: async (policyId: string) => {
-      const token = get()._token;
-      const headers: Record<string, string> = {};
-      if (token) headers["Authorization"] = `Bearer ${token}`;
-      const res = await fetch(`${API_BASE}/research/assessments/${policyId}`, { headers });
+      const res = await apiGet(`/research/assessments/${policyId}`);
       if (!res.ok) return [];
       return res.json();
     },

@@ -4,6 +4,7 @@ export const FALLBACK_DATA: FallbackData = {
   run_id: "fallback",
   source: "static",
   pipeline_status: [
+    { stage: 0, status: "idle" },
     { stage: 1, status: "idle" },
     { stage: 2, status: "idle" },
     { stage: 3, status: "idle" },
