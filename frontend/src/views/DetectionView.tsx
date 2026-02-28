@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { usePipelineStore } from "../data/pipelineStore";
 import { Badge } from "../components/SharedUI";
@@ -6,117 +6,327 @@ import type { DetectionPattern, RiskLevel } from "../types";
 
 const PRIORITY_ORDER: RiskLevel[] = ["critical", "high", "medium", "low"];
 
-function PatternDetail({ pat }: { pat: DetectionPattern }) {
+function priorityRank(p: RiskLevel): number {
+  return PRIORITY_ORDER.indexOf(p);
+}
+
+// ── Grouping types ───────────────────────────────────────────────────────
+
+interface StepGroup {
+  step_id: string;
+  step_title: string;
+  patterns: DetectionPattern[];
+  highestPriority: RiskLevel;
+}
+
+interface TreeGroup {
+  tree_id: string;
+  policy_name: string;
+  steps: StepGroup[];
+  patternCount: number;
+  priorityCounts: Record<RiskLevel, number>;
+}
+
+function buildTreeGroups(patterns: DetectionPattern[]): TreeGroup[] {
+  const treeMap = new Map<
+    string,
+    { policy_name: string; stepMap: Map<string, { step_title: string; patterns: DetectionPattern[] }> }
+  >();
+
+  for (const pat of patterns) {
+    let tree = treeMap.get(pat.tree_id);
+    if (!tree) {
+      tree = { policy_name: pat.policy_name, stepMap: new Map() };
+      treeMap.set(pat.tree_id, tree);
+    }
+    let step = tree.stepMap.get(pat.step_id);
+    if (!step) {
+      step = { step_title: pat.step_title, patterns: [] };
+      tree.stepMap.set(pat.step_id, step);
+    }
+    step.patterns.push(pat);
+  }
+
+  const groups: TreeGroup[] = [];
+  for (const [tree_id, tree] of treeMap) {
+    const steps: StepGroup[] = [];
+    const priorityCounts: Record<RiskLevel, number> = { critical: 0, high: 0, medium: 0, low: 0 };
+    let patternCount = 0;
+
+    for (const [step_id, stepData] of tree.stepMap) {
+      stepData.patterns.sort((a, b) => priorityRank(a.priority) - priorityRank(b.priority));
+      const highestPriority = stepData.patterns[0]?.priority ?? "low";
+      steps.push({ step_id, step_title: stepData.step_title, patterns: stepData.patterns, highestPriority });
+      patternCount += stepData.patterns.length;
+      for (const p of stepData.patterns) {
+        priorityCounts[p.priority]++;
+      }
+    }
+
+    steps.sort((a, b) => {
+      const d = priorityRank(a.highestPriority) - priorityRank(b.highestPriority);
+      return d !== 0 ? d : b.patterns.length - a.patterns.length;
+    });
+
+    groups.push({ tree_id, policy_name: tree.policy_name, steps, patternCount, priorityCounts });
+  }
+
+  groups.sort((a, b) => {
+    const aTop = a.steps[0]?.highestPriority ?? "low";
+    const bTop = b.steps[0]?.highestPriority ?? "low";
+    const d = priorityRank(aTop) - priorityRank(bTop);
+    return d !== 0 ? d : b.patternCount - a.patternCount;
+  });
+
+  return groups;
+}
+
+// ── Level 3: Pattern block ───────────────────────────────────────────────
+
+function PatternBlock({
+  pat,
+  isExpanded,
+  onToggle,
+}: {
+  pat: DetectionPattern;
+  isExpanded: boolean;
+  onToggle: (id: string) => void;
+}) {
   return (
-    <div className="panel-body panel-body-bordered">
-      <div className="detail-grid">
-        <div>
-          <div className="detail-label">Data Source</div>
-          <div className="pattern-data-source">
-            {pat.data_source}
-          </div>
-          <div className="detail-label">Baseline</div>
-          <div className="pattern-baseline">{pat.baseline}</div>
-        </div>
-        <div>
-          <div className="detail-label">False Positive Risk</div>
-          <div className="pattern-false-positive">{pat.false_positive_risk}</div>
-          <div className="detail-label">Detection Latency</div>
-          <div className="pattern-latency">{pat.detection_latency}</div>
-        </div>
+    <div
+      className={`detection-pattern${isExpanded ? " expanded" : ""}`}
+      role="button"
+      tabIndex={0}
+      onClick={() => onToggle(pat.pattern_id)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onToggle(pat.pattern_id); }
+      }}
+    >
+      <div className="detection-pattern-header">
+        <Badge level={pat.priority}>{pat.priority}</Badge>
+        <div className="detection-pattern-signal">{pat.anomaly_signal}</div>
       </div>
+      {!isExpanded && (
+        <div className="detection-pattern-source">{pat.data_source}</div>
+      )}
+      {isExpanded && (
+        <div className="detection-pattern-detail">
+          <div className="detection-detail-field">
+            <div className="detection-detail-label">Data Source</div>
+            <div className="detection-detail-value accent">{pat.data_source}</div>
+          </div>
+          {pat.detection_latency && (
+            <div className="detection-detail-field">
+              <div className="detection-detail-label">Detection Latency</div>
+              <div className="detection-detail-value">{pat.detection_latency}</div>
+            </div>
+          )}
+          {pat.baseline && (
+            <div className="detection-detail-field">
+              <div className="detection-detail-label">Baseline</div>
+              <div className="detection-detail-value">{pat.baseline}</div>
+            </div>
+          )}
+          {pat.false_positive_risk && (
+            <div className="detection-detail-field">
+              <div className="detection-detail-label">False Positive Risk</div>
+              <div className="detection-detail-value risk">{pat.false_positive_risk}</div>
+            </div>
+          )}
+          {pat.implementation_notes && (
+            <div className="detection-detail-field">
+              <div className="detection-detail-label">Implementation Notes</div>
+              <div className="detection-detail-value">{pat.implementation_notes}</div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
 
-function PatternCard({
-  pat,
+// ── Level 2: Step row ────────────────────────────────────────────────────
+
+function StepRow({
+  step,
   isExpanded,
-  onToggleId,
+  onToggle,
+  expandedPatterns,
+  onTogglePattern,
 }: {
-  pat: DetectionPattern;
+  step: StepGroup;
   isExpanded: boolean;
-  onToggleId: (id: string) => void;
+  onToggle: (id: string) => void;
+  expandedPatterns: Set<string>;
+  onTogglePattern: (id: string) => void;
 }) {
-  const handleToggle = () => onToggleId(pat.pattern_id);
   return (
-    <div className="panel stagger-in pattern-card">
+    <div className="detection-step">
+      <div
+        className="detection-step-content"
+        role="button"
+        tabIndex={0}
+        onClick={() => onToggle(step.step_id)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onToggle(step.step_id); }
+        }}
+      >
+        <div className="detection-step-header">
+          {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+          <span className="detection-step-title">{step.step_title}</span>
+          <Badge level={step.highestPriority}>{step.highestPriority}</Badge>
+          <span className="detection-step-count">{step.patterns.length}</span>
+        </div>
+      </div>
+      {isExpanded && (
+        <div className="detection-patterns">
+          {step.patterns.map((pat) => (
+            <PatternBlock
+              key={pat.pattern_id}
+              pat={pat}
+              isExpanded={expandedPatterns.has(pat.pattern_id)}
+              onToggle={onTogglePattern}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Level 1: Tree panel ──────────────────────────────────────────────────
+
+function TreePanel({
+  group,
+  isExpanded,
+  onToggle,
+  expandedSteps,
+  onToggleStep,
+  expandedPatterns,
+  onTogglePattern,
+}: {
+  group: TreeGroup;
+  isExpanded: boolean;
+  onToggle: (id: string) => void;
+  expandedSteps: Set<string>;
+  onToggleStep: (id: string) => void;
+  expandedPatterns: Set<string>;
+  onTogglePattern: (id: string) => void;
+}) {
+  const { priorityCounts } = group;
+
+  return (
+    <div className="panel stagger-in">
       <div
         className="panel-header clickable"
         role="button"
         tabIndex={0}
-        onClick={handleToggle}
+        onClick={() => onToggle(group.tree_id)}
         onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            handleToggle();
-          }
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onToggle(group.tree_id); }
         }}
       >
-        <div className="pattern-header-left">
-          <div className="pattern-chevron">
-            {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-          </div>
-          <div className="pattern-header-content">
-            <div className="pattern-badge-row">
-              <Badge level={pat.priority}>{pat.priority}</Badge>
-              <span className="pattern-policy-name">
-                {pat.policy_name}
-              </span>
-              {pat.step_title && (
-                <span className="pattern-step-title">
-                  {"\u2014"} {pat.step_title}
-                </span>
-              )}
-            </div>
-            <div className="pattern-anomaly-signal">
-              {pat.anomaly_signal}
-            </div>
-          </div>
+        <div className="detection-header-left">
+          {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+          <h3 className="detection-policy-name">{group.policy_name}</h3>
         </div>
-        <div className="pattern-detection-latency">
-          {pat.detection_latency}
+        <div className="detection-header-right">
+          <div className="detection-priority-pills">
+            {PRIORITY_ORDER.map((p) =>
+              priorityCounts[p] > 0 ? (
+                <span key={p} className={`detection-priority-pill ${p}`}>
+                  {priorityCounts[p]} {p}
+                </span>
+              ) : null,
+            )}
+          </div>
+          <span className="tree-header-stat">
+            {group.patternCount} pattern{group.patternCount !== 1 ? "s" : ""}
+          </span>
+          <span className="tree-header-stat">
+            {group.steps.length} step{group.steps.length !== 1 ? "s" : ""}
+          </span>
         </div>
       </div>
 
-      {isExpanded && <PatternDetail pat={pat} />}
+      {isExpanded && (
+        <div className="panel-body panel-body-bordered">
+          <div className="detection-steps">
+            {group.steps.map((step) => (
+              <StepRow
+                key={step.step_id}
+                step={step}
+                isExpanded={expandedSteps.has(step.step_id)}
+                onToggle={onToggleStep}
+                expandedPatterns={expandedPatterns}
+                onTogglePattern={onTogglePattern}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
+// ── Root ──────────────────────────────────────────────────────────────────
+
+function toggleSet(prev: Set<string>, id: string): Set<string> {
+  const next = new Set(prev);
+  if (next.has(id)) next.delete(id);
+  else next.add(id);
+  return next;
+}
+
 export default function DetectionView() {
   const detection_patterns = usePipelineStore((s) => s.detection_patterns);
-  const [expandedPattern, setExpandedPattern] = useState<string | null>(null);
   const [filterPriority, setFilterPriority] = useState<RiskLevel | null>(null);
-  const togglePattern = useCallback(
-    (id: string) => setExpandedPattern((prev) => (prev === id ? null : id)),
-    []
-  );
+  const [expandedTrees, setExpandedTrees] = useState<Set<string>>(new Set());
+  const [expandedSteps, setExpandedSteps] = useState<Set<string>>(new Set());
+  const [expandedPatterns, setExpandedPatterns] = useState<Set<string>>(new Set());
+
+  const toggleTree = useCallback((id: string) => setExpandedTrees((p) => toggleSet(p, id)), []);
+  const toggleStep = useCallback((id: string) => setExpandedSteps((p) => toggleSet(p, id)), []);
+  const togglePattern = useCallback((id: string) => setExpandedPatterns((p) => toggleSet(p, id)), []);
 
   const filtered = filterPriority
     ? detection_patterns.filter((p) => p.priority === filterPriority)
     : detection_patterns;
 
-  const sorted = [...filtered].sort((a, b) => {
-    return PRIORITY_ORDER.indexOf(a.priority) - PRIORITY_ORDER.indexOf(b.priority);
-  });
+  const treeGroups = useMemo(() => buildTreeGroups(filtered), [filtered]);
 
+  // Unfiltered counts for filter pills
   const counts: Partial<Record<RiskLevel, number>> = {};
   detection_patterns.forEach((p) => {
     counts[p.priority] = (counts[p.priority] || 0) + 1;
   });
+
+  const expandAll = useCallback(() => {
+    setExpandedTrees(new Set(treeGroups.map((g) => g.tree_id)));
+    setExpandedSteps(new Set(treeGroups.flatMap((g) => g.steps.map((s) => s.step_id))));
+  }, [treeGroups]);
+
+  const collapseAll = useCallback(() => {
+    setExpandedTrees(new Set());
+    setExpandedSteps(new Set());
+    setExpandedPatterns(new Set());
+  }, []);
 
   return (
     <div>
       <div className="view-header stagger-in">
         <h2>Detection Patterns</h2>
         <div className="view-desc">
-          {detection_patterns.length} actionable anomaly signals derived from exploitation steps
+          {detection_patterns.length} anomaly signals across {treeGroups.length} polic
+          {treeGroups.length === 1 ? "y" : "ies"}
         </div>
       </div>
 
       <div className="filter-bar filter-bar-mb stagger-in">
-        <button className={`btn ${!filterPriority ? "btn-accent" : ""}`} onClick={() => setFilterPriority(null)}>
+        <button
+          className={`btn ${!filterPriority ? "btn-accent" : ""}`}
+          onClick={() => setFilterPriority(null)}
+        >
           All ({detection_patterns.length})
         </button>
         {PRIORITY_ORDER.map((p) =>
@@ -128,16 +338,24 @@ export default function DetectionView() {
             >
               {p} ({counts[p]})
             </button>
-          ) : null
+          ) : null,
         )}
+        <div className="detection-controls">
+          <button className="btn-ghost" onClick={expandAll}>Expand all</button>
+          <button className="btn-ghost" onClick={collapseAll}>Collapse all</button>
+        </div>
       </div>
 
-      {sorted.map((pat) => (
-        <PatternCard
-          key={pat.pattern_id}
-          pat={pat}
-          isExpanded={expandedPattern === pat.pattern_id}
-          onToggleId={togglePattern}
+      {treeGroups.map((group) => (
+        <TreePanel
+          key={group.tree_id}
+          group={group}
+          isExpanded={expandedTrees.has(group.tree_id)}
+          onToggle={toggleTree}
+          expandedSteps={expandedSteps}
+          onToggleStep={toggleStep}
+          expandedPatterns={expandedPatterns}
+          onTogglePattern={togglePattern}
         />
       ))}
     </div>

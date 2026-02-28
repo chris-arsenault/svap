@@ -1149,61 +1149,179 @@ html, body, #root {
   border: 1px solid var(--cell-color);
 }
 
-/* DetectionView */
-.pattern-card { margin-bottom: var(--sp-4); }
-.pattern-header-left {
+/* ── DetectionView: Tree-grouped hierarchy ── */
+
+/* Level 1: Tree panel header */
+.detection-header-left {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--sp-3);
-  flex: 1;
 }
-.pattern-chevron { padding-top: 2px; color: var(--text-muted); }
-.pattern-header-content { flex: 1; }
-.pattern-badge-row {
+.detection-header-right {
   display: flex;
   align-items: center;
   gap: var(--sp-2);
-  margin-bottom: var(--sp-1);
+  flex-wrap: wrap;
 }
-.pattern-policy-name {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--accent-bright);
-}
-.pattern-anomaly-signal {
-  font-family: var(--font-body);
-  font-size: 13px;
+.detection-policy-name {
   text-transform: none;
   letter-spacing: 0;
-  font-weight: 400;
-  color: var(--text-primary);
-  line-height: 1.4;
 }
-.pattern-detection-latency {
+.detection-priority-pills {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.detection-priority-pill {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+.detection-priority-pill.critical { color: var(--critical); background: color-mix(in srgb, var(--critical) 12%, transparent); }
+.detection-priority-pill.high { color: var(--high); background: color-mix(in srgb, var(--high) 12%, transparent); }
+.detection-priority-pill.medium { color: var(--medium); background: color-mix(in srgb, var(--medium) 12%, transparent); }
+.detection-priority-pill.low { color: var(--low); background: color-mix(in srgb, var(--low) 12%, transparent); }
+
+/* Level 2: Steps container */
+.detection-steps {
+  border-left: 2px solid var(--border-subtle);
+  margin-left: var(--sp-3);
+}
+.detection-step {
+  position: relative;
+  padding: 2px 0;
+}
+.detection-step::before {
+  content: "";
+  position: absolute;
+  left: -2px;
+  top: 14px;
+  width: 10px;
+  height: 2px;
+  background: var(--border-subtle);
+}
+.detection-step-content {
+  border-radius: var(--radius-sm);
+  padding: var(--sp-2) var(--sp-3);
+  margin-left: 12px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.detection-step-content:hover { background: var(--bg-hover); }
+.detection-step-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.detection-step-title {
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--text-primary);
+  flex: 1;
+}
+.detection-step-count {
+  font-family: var(--font-mono);
   font-size: 11px;
   color: var(--text-muted);
-  white-space: nowrap;
-  flex-shrink: 0;
-  font-family: var(--font-mono);
 }
-.pattern-data-source {
+
+/* Level 3: Patterns within a step */
+.detection-patterns {
+  margin-left: 28px;
+  padding: var(--sp-1) 0 var(--sp-2);
+  border-left: 1px solid var(--border-subtle);
+}
+.detection-pattern {
+  padding: var(--sp-2) var(--sp-3);
+  margin-left: var(--sp-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.detection-pattern:hover { background: var(--bg-hover); }
+.detection-pattern-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-2);
+}
+.detection-pattern-signal {
   font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1.45;
+  flex: 1;
+  /* Clamp to 2 lines when collapsed */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.detection-pattern.expanded .detection-pattern-signal {
+  -webkit-line-clamp: unset;
+  overflow: visible;
+}
+.detection-pattern-source {
+  font-size: 11px;
+  color: var(--accent-bright);
+  font-family: var(--font-mono);
+  margin-top: 2px;
+  padding-left: 50px;
+}
+
+/* Level 3: Expanded detail — full-width stacked layout */
+.detection-pattern-detail {
+  padding: var(--sp-3) 0 var(--sp-1) 50px;
+}
+.detection-detail-field {
+  margin-bottom: var(--sp-3);
+}
+.detection-detail-field:last-child { margin-bottom: 0; }
+.detection-detail-label {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+.detection-detail-value {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.detection-detail-value.accent {
   color: var(--accent-bright);
   font-family: var(--font-mono);
 }
-.pattern-baseline {
-  font-size: 13px;
-  color: var(--text-secondary);
-  line-height: 1.6;
-}
-.pattern-false-positive {
-  font-size: 13px;
+.detection-detail-value.risk {
   color: var(--high);
-  line-height: 1.6;
 }
-.pattern-latency {
-  font-size: 13px;
-  color: var(--text-secondary);
+
+/* Filter bar controls */
+.detection-controls {
+  display: flex;
+  gap: var(--sp-2);
+  margin-left: auto;
+}
+.btn-ghost {
+  background: none;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  font-size: 10px;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transition: all 0.15s;
+}
+.btn-ghost:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-default);
 }
 
 /* PredictionView */
@@ -1330,11 +1448,6 @@ html, body, #root {
   margin-top: 2px;
 }
 .tree-step-qualities { margin-top: 4px; }
-.pattern-step-title {
-  font-size: 12px;
-  color: var(--text-muted);
-  font-style: italic;
-}
 
 /* TaxonomyView */
 .quality-grid {
