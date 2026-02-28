@@ -1,0 +1,11 @@
+{
+  "library": "~/.drift/library",
+  "tags": [],
+  "mode": "online",
+  "sync": {
+    "eslint-rule": "eslint-rules/",
+    "adr": "docs/adr/",
+    "pattern": "docs/patterns/",
+    "checklist": "docs/"
+  }
+}

@@ -1,0 +1,571 @@
+=== CODEBASE DISCOVERY ===
+Project root: .
+Source root: .
+Timestamp: 2026-02-27T17:05:43Z
+
+=== SECTION: FILE_INVENTORY ===
+## File counts by extension
+   1613 py
+    991 json
+    901 gz
+    270 pyi
+    132 pyc
+     80 txt
+     61 f90
+     55 Identifier
+     43 dist-info/WHEEL
+     43 dist-info/REQUESTED
+     43 dist-info/RECORD
+     43 dist-info/METADATA
+     43 dist-info/INSTALLER
+     37 md
+     34 pxd
+     32 so
+     30 typed
+     30 csv
+     29 pyx
+     27 h
+     25 dist-info/licenses/LICENSE
+     24 f
+     16 tsx
+     16 tf
+     13 js
+     11 jsx
+     10 ts
+      7 pyf
+      7 c
+      6 gitignore
+
+## Total source files (ts/tsx/js/jsx)
+49
+
+## Directory structure (depth 3)
+.
+./.claude
+./.claude/skills
+./.claude/skills/drift
+./.claude/skills/drift-audit
+./.claude/skills/drift-audit-semantic
+./.claude/skills/drift-audit-ux
+./.claude/skills/drift-guard
+./.claude/skills/drift-unify
+./.drift-audit
+./.git
+./.ruff_cache
+./.ruff_cache/0.15.2
+./.serena
+./.serena/cache
+./.serena/cache/typescript
+./.serena/memories
+./backend
+./backend/.ruff_cache
+./backend/.ruff_cache/0.15.2
+./backend/.venv
+./backend/.venv/bin
+./backend/.venv/lib
+./backend/dist
+./backend/scripts
+./backend/src
+./backend/src/svap
+./backend/src/svap.egg-info
+./docs
+./frontend
+./frontend/.ruff_cache
+./frontend/.ruff_cache/0.15.2
+./frontend/dist
+./frontend/eslint-rules
+./frontend/node_modules
+./frontend/public
+./frontend/src
+./frontend/src/components
+./frontend/src/data
+./frontend/src/views
+./infrastructure
+./infrastructure/terraform
+./infrastructure/terraform/.terraform
+./infrastructure/terraform/modules
+./scripts
+./svap-ui-project
+./svap-ui-project/svap-ui
+./svap-ui-project/svap-ui/src
+./svap_pipeline
+./svap_pipeline/svap
+./svap_pipeline/svap/docs
+./svap_pipeline/svap/svap
+
+## Largest files by line count (potential god files)
+  5631 total
+   365 ./frontend/src/views/ManagementView.tsx
+   358 ./frontend/src/data/pipelineStore.ts
+   300 ./frontend/src/views/ResearchView.tsx
+   295 ./frontend/src/views/Dashboard.tsx
+   284 ./frontend/src/views/SourcesView.tsx
+   235 ./frontend/src/views/DiscoveryView.tsx
+   228 ./frontend/src/views/PolicyExplorer.tsx
+   186 ./svap-ui-project/svap-ui/src/data/usePipelineData.js
+   178 ./frontend/src/views/ConvergenceMatrix.tsx
+   177 ./frontend/src/types.ts
+   177 ./frontend/src/App.tsx
+   145 ./svap-ui-project/svap-ui/src/views/ConvergenceMatrix.jsx
+   140 ./frontend/src/views/DetectionView.tsx
+   137 ./frontend/src/views/DimensionRegistryView.tsx
+   133 ./frontend/src/components/Sidebar.tsx
+   132 ./svap-ui-project/svap-ui/src/views/Dashboard.jsx
+   132 ./frontend/src/views/CaseSourcing.tsx
+   123 ./svap-ui-project/svap-ui/src/views/DetectionView.jsx
+   122 ./svap-ui-project/svap-ui/src/views/PolicyExplorer.jsx
+   119 ./frontend/src/views/TaxonomyView.tsx
+   110 ./backend/.venv/lib/python3.14/site-packages/urllib3/contrib/emscripten/emscripten_fetch_worker.js
+   106 ./frontend/src/views/PredictionView.tsx
+   103 ./svap-ui-project/svap-ui/src/data/predictions.js
+   100 ./svap-ui-project/svap-ui/src/views/TaxonomyView.jsx
+   100 ./svap-ui-project/svap-ui/src/views/CaseSourcing.jsx
+    89 ./svap-ui-project/svap-ui/src/views/PredictionView.jsx
+    86 ./frontend/src/data/useStatusSubscription.ts
+    85 ./frontend/eslint.config.js
+    82 ./svap-ui-project/svap-ui/src/data/seedCases.js
+
+=== SECTION: EXPORTS ===
+## All named exports (grouped by what they export)
+### Exported functions
+      2 export function formatDollars
+      2 export function StageDot
+      2 export function ScoreBar
+      2 export function RiskBadge
+      2 export function QualityTags
+      2 export function QualityTag
+      2 export function Badge
+      1 export function useStatusSubscription
+      1 export function usePipelineData
+      1 export function usePipeline
+      1 export function scoreLevel
+      1 export function scoreColor
+      1 export function PipelineProvider
+      1 export const useUploadSourceDocument
+      1 export const useSeedPipeline
+      1 export const useRunPipeline
+      1 export const useRefresh
+      1 export const useQuality
+      1 export const usePipelineStore
+      1 export const usePipelineStatus
+      1 export const useLoading
+      1 export const useError
+      1 export const useDeleteSource
+      1 export const useCreateSource
+      1 export const useCounts
+      1 export const useApproveStage
+      1 export const useApiAvailable
+      1 export const signOut
+      1 export const signIn
+      1 export const getToken
+      1 export const getSession
+      1 export const config
+      1 export const SEED_TAXONOMY
+      1 export const SEED_PREDICTIONS
+      1 export const SEED_POLICIES
+      1 export const SEED_DETECTION_PATTERNS
+      1 export const SEED_CASES
+      1 export const SCANNED_PROGRAMS
+      1 export const POLICY_CATALOG
+      1 export const HHS_DATA_SOURCES
+      1 export const FALLBACK_DATA
+      1 export const ENFORCEMENT_SOURCES
+      1 export const CONVERGENCE_THRESHOLD
+
+### Exported classes
+
+### Exported interfaces and types
+      1 export type ValidationStatus
+      1 export type StageStatus
+      1 export type RiskLevel
+      1 export interface TriageResult
+      1 export interface StructuralFinding
+      1 export interface SourceFeed
+      1 export interface SourceCandidate
+      1 export interface ResearchSession
+      1 export interface QualityAssessment
+      1 export interface Quality
+      1 export interface Prediction
+      1 export interface Policy
+      1 export interface PipelineStore
+      1 export interface PipelineStageStatus
+      1 export interface FallbackData
+      1 export interface EnforcementSource
+      1 export interface Dimension
+      1 export interface DetectionPattern
+      1 export interface Counts
+      1 export interface Case
+
+### Default exports
+./svap-ui-project/svap-ui/vite.config.js:export default defineConfig({
+./frontend/src/components/Sidebar.tsx:export default function Sidebar({ onSignOut, username }: SidebarProps) {
+./frontend/src/App.tsx:export default function App() {
+./svap-ui-project/svap-ui/src/components/Sidebar.jsx:export default function Sidebar({ activeView, onNavigate }) {
+./svap-ui-project/svap-ui/src/App.jsx:export default function App() {
+./frontend/src/views/DetectionView.tsx:export default function DetectionView() {
+./frontend/src/views/PredictionView.tsx:export default function PredictionView() {
+./frontend/src/views/CaseSourcing.tsx:export default function CaseSourcing() {
+./frontend/src/views/ConvergenceMatrix.tsx:export default function ConvergenceMatrix() {
+./frontend/src/views/PolicyExplorer.tsx:export default function PolicyExplorer() {
+./svap-ui-project/svap-ui/src/views/CaseSourcing.jsx:export default function CaseSourcing() {
+./svap-ui-project/svap-ui/src/views/Dashboard.jsx:export default function Dashboard({ onNavigate }) {
+./frontend/src/views/DimensionRegistryView.tsx:export default function DimensionRegistryView() {
+./svap-ui-project/svap-ui/src/views/TaxonomyView.jsx:export default function TaxonomyView() {
+./svap-ui-project/svap-ui/src/views/ConvergenceMatrix.jsx:export default function ConvergenceMatrix() {
+./frontend/src/views/ResearchView.tsx:export default function ResearchView() {
+./svap-ui-project/svap-ui/src/views/PredictionView.jsx:export default function PredictionView() {
+./svap-ui-project/svap-ui/src/views/DetectionView.jsx:export default function DetectionView() {
+./frontend/src/views/SourcesView.tsx:export default function SourcesView() {
+./frontend/src/views/TaxonomyView.tsx:export default function TaxonomyView() {
+./frontend/eslint.config.js:export default tseslint.config(
+./svap-ui-project/svap-ui/src/views/PolicyExplorer.jsx:export default function PolicyExplorer() {
+./frontend/src/views/ManagementView.tsx:export default function ManagementView() {
+./frontend/src/views/Dashboard.tsx:export default function Dashboard() {
+./frontend/src/views/DiscoveryView.tsx:export default function DiscoveryView() {
+./frontend/vite.config.ts:export default defineConfig({
+./frontend/eslint-rules/max-jsx-props.js:export default {
+./frontend/eslint-rules/no-inline-styles.js:export default {
+
+=== SECTION: COMPONENT_DEFINITIONS ===
+## React component definitions (all styles)
+### Arrow function components (const X = ...)
+const QUALITY_MAP = {};
+const PRIORITY_ORDER = ['critical', 'high', 'medium', 'low'];
+const NAV_ITEMS = [
+const PIPELINE_STAGES = [
+const VIEWS = {
+const API_BASE = config.apiBaseUrl || "/api";
+const STAGE_ORDER = [0, 1, 2, 3, 4, 5, 6];
+const HUMAN_GATE_STAGES = [2, 5];
+
+### Function declaration components
+function StatusBadge({ status, hasDocument }: { status: ValidationStatus; hasDocument: boolean }) {
+function StatusIcon({ status, hasDocument }: { status: ValidationStatus; hasDocument: boolean }) {
+function SourceRow({ source }: { source: EnforcementSource }) {
+function AddSourceForm({ onClose }: { onClose: () => void }) {
+export default function SourcesView() {
+export function Badge({ level, children }) {
+export function ScoreBar({ score, max = 8, threshold = 3 }) {
+export function QualityTag({ id }) {
+export function QualityTags({ ids }) {
+export function RiskBadge({ level }) {
+export function StageDot({ status }) {
+export default function App() {
+function AuthenticatedApp({ token, username, onSignOut }: { token: string; username: string; onSignOut: () => void }) {
+function ApiGate({ children }: { children: React.ReactNode }) {
+export default function Dashboard({ onNavigate }) {
+export default function Sidebar({ onSignOut, username }: SidebarProps) {
+export default function ConvergenceMatrix() {
+export default function PredictionView() {
+export default function TaxonomyView() {
+export default function CaseSourcing() {
+export function Badge({ level, children }: BadgeProps) {
+export function ScoreBar({ score, max = 8, threshold = 3 }: ScoreBarProps) {
+export function QualityTag({ id }: { id: string }) {
+export function QualityTags({ ids }: { ids: string[] }) {
+export function RiskBadge({ level }: { level: RiskLevel }) {
+export function StageDot({ status }: { status: StageStatus }) {
+export default function Sidebar({ activeView, onNavigate }) {
+export default function DetectionView() {
+function MetricsRow({
+function HighRiskTable({
+function TopCasesTable({ cases }: { cases: Case[] }) {
+function PipelineControls() {
+export default function Dashboard() {
+export default function ManagementView() {
+function PredictionCard({
+export default function PredictionView() {
+function PatternDetail({ pat }: { pat: DetectionPattern }) {
+function PatternCard({
+export default function DetectionView() {
+function MatrixCell({ present, color }: { present: boolean; color: string }) {
+function MatrixRow({
+function MatrixFooter({
+export default function ConvergenceMatrix() {
+export default function ResearchView() {
+export default function DiscoveryView() {
+function CandidateRow({
+function QualityCard({
+function QualityDetail({ quality, matchingCases }: { quality: Quality; matchingCases: Case[] }) {
+export default function TaxonomyView() {
+function TreeNode({ nodeKey, node, depth = 0 }) {
+export default function PolicyExplorer() {
+export default function DimensionRegistryView() {
+function SourceRegistry({ sources }: { sources: EnforcementSource[] }) {
+function CaseRow({
+export default function CaseSourcing() {
+export default function App() {
+function TreeNode({ node, depth = 0, scannedPrograms = EMPTY_PROGRAMS }: TreeNodeProps) {
+function TreeChildren({
+function ScanResultsTable({
+function DataSourcesPanel({ dataSources }: { dataSources: Record<string, unknown> }) {
+export default function PolicyExplorer() {
+
+=== SECTION: CUSTOM_HOOKS ===
+## All custom hook definitions
+./frontend/src/data/pipelineStore.ts:export const usePipelineStore = create<PipelineStore>((set, get) => {
+./frontend/src/data/usePipelineSelectors.ts:export const useApiAvailable = () => usePipelineStore((s) => s.apiAvailable);
+./frontend/src/data/usePipelineSelectors.ts:export const useApproveStage = () => usePipelineStore((s) => s.approveStage);
+./frontend/src/data/usePipelineSelectors.ts:export const useCounts = () => usePipelineStore((s) => s.counts);
+./frontend/src/data/usePipelineSelectors.ts:export const useCreateSource = () => usePipelineStore((s) => s.createSource);
+./frontend/src/data/usePipelineSelectors.ts:export const useDeleteSource = () => usePipelineStore((s) => s.deleteSource);
+./frontend/src/data/usePipelineSelectors.ts:export const useError = () => usePipelineStore((s) => s.error);
+./frontend/src/data/usePipelineSelectors.ts:export const useLoading = () => usePipelineStore((s) => s.loading);
+./frontend/src/data/usePipelineSelectors.ts:export const usePipelineStatus = () => usePipelineStore((s) => s.pipeline_status);
+./frontend/src/data/usePipelineSelectors.ts:export const useQuality = (id: string) => usePipelineStore((s) => s.qualityMap[id]);
+./frontend/src/data/usePipelineSelectors.ts:export const useRefresh = () => usePipelineStore((s) => s.refresh);
+./frontend/src/data/usePipelineSelectors.ts:export const useRunPipeline = () => usePipelineStore((s) => s.runPipeline);
+./frontend/src/data/usePipelineSelectors.ts:export const useSeedPipeline = () => usePipelineStore((s) => s.seedPipeline);
+./frontend/src/data/usePipelineSelectors.ts:export const useUploadSourceDocument = () => usePipelineStore((s) => s.uploadSourceDocument);
+./frontend/src/data/useStatusSubscription.ts:export function useStatusSubscription() {
+
+=== SECTION: IMPORT_SOURCES ===
+## Most common import sources (external packages)
+
+## Most common internal import paths
+      1 ./svap-ui-project/svap-ui/src/views/TaxonomyView.jsx:from '../data/seedTaxonomy'
+      1 ./svap-ui-project/svap-ui/src/views/TaxonomyView.jsx:from '../data/seedCases'
+      1 ./svap-ui-project/svap-ui/src/views/PredictionView.jsx:from '../data/seedPolicies'
+      1 ./svap-ui-project/svap-ui/src/views/PredictionView.jsx:from '../data/predictions'
+      1 ./svap-ui-project/svap-ui/src/views/PredictionView.jsx:from '../components/SharedUI'
+      1 ./svap-ui-project/svap-ui/src/views/PolicyExplorer.jsx:from '../data/sources'
+      1 ./svap-ui-project/svap-ui/src/views/PolicyExplorer.jsx:from '../data/seedPolicies'
+      1 ./svap-ui-project/svap-ui/src/views/PolicyExplorer.jsx:from '../data/policyCatalog'
+      1 ./svap-ui-project/svap-ui/src/views/PolicyExplorer.jsx:from '../components/SharedUI'
+      1 ./svap-ui-project/svap-ui/src/views/DetectionView.jsx:from '../data/predictions'
+      1 ./svap-ui-project/svap-ui/src/views/DetectionView.jsx:from '../components/SharedUI'
+      1 ./svap-ui-project/svap-ui/src/views/Dashboard.jsx:from '../data/seedTaxonomy'
+      1 ./svap-ui-project/svap-ui/src/views/Dashboard.jsx:from '../data/seedPolicies'
+      1 ./svap-ui-project/svap-ui/src/views/Dashboard.jsx:from '../data/seedCases'
+      1 ./svap-ui-project/svap-ui/src/views/Dashboard.jsx:from '../data/predictions'
+      1 ./svap-ui-project/svap-ui/src/views/Dashboard.jsx:from '../components/SharedUI'
+      1 ./svap-ui-project/svap-ui/src/views/ConvergenceMatrix.jsx:from '../data/seedTaxonomy'
+      1 ./svap-ui-project/svap-ui/src/views/ConvergenceMatrix.jsx:from '../data/seedPolicies'
+      1 ./svap-ui-project/svap-ui/src/views/ConvergenceMatrix.jsx:from '../data/seedCases'
+      1 ./svap-ui-project/svap-ui/src/views/ConvergenceMatrix.jsx:from '../components/SharedUI'
+      1 ./svap-ui-project/svap-ui/src/views/CaseSourcing.jsx:from '../data/sources'
+      1 ./svap-ui-project/svap-ui/src/views/CaseSourcing.jsx:from '../data/seedCases'
+      1 ./svap-ui-project/svap-ui/src/views/CaseSourcing.jsx:from '../components/SharedUI'
+      1 ./svap-ui-project/svap-ui/src/main.jsx:from './App'
+      1 ./svap-ui-project/svap-ui/src/data/usePipelineData.js:from '../data/sources'
+      1 ./svap-ui-project/svap-ui/src/data/usePipelineData.js:from '../data/seedTaxonomy'
+      1 ./svap-ui-project/svap-ui/src/data/usePipelineData.js:from '../data/seedPolicies'
+      1 ./svap-ui-project/svap-ui/src/data/usePipelineData.js:from '../data/seedCases'
+      1 ./svap-ui-project/svap-ui/src/data/usePipelineData.js:from '../data/predictions'
+      1 ./svap-ui-project/svap-ui/src/data/usePipelineData.js:from '../data/policyCatalog'
+      1 ./svap-ui-project/svap-ui/src/components/Sidebar.jsx:from './SharedUI'
+      1 ./svap-ui-project/svap-ui/src/components/SharedUI.jsx:from '../data/seedTaxonomy'
+      1 ./svap-ui-project/svap-ui/src/App.jsx:from './views/TaxonomyView'
+      1 ./svap-ui-project/svap-ui/src/App.jsx:from './views/PredictionView'
+      1 ./svap-ui-project/svap-ui/src/App.jsx:from './views/PolicyExplorer'
+      1 ./svap-ui-project/svap-ui/src/App.jsx:from './views/DetectionView'
+      1 ./svap-ui-project/svap-ui/src/App.jsx:from './views/Dashboard'
+      1 ./svap-ui-project/svap-ui/src/App.jsx:from './views/ConvergenceMatrix'
+      1 ./svap-ui-project/svap-ui/src/App.jsx:from './views/CaseSourcing'
+      1 ./svap-ui-project/svap-ui/src/App.jsx:from './data/usePipelineData'
+      1 ./svap-ui-project/svap-ui/src/App.jsx:from './components/Sidebar'
+
+=== SECTION: NAMING_CLUSTERS ===
+## Files/exports sharing common name fragments
+## (Clusters suggest related functionality that may have drift)
+     11 View
+      6 Quality
+      4 Stage
+      4 Badge
+      3 Status
+      3 Source
+      3 Risk
+      3 Prediction
+      3 Policy
+      3 Detection
+      3 Case
+      2 Taxonomy
+      2 Tags
+      2 Tag
+      2 Sourcing
+      2 Sidebar
+      2 Score
+      2 Research
+      2 Pipeline
+      2 Matrix
+      2 Explorer
+      2 Dot
+      2 Dimension
+      2 Dashboard
+      2 Convergence
+      2 Bar
+      2 App
+      1 Validation
+      1 Triage
+      1 Structural
+      1 Store
+      1 Sources
+      1 Session
+      1 Result
+      1 Registry
+      1 Pattern
+      1 Management
+      1 Level
+      1 Finding
+      1 Feed
+
+## File name patterns (basename clusters)
+      8 View
+      1 Subscription
+      1 Store
+      1 Sourcing
+      1 Sidebar
+      1 Selectors
+      1 Matrix
+      1 Explorer
+      1 Dashboard
+      1 App
+
+=== SECTION: PATTERN_FREQUENCY ===
+## High-frequency function/method calls (what the codebase does most)
+     36 map(
+     28 usePipelineStore(
+     17 useCallback(
+     16 get(
+     16 filter(
+     15 var(
+     14 setBusy(
+     13 Error(
+     12 json(
+     11 set(
+     11 apiPost(
+     10 apiGet(
+      9 useState(
+      9 useShallow(
+      9 setError(
+      8 preventDefault(
+      8 error(
+      7 useEffect(
+      7 includes(
+      7 fetch(
+      6 sort(
+      6 setRunning(
+      5 trim(
+      5 toFixed(
+      5 refreshAll(
+      5 getIdToken(
+      5 formatDollars(
+      5 String(
+      4 wrap(
+      4 slice(
+      4 setFilter(
+      4 setAuth(
+      4 resolve(
+      4 onToggleId(
+      4 hasRunningStage(
+      4 getToken(
+      4 getState(
+      4 floor(
+      4 confirm(
+      4 authHeaders(
+      4 all(
+      4 Date(
+      3 timeAgo(
+      3 stringify(
+      3 stopPropagation(
+      3 startPolling(
+      3 setExpanded(
+      3 scoreColor(
+      3 replace(
+      3 refreshSources(
+      3 readRuntime(
+      3 getTime(
+      3 getSession(
+      3 getJwtToken(
+      3 getCurrentUser(
+      3 forEach(
+      3 find(
+      3 fetchDiscovery(
+      3 fetchDashboard(
+      3 entries(
+
+## Third-party hook usage
+     28 usePipelineStore(
+     17 useCallback(
+      9 useState(
+      9 useShallow(
+      7 useEffect(
+      2 useStatusSubscription(
+      2 useNavigate(
+      1 useUploadSourceDocument(
+      1 useRefresh(
+      1 useRef(
+      1 useQuality(
+      1 usePipelineStatus(
+      1 useLoading(
+      1 useError(
+      1 useDeleteSource(
+      1 useCreateSource(
+      1 useCounts(
+
+=== SECTION: STRUCTURAL_PATTERNS ===
+## Index/barrel files
+
+## Config/constants files
+./svap_pipeline/svap/config.yaml:Zone.Identifier
+./svap_pipeline/svap/config.yaml
+./svap-ui-project/svap-ui/vite.config.js
+./svap-ui-project/svap-ui/vite.config.js:Zone.Identifier
+./.git/config
+./.drift-audit/config.json
+./frontend/eslint.config.js
+./frontend/tsconfig.json
+./frontend/vite.config.ts
+./frontend/public/config.js
+./frontend/src/config.ts
+./backend/.venv/bin/numpy-config
+./backend/.venv/lib/python3.14/site-packages/numpy/f2py/tests/src/parameter/constant_real.f90
+./backend/.venv/lib/python3.14/site-packages/numpy/f2py/tests/src/parameter/constant_both.f90
+./backend/.venv/lib/python3.14/site-packages/numpy/f2py/tests/src/parameter/constant_array.f90
+./backend/.venv/lib/python3.14/site-packages/numpy/f2py/tests/src/parameter/constant_non_compound.f90
+./backend/.venv/lib/python3.14/site-packages/numpy/f2py/tests/src/parameter/constant_compound.f90
+./backend/.venv/lib/python3.14/site-packages/numpy/f2py/tests/src/parameter/constant_integer.f90
+./backend/.venv/lib/python3.14/site-packages/numpy/_configtool.pyi
+./backend/.venv/lib/python3.14/site-packages/numpy/tests/test_numpy_config.py
+./backend/.venv/lib/python3.14/site-packages/numpy/tests/test_configtool.py
+./backend/.venv/lib/python3.14/site-packages/numpy/__config__.pyi
+./backend/.venv/lib/python3.14/site-packages/numpy/__config__.py
+./backend/.venv/lib/python3.14/site-packages/numpy/_configtool.py
+./backend/.venv/lib/python3.14/site-packages/numpy/_core/_ufunc_config.py
+./backend/.venv/lib/python3.14/site-packages/numpy/_core/include/numpy/numpyconfig.h
+./backend/.venv/lib/python3.14/site-packages/numpy/_core/include/numpy/_numpyconfig.h
+./backend/.venv/lib/python3.14/site-packages/numpy/_core/_ufunc_config.pyi
+./backend/.venv/lib/python3.14/site-packages/numpy/typing/tests/data/fail/ufunc_config.pyi
+./backend/.venv/lib/python3.14/site-packages/numpy/typing/tests/data/fail/constants.pyi
+
+## Test file patterns
+0
+(test files found)
+
+## Style/CSS file patterns
+      2 css
+
+=== SECTION: DUPLICATION_INDICATORS ===
+## Files with very similar names (potential duplicated concepts)
+
+## Repeated multi-line patterns (exact duplicates, 3+ lines)
+
+=== SECTION: ERROR_AND_ASYNC ===
+## Try/catch density per file (top files by catch count)
+./frontend/src/views/ManagementView.tsx:6
+./frontend/src/views/SourcesView.tsx:3
+./frontend/src/App.tsx:2
+./frontend/src/views/Dashboard.tsx:1
+./frontend/src/data/pipelineStore.ts:1
+
+## Async pattern styles
+### async/await files
+9
+### .then() chain files
+0
+0
+### callback-style files
+0
+0
+
+=== END DISCOVERY ===

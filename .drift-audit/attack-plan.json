@@ -1,0 +1,78 @@
+{
+  "created": "2026-02-27T17:20:00Z",
+  "updated": "2026-02-27T17:20:00Z",
+  "plan": [
+    {
+      "area_id": "dead-prototype-codebase",
+      "rank": 1,
+      "depends_on": [],
+      "phase": "planned",
+      "canonical_variant": "active-typescript-frontend",
+      "unify_summary": null,
+      "guard_artifacts": []
+    },
+    {
+      "area_id": "frontend-store-access-patterns",
+      "rank": 2,
+      "depends_on": [],
+      "phase": "planned",
+      "canonical_variant": null,
+      "unify_summary": null,
+      "guard_artifacts": []
+    },
+    {
+      "area_id": "frontend-error-loading-handling",
+      "rank": 3,
+      "depends_on": [],
+      "phase": "planned",
+      "canonical_variant": null,
+      "unify_summary": null,
+      "guard_artifacts": []
+    },
+    {
+      "area_id": "backend-config-duplication",
+      "rank": 4,
+      "depends_on": [],
+      "phase": "planned",
+      "canonical_variant": "factory-function",
+      "unify_summary": null,
+      "guard_artifacts": []
+    },
+    {
+      "area_id": "parallel-execution-duplication",
+      "rank": 5,
+      "depends_on": [],
+      "phase": "planned",
+      "canonical_variant": null,
+      "unify_summary": null,
+      "guard_artifacts": []
+    },
+    {
+      "area_id": "frontend-inline-styles",
+      "rank": 6,
+      "depends_on": [],
+      "phase": "planned",
+      "canonical_variant": "css-classes",
+      "unify_summary": null,
+      "guard_artifacts": []
+    },
+    {
+      "area_id": "backend-route-error-handling",
+      "rank": 7,
+      "depends_on": [],
+      "phase": "planned",
+      "canonical_variant": null,
+      "unify_summary": null,
+      "guard_artifacts": []
+    },
+    {
+      "area_id": "frontend-auth-token-access",
+      "rank": 8,
+      "depends_on": ["frontend-store-access-patterns"],
+      "phase": "planned",
+      "canonical_variant": null,
+      "unify_summary": null,
+      "guard_artifacts": []
+    }
+  ]
+}
