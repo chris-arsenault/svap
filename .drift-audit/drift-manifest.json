@@ -1,0 +1,547 @@
+{
+  "generated": "2026-02-27T17:15:00Z",
+  "project_root": "/home/tsonu/src/svap",
+  "project_name": "svap",
+  "summary": {
+    "total_drift_areas": 8,
+    "total_files_affected": 38,
+    "high_impact": 3,
+    "medium_impact": 3,
+    "low_impact": 2,
+    "by_type": {
+      "structural": 5,
+      "behavioral": 2,
+      "semantic": 1
+    },
+    "evidence_coverage": {
+      "high": 8,
+      "medium": 0,
+      "low": 0
+    }
+  },
+  "areas": [
+    {
+      "id": "dead-prototype-codebase",
+      "name": "Dead Prototype Codebase",
+      "type": "structural",
+      "description": "svap-ui-project/ is an unreferenced JSX prototype superseded by frontend/ on the same day it was committed. Contains duplicate shared UI components that have since diverged.",
+      "impact": "HIGH",
+      "total_files": 11,
+      "variants": [
+        {
+          "name": "active-typescript-frontend",
+          "description": "frontend/ — React 18 + TypeScript + Vite + Zustand + react-router-dom + Cognito auth. 12 views, path-based routing, granular store subscriptions.",
+          "file_count": 25,
+          "files": [
+            "frontend/src/App.tsx",
+            "frontend/src/data/pipelineStore.ts",
+            "frontend/src/data/usePipelineSelectors.ts",
+            "frontend/src/components/SharedUI.tsx",
+            "frontend/src/views/Dashboard.tsx"
+          ],
+          "sample_file": "frontend/src/App.tsx",
+          "code_excerpts": [
+            {
+              "file": "frontend/src/App.tsx",
+              "start_line": 120,
+              "end_line": 135,
+              "snippet": "<Routes>\n  <Route path=\"/\" element={<Dashboard />} />\n  <Route path=\"/sources\" element={<SourcesView />} />\n  <Route path=\"/cases\" element={<CaseSourcing />} />\n  <Route path=\"/policies\" element={<PolicyExplorer />} />\n  ...\n</Routes>"
+            }
+          ],
+          "implementation_details": "Production frontend with TypeScript types, Zustand state management with granular selectors, react-router-dom path-based routing, Cognito JWT authentication, and 12 views covering all pipeline stages plus management/discovery/research."
+        },
+        {
+          "name": "dead-jsx-prototype",
+          "description": "svap-ui-project/svap-ui/ — React + plain JavaScript + Context API + state-based routing. 7 views, no auth, static seed data only.",
+          "file_count": 11,
+          "files": [
+            "svap-ui-project/svap-ui/src/App.jsx",
+            "svap-ui-project/svap-ui/src/data/usePipelineData.js",
+            "svap-ui-project/svap-ui/src/components/SharedUI.jsx",
+            "svap-ui-project/svap-ui/src/components/Sidebar.jsx",
+            "svap-ui-project/svap-ui/src/views/Dashboard.jsx"
+          ],
+          "sample_file": "svap-ui-project/svap-ui/src/App.jsx",
+          "code_excerpts": [
+            {
+              "file": "svap-ui-project/svap-ui/src/App.jsx",
+              "start_line": 1,
+              "end_line": 10,
+              "snippet": "const VIEWS = {\n  dashboard: Dashboard,\n  cases: CaseSourcing,\n  policies: PolicyExplorer,\n  ...\n};\nconst [activeView, setActiveView] = useState('dashboard');\nconst ViewComponent = VIEWS[activeView] || Dashboard;"
+            }
+          ],
+          "implementation_details": "Initial prototype with React Context pattern, state-based view switching (no URL routing), static seed data, no authentication, 7 views. Zero commits after initial creation."
+        }
+      ],
+      "analysis": "svap-ui-project/ was committed once (2026-02-25) and never updated. frontend/ was committed in the same initial commit and received 10+ subsequent updates. There are zero cross-references between them. The prototype's SharedUI components have diverged from frontend/'s versions (QualityTag uses static seeds vs store subscription, formatDollars relocated to utils.ts). Its continued presence inflates tooling output and creates confusion about canonical source.",
+      "recommendation": "Delete svap-ui-project/ entirely: rm -rf svap-ui-project/. There is no code in it that isn't already present (and improved) in frontend/.",
+      "evidence_quality": "high",
+      "status": "pending"
+    },
+    {
+      "id": "frontend-store-access-patterns",
+      "name": "Frontend Store Access Patterns",
+      "type": "structural",
+      "description": "Views use 4 different patterns to access the Zustand store: useShallow for data, direct inline selectors, pre-defined selector hooks (usePipelineSelectors.ts), and mixed data+actions in useShallow. Only 1 of 12 views uses the selector hooks despite 14 being defined.",
+      "impact": "HIGH",
+      "total_files": 10,
+      "variants": [
+        {
+          "name": "useShallow-data-destructure",
+          "description": "usePipelineStore(useShallow((s) => ({ field1: s.field1, ... }))) — extracts multiple data slices with shallow equality",
+          "file_count": 6,
+          "files": [
+            "frontend/src/views/Dashboard.tsx:237-245",
+            "frontend/src/views/CaseSourcing.tsx",
+            "frontend/src/views/ConvergenceMatrix.tsx",
+            "frontend/src/views/PolicyExplorer.tsx",
+            "frontend/src/views/TaxonomyView.tsx",
+            "frontend/src/views/SourcesView.tsx:210"
+          ],
+          "sample_file": "frontend/src/views/Dashboard.tsx",
+          "code_excerpts": [
+            {
+              "file": "frontend/src/views/Dashboard.tsx",
+              "start_line": 237,
+              "end_line": 245,
+              "snippet": "const { cases, taxonomy, policies, detection_patterns, threshold } = usePipelineStore(\n  useShallow((s) => ({\n    cases: s.cases,\n    taxonomy: s.taxonomy,\n    policies: s.policies,\n    detection_patterns: s.detection_patterns,\n    threshold: s.threshold,\n  })),\n);"
+            }
+          ],
+          "implementation_details": "Most common pattern (6 views). Uses Zustand's useShallow to prevent unnecessary re-renders when unrelated store slices change. Correct for multi-field data access."
+        },
+        {
+          "name": "direct-inline-selector",
+          "description": "usePipelineStore((s) => s.field) — single-field inline selectors without useShallow",
+          "file_count": 3,
+          "files": [
+            "frontend/src/views/DetectionView.tsx:83",
+            "frontend/src/views/PredictionView.tsx:82",
+            "frontend/src/views/ManagementView.tsx:81-83"
+          ],
+          "sample_file": "frontend/src/views/DetectionView.tsx",
+          "code_excerpts": [
+            {
+              "file": "frontend/src/views/DetectionView.tsx",
+              "start_line": 83,
+              "end_line": 83,
+              "snippet": "const detection_patterns = usePipelineStore((s) => s.detection_patterns);"
+            },
+            {
+              "file": "frontend/src/views/ManagementView.tsx",
+              "start_line": 81,
+              "end_line": 83,
+              "snippet": "const runPipeline = usePipelineStore((s) => s.runPipeline);\nconst seedPipeline = usePipelineStore((s) => s.seedPipeline);\nconst refresh = usePipelineStore((s) => s.refresh);"
+            }
+          ],
+          "implementation_details": "Used for single-field access (fine) but also for multiple action functions in ManagementView (wasteful — actions are stable references and don't need individual selectors)."
+        },
+        {
+          "name": "selector-hooks",
+          "description": "Pre-defined hooks from usePipelineSelectors.ts — useUploadSourceDocument(), useDeleteSource(), etc.",
+          "file_count": 1,
+          "files": [
+            "frontend/src/views/SourcesView.tsx:4,30-31",
+            "frontend/src/data/usePipelineSelectors.ts:1-29"
+          ],
+          "sample_file": "frontend/src/views/SourcesView.tsx",
+          "code_excerpts": [
+            {
+              "file": "frontend/src/views/SourcesView.tsx",
+              "start_line": 4,
+              "end_line": 4,
+              "snippet": "import { useUploadSourceDocument, useDeleteSource, useCreateSource } from \"../data/usePipelineSelectors\";"
+            }
+          ],
+          "implementation_details": "14 selector hooks are defined in usePipelineSelectors.ts but only 1 of 12 views uses them. These represent the intended canonical pattern that was built but never adopted."
+        },
+        {
+          "name": "mixed-data-actions-useShallow",
+          "description": "Extracts both data slices AND action functions in one useShallow call",
+          "file_count": 2,
+          "files": [
+            "frontend/src/views/ResearchView.tsx:29-40",
+            "frontend/src/views/DiscoveryView.tsx:28-36"
+          ],
+          "sample_file": "frontend/src/views/ResearchView.tsx",
+          "code_excerpts": [
+            {
+              "file": "frontend/src/views/ResearchView.tsx",
+              "start_line": 29,
+              "end_line": 40,
+              "snippet": "const { triage_results, research_sessions, policies,\n  fetchTriageResults, fetchResearchSessions, runTriage,\n  runDeepResearch, fetchFindings, fetchAssessments,\n} = usePipelineStore(useShallow((s) => ({ ... })));"
+            }
+          ],
+          "implementation_details": "Actions are already stable Zustand references — wrapping them in useShallow adds shallow-comparison overhead with no render benefit. This pattern likely emerged because it's visually convenient to destructure everything in one call."
+        }
+      ],
+      "analysis": "The project built usePipelineSelectors.ts as the canonical store access layer (14 hooks), but adoption stalled at 1 of 12 views. The remaining 11 views developed 3 ad-hoc patterns organically. The useShallow pattern for data is correct; the issue is mixing data+actions in useShallow (unnecessary overhead) and having multiple access patterns without a clear convention. New views have no template to follow.",
+      "recommendation": "Converge on: (1) useShallow for multi-field data access, (2) selector hooks for individual actions. Add grouped data selectors to usePipelineSelectors.ts (e.g., useDashboardData() wrapping useShallow internally). Target: every view imports from usePipelineSelectors, never directly from usePipelineStore.",
+      "evidence_quality": "high",
+      "status": "pending"
+    },
+    {
+      "id": "frontend-error-loading-handling",
+      "name": "Frontend Error/Loading Handling",
+      "type": "behavioral",
+      "description": "10 of 12 views have no error UI for async operations. Views independently create local busy state with different types (boolean vs string|null). Only ManagementView displays errors; the rest log to console.error or swallow silently.",
+      "impact": "HIGH",
+      "total_files": 12,
+      "variants": [
+        {
+          "name": "no-error-ui",
+          "description": "Async operations catch errors but only log to console.error() — user gets no feedback",
+          "file_count": 10,
+          "files": [
+            "frontend/src/views/Dashboard.tsx",
+            "frontend/src/views/SourcesView.tsx:44",
+            "frontend/src/views/CaseSourcing.tsx",
+            "frontend/src/views/TaxonomyView.tsx",
+            "frontend/src/views/ConvergenceMatrix.tsx",
+            "frontend/src/views/PolicyExplorer.tsx",
+            "frontend/src/views/PredictionView.tsx",
+            "frontend/src/views/DetectionView.tsx",
+            "frontend/src/views/DiscoveryView.tsx:50-53",
+            "frontend/src/views/ResearchView.tsx:64,73"
+          ],
+          "sample_file": "frontend/src/views/SourcesView.tsx",
+          "code_excerpts": [
+            {
+              "file": "frontend/src/views/SourcesView.tsx",
+              "start_line": 44,
+              "end_line": 44,
+              "snippet": "} catch (err) { console.error(\"Upload failed:\", err); }"
+            }
+          ],
+          "implementation_details": "Most views either have no try/catch at all (read-only views like TaxonomyView) or catch errors silently. Users see no indication when uploads, pipeline runs, or approvals fail."
+        },
+        {
+          "name": "inline-error-panel",
+          "description": "Local useState for error string, rendered as styled panel with critical color",
+          "file_count": 1,
+          "files": [
+            "frontend/src/views/ManagementView.tsx:85-88,204-210"
+          ],
+          "sample_file": "frontend/src/views/ManagementView.tsx",
+          "code_excerpts": [
+            {
+              "file": "frontend/src/views/ManagementView.tsx",
+              "start_line": 204,
+              "end_line": 210,
+              "snippet": "{error && (\n  <div className=\"panel stagger-in\" style={{ borderLeft: \"3px solid var(--critical)\" }}>\n    <div className=\"panel-body\" style={{ color: \"var(--critical)\" }}>\n      {error}\n    </div>\n  </div>\n)}"
+            }
+          ],
+          "implementation_details": "ManagementView is the only view with inline error display. Uses local useState<string|null> for error, renders as a panel with critical-color left border. Uses inline styles rather than a shared error component class."
+        },
+        {
+          "name": "global-api-gate",
+          "description": "ApiGate component wraps all views, shows global loading/error from store selectors on initial load",
+          "file_count": 1,
+          "files": [
+            "frontend/src/App.tsx:153-176"
+          ],
+          "sample_file": "frontend/src/App.tsx",
+          "code_excerpts": [
+            {
+              "file": "frontend/src/App.tsx",
+              "start_line": 153,
+              "end_line": 176,
+              "snippet": "function ApiGate({ children }) {\n  const loading = useLoading();\n  const error = useError();\n  const refresh = useRefresh();\n  // renders global loading or error overlay\n}"
+            }
+          ],
+          "implementation_details": "Handles initial dashboard load errors only. Once the app is running, per-view async operations are not covered by this gate."
+        }
+      ],
+      "behavior_matrix": {
+        "Dashboard": {"local_busy": "useState<string|null>", "error_display": "none", "error_handling": "swallowed"},
+        "SourcesView": {"local_busy": "useState(false)", "error_display": "none", "error_handling": "console.error"},
+        "ManagementView": {"local_busy": "useState<string|null>", "error_display": "inline panel", "error_handling": "try/catch per action"},
+        "DiscoveryView": {"local_busy": "useState(false)", "error_display": "none", "error_handling": "catch swallowed"},
+        "ResearchView": {"local_busy": "useState(false)", "error_display": "none", "error_handling": "catch swallowed"},
+        "DimensionRegistryView": {"local_busy": "useState(false)", "error_display": "none", "error_handling": "none"},
+        "CaseSourcing": {"local_busy": "none", "error_display": "none", "error_handling": "none"},
+        "TaxonomyView": {"local_busy": "none", "error_display": "none", "error_handling": "none"},
+        "ConvergenceMatrix": {"local_busy": "none", "error_display": "none", "error_handling": "none"},
+        "PolicyExplorer": {"local_busy": "none", "error_display": "none", "error_handling": "none"},
+        "PredictionView": {"local_busy": "none", "error_display": "none", "error_handling": "none"},
+        "DetectionView": {"local_busy": "none", "error_display": "none", "error_handling": "none"}
+      },
+      "missing_behavior_complexity": {
+        "error_display": "moderate — need shared ErrorBanner component + useAsyncAction hook",
+        "consistent_busy_tracking": "trivial — standardize on string|null pattern for named actions"
+      },
+      "analysis": "This is genuine drift. The store exports useLoading() and useError() selectors but only ApiGate uses them. Views independently create local busy state with different types. The user-visible impact is significant: failed uploads, pipeline runs, and approvals produce no feedback. ManagementView is the only view that displays errors, using an ad-hoc inline-styled panel.",
+      "recommendation": "Create shared useAsyncAction() hook returning { busy, error, run, clearError } and an ErrorBanner component. Target: every view that performs async operations uses useAsyncAction() and renders <ErrorBanner /> at the top of its content area.",
+      "evidence_quality": "high",
+      "status": "pending"
+    },
+    {
+      "id": "backend-config-duplication",
+      "name": "Backend Config Duplication",
+      "type": "structural",
+      "description": "Identical default configuration dict exists in both api.py (_DEFAULT_CONFIG) and stage_runner.py (_default_config()). Must be updated in two places when defaults change.",
+      "impact": "MEDIUM",
+      "total_files": 2,
+      "variants": [
+        {
+          "name": "module-level-dict",
+          "description": "_DEFAULT_CONFIG as module-level dict in api.py — shared mutable reference",
+          "file_count": 1,
+          "files": ["backend/src/svap/api.py:52-72"],
+          "sample_file": "backend/src/svap/api.py",
+          "code_excerpts": [
+            {
+              "file": "backend/src/svap/api.py",
+              "start_line": 52,
+              "end_line": 72,
+              "snippet": "_DEFAULT_CONFIG = {\n    \"bedrock\": {\n        \"region\": \"us-east-1\",\n        \"model_id\": \"us.anthropic.claude-sonnet-4-6\",\n        \"max_tokens\": 4096,\n        \"temperature\": 0.2,\n        \"retry_attempts\": 3,\n        \"retry_delay_seconds\": 5,\n    },\n    \"rag\": { ... },\n    \"pipeline\": { ... },\n}"
+            }
+          ],
+          "implementation_details": "Module-level dict. Used as dict(_DEFAULT_CONFIG) when needed (shallow copy). Mutable — could be accidentally modified at runtime."
+        },
+        {
+          "name": "factory-function",
+          "description": "_default_config() factory function in stage_runner.py — returns fresh dict each call",
+          "file_count": 1,
+          "files": ["backend/src/svap/stage_runner.py:134-156"],
+          "sample_file": "backend/src/svap/stage_runner.py",
+          "code_excerpts": [
+            {
+              "file": "backend/src/svap/stage_runner.py",
+              "start_line": 134,
+              "end_line": 156,
+              "snippet": "def _default_config() -> dict:\n    \"\"\"Minimal default config when no config file is available.\"\"\"\n    return {\n        \"bedrock\": {\n            \"region\": \"us-east-1\",\n            \"model_id\": \"us.anthropic.claude-sonnet-4-6\",\n            ...\n        },\n        ...\n    }"
+            }
+          ],
+          "implementation_details": "Factory function returning fresh dict. Safer pattern (no shared mutable state) but duplicates all values from api.py."
+        }
+      ],
+      "analysis": "Both files contain identical configuration values today. They diverged in form (dict vs function) but not content. The risk is future desynchronization — if the model ID or retry parameters change, both must be updated independently. The factory function pattern in stage_runner.py is safer (returns fresh dict), but having two sources of truth for defaults is unnecessary given they're in the same Python package.",
+      "recommendation": "Extract to svap/defaults.py: def default_config() -> dict. Both api.py and stage_runner.py import from this single source. Use the factory function pattern (fresh dict per call).",
+      "evidence_quality": "high",
+      "status": "pending"
+    },
+    {
+      "id": "parallel-execution-duplication",
+      "name": "Parallel LLM Execution Duplication",
+      "type": "semantic",
+      "description": "Stages 5 and 6 each have a nearly identical _run_parallel_* function that creates a ThreadPoolExecutor, submits LLM calls, collects results via as_completed, counts successes, and tracks failures. Only variable names and store functions differ.",
+      "impact": "MEDIUM",
+      "total_files": 2,
+      "variants": [
+        {
+          "name": "run-parallel-predictions",
+          "description": "_run_parallel_predictions() in stage5 — submits prediction LLM calls, stores via _store_predictions",
+          "file_count": 1,
+          "files": ["backend/src/svap/stages/stage5_prediction.py:104-131"],
+          "sample_file": "backend/src/svap/stages/stage5_prediction.py",
+          "code_excerpts": [
+            {
+              "file": "backend/src/svap/stages/stage5_prediction.py",
+              "start_line": 104,
+              "end_line": 126,
+              "snippet": "def _run_parallel_predictions(storage, client, run_id, jobs, max_concurrency):\n    total_predictions = 0\n    failed_policies = []\n    with ThreadPoolExecutor(max_workers=max_concurrency) as executor:\n        future_to_policy = {\n            executor.submit(_invoke_llm, client, prompt): (policy_id, profile, h)\n            for policy_id, profile, h, prompt in jobs\n        }\n        for future in as_completed(future_to_policy):\n            policy_id, profile, h = future_to_policy[future]\n            try:\n                result = future.result()\n                count = _store_predictions(storage, run_id, policy_id, profile, result)\n                total_predictions += count\n            except Exception as exc:\n                failed_policies.append(policy_id)\n                print(f\"  ERROR for {policy_id}: {exc}\")\n    return total_predictions, failed_policies"
+            }
+          ],
+          "implementation_details": "Jobs are (policy_id, profile, hash, prompt) tuples. Result stored via _store_predictions(). Failures tracked by policy_id. Returns (total_predictions, failed_policies)."
+        },
+        {
+          "name": "run-parallel-detection",
+          "description": "_run_parallel_detection() in stage6 — submits detection LLM calls, stores via _store_patterns",
+          "file_count": 1,
+          "files": ["backend/src/svap/stages/stage6_detection.py:98-125"],
+          "sample_file": "backend/src/svap/stages/stage6_detection.py",
+          "code_excerpts": [
+            {
+              "file": "backend/src/svap/stages/stage6_detection.py",
+              "start_line": 98,
+              "end_line": 120,
+              "snippet": "def _run_parallel_detection(storage, client, run_id, jobs, max_concurrency):\n    total_patterns = 0\n    failed_predictions = []\n    with ThreadPoolExecutor(max_workers=max_concurrency) as executor:\n        future_to_pred = {\n            executor.submit(_invoke_llm, client, prompt): (pred, h)\n            for pred, h, prompt in jobs\n        }\n        for future in as_completed(future_to_pred):\n            pred, h = future_to_pred[future]\n            try:\n                result = future.result()\n                count = _store_patterns(storage, run_id, pred, result)\n                total_patterns += count\n            except Exception as exc:\n                failed_predictions.append(pred[\"prediction_id\"])\n                print(f\"  ERROR for {pred['prediction_id']}: {exc}\")\n    return total_patterns, failed_predictions"
+            }
+          ],
+          "implementation_details": "Jobs are (pred, hash, prompt) tuples. Result stored via _store_patterns(). Failures tracked by prediction_id. Returns (total_patterns, failed_predictions)."
+        }
+      ],
+      "analysis": "This is textbook semantic duplication — the same functional concept ('execute LLM calls in parallel, store results, track failures') implemented twice with different variable names. The functions share identical control flow: ThreadPoolExecutor creation, future submission via _invoke_llm, as_completed iteration, try/except per future, success counting, failure tracking, and tuple return. The only meaningful differences are the job tuple shape and the store callback. This likely arose from copy-paste when stage6 was built from stage5.",
+      "recommendation": "Extract a generic run_parallel_llm() utility to svap/parallel.py parameterized by (client, jobs, store_fn, max_concurrency). Interface: run_parallel_llm(client: BedrockClient, jobs: list[tuple], store_fn: Callable, max_concurrency: int, label: str) -> tuple[int, list[str]]. Both stages call this with their specific store function.",
+      "evidence_quality": "high",
+      "status": "pending"
+    },
+    {
+      "id": "frontend-inline-styles",
+      "name": "Frontend Inline Styles",
+      "type": "structural",
+      "description": "27 inline style={{}} usages across 7 views, while the project has a well-structured index.css with CSS custom properties and utility classes. Most inline styles are for layout (flex/gap) and spacing (margins/padding) that could be CSS classes.",
+      "impact": "MEDIUM",
+      "total_files": 7,
+      "variants": [
+        {
+          "name": "css-classes",
+          "description": "Views use CSS classes from index.css — className='panel', className='view-section', etc.",
+          "file_count": 12,
+          "files": [
+            "frontend/src/views/Dashboard.tsx",
+            "frontend/src/views/CaseSourcing.tsx",
+            "frontend/src/views/TaxonomyView.tsx"
+          ],
+          "sample_file": "frontend/src/views/Dashboard.tsx",
+          "code_excerpts": [
+            {
+              "file": "frontend/src/views/Dashboard.tsx",
+              "start_line": 1,
+              "end_line": 5,
+              "snippet": "<section className=\"view-section\">\n  <div className=\"panel stagger-in\">\n    <div className=\"panel-header\"><h2>Pipeline</h2></div>\n    <div className=\"panel-body\">"
+            }
+          ],
+          "implementation_details": "Canonical pattern. CSS custom properties (--critical, --border, etc.) and structural classes (panel, panel-header, view-section) provide consistent styling."
+        },
+        {
+          "name": "inline-style-objects",
+          "description": "Ad-hoc style={{}} props for layout, spacing, and conditional colors",
+          "file_count": 7,
+          "files": [
+            "frontend/src/views/ResearchView.tsx",
+            "frontend/src/views/DimensionRegistryView.tsx",
+            "frontend/src/views/ConvergenceMatrix.tsx",
+            "frontend/src/views/ManagementView.tsx",
+            "frontend/src/views/TaxonomyView.tsx",
+            "frontend/src/views/DiscoveryView.tsx",
+            "frontend/src/views/SourcesView.tsx"
+          ],
+          "sample_file": "frontend/src/views/ResearchView.tsx",
+          "code_excerpts": [
+            {
+              "file": "frontend/src/views/ResearchView.tsx",
+              "start_line": 162,
+              "end_line": 168,
+              "snippet": "<span style={{\n  color: t.triage_score >= 0.7 ? \"var(--critical)\" : t.triage_score >= 0.4 ? \"var(--high)\" : undefined,\n  fontWeight: 600,\n}}>"
+            },
+            {
+              "file": "frontend/src/views/DimensionRegistryView.tsx",
+              "start_line": 83,
+              "end_line": 86,
+              "snippet": "<div style={{ display: \"flex\", alignItems: \"center\", gap: \"0.5rem\" }}>"
+            }
+          ],
+          "implementation_details": "27 instances. Breakdown: layout flex/gap (12), spacing margins/padding (6), conditional colors (5), CSS variable injection (4). The CSS variable injection pattern (style={{ '--q-color': quality.color }}) is legitimate for dynamic theming; the rest should be CSS classes."
+        }
+      ],
+      "analysis": "The project has a well-structured CSS system with custom properties and utility classes, but 7 views bypass it with inline styles. Most are for common layout patterns (flex row with gap, flex wrap) that appear repeatedly across views. Creating new objects on every render is a minor perf concern but mainly it's a consistency issue — some views are pure CSS classes, others mix in inline styles. CSS variable injection via inline style is the correct React pattern for dynamic theming and should not change.",
+      "recommendation": "Add utility classes to index.css for repeated patterns: .flex-row (display:flex; align-items:center; gap:0.5rem), .flex-wrap (display:flex; flex-wrap:wrap; gap:0.25rem), .score-critical (color:var(--critical); font-weight:600), .score-high (color:var(--high); font-weight:600). Keep CSS variable injection inline. This eliminates ~20 of 27 inline styles.",
+      "evidence_quality": "high",
+      "status": "pending"
+    },
+    {
+      "id": "backend-route-error-handling",
+      "name": "Backend API Route Error Handling",
+      "type": "behavioral",
+      "description": "API routes use 3 different strategies for missing data: strict 404 via get_active_run_id(), graceful fallback via get_latest_run() or empty string, and unguarded path parameter access that could produce raw 500 errors.",
+      "impact": "LOW",
+      "total_files": 1,
+      "variants": [
+        {
+          "name": "strict-404",
+          "description": "Routes call get_active_run_id() which raises ApiError(404) if no active run exists",
+          "file_count": 1,
+          "files": ["backend/src/svap/api.py"],
+          "sample_file": "backend/src/svap/api.py",
+          "code_excerpts": [
+            {
+              "file": "backend/src/svap/api.py",
+              "start_line": 113,
+              "end_line": 120,
+              "snippet": "def get_active_run_id(storage):\n    run_id = storage.get_latest_run()\n    if not run_id:\n        raise ApiError(404, \"No active pipeline run\")\n    return run_id"
+            }
+          ],
+          "implementation_details": "Used by /api/status and resource-specific endpoints. Correct for endpoints that require an active run."
+        },
+        {
+          "name": "graceful-fallback",
+          "description": "Routes use get_latest_run() or empty string — returns empty/default data instead of 404",
+          "file_count": 1,
+          "files": ["backend/src/svap/api.py"],
+          "sample_file": "backend/src/svap/api.py",
+          "code_excerpts": [
+            {
+              "file": "backend/src/svap/api.py",
+              "start_line": 1,
+              "end_line": 5,
+              "snippet": "def _dashboard(event):\n    storage = get_storage()\n    run_id = storage.get_latest_run() or \"\"\n    return get_dashboard_data(storage, run_id)"
+            }
+          ],
+          "implementation_details": "Used by /api/dashboard. Correct for the dashboard which should render even with no runs."
+        },
+        {
+          "name": "unguarded-path-params",
+          "description": "Direct event['pathParameters']['param'] access without .get() fallback",
+          "file_count": 1,
+          "files": ["backend/src/svap/api.py"],
+          "sample_file": "backend/src/svap/api.py",
+          "code_excerpts": [
+            {
+              "file": "backend/src/svap/api.py",
+              "start_line": 1,
+              "end_line": 3,
+              "snippet": "def _get_case(event):\n    case_id = event[\"pathParameters\"][\"case_id\"]  # Could KeyError"
+            }
+          ],
+          "implementation_details": "If API Gateway malforms the event, this raises KeyError which becomes a raw 500 instead of ApiError(400). Should use .get() with a guard."
+        }
+      ],
+      "behavior_matrix": {
+        "_status": {"missing_run": "ApiError(404)", "path_params": "n/a"},
+        "_dashboard": {"missing_run": "empty data", "path_params": "n/a"},
+        "_get_case": {"missing_run": "n/a", "path_params": "direct dict access (KeyError risk)"}
+      },
+      "analysis": "The strict-404 vs graceful-fallback distinction is intentional and correct — the dashboard should work without runs, but /api/status should not. The actual bug is the unguarded path parameter access which could produce a raw 500 error instead of a proper 400. This is LOW impact because API Gateway validates path parameters before the Lambda runs, so the KeyError would only occur with a malformed test event.",
+      "recommendation": "Add a _path_param(event, name) helper that extracts with .get() and raises ApiError(400) on missing. Use it in all path-parameterized routes.",
+      "evidence_quality": "high",
+      "status": "pending"
+    },
+    {
+      "id": "frontend-auth-token-access",
+      "name": "Frontend Auth Token Access",
+      "type": "structural",
+      "description": "ManagementView builds its own auth headers helper and calls fetch() directly, while all other views use the Zustand store's apiGet/apiPost which handle auth centrally.",
+      "impact": "LOW",
+      "total_files": 2,
+      "variants": [
+        {
+          "name": "store-centralized-auth",
+          "description": "API calls go through pipelineStore's apiGet()/apiPost() which handle Authorization header",
+          "file_count": 11,
+          "files": ["frontend/src/data/pipelineStore.ts:38-49"],
+          "sample_file": "frontend/src/data/pipelineStore.ts",
+          "code_excerpts": [
+            {
+              "file": "frontend/src/data/pipelineStore.ts",
+              "start_line": 38,
+              "end_line": 49,
+              "snippet": "async function apiPost(path: string, body?: unknown): Promise<unknown> {\n  const token = await getToken();\n  const headers: Record<string, string> = {};\n  if (body !== undefined) headers[\"Content-Type\"] = \"application/json\";\n  if (token) headers[\"Authorization\"] = `Bearer ${token}`;\n  // ...\n}"
+            }
+          ],
+          "implementation_details": "apiGet and apiPost are module-scoped functions in pipelineStore.ts. They handle token retrieval, header construction, and JSON parsing. All store actions use these."
+        },
+        {
+          "name": "direct-fetch-with-local-auth",
+          "description": "ManagementView creates its own authHeaders() helper and calls fetch() directly",
+          "file_count": 1,
+          "files": ["frontend/src/views/ManagementView.tsx:90-93"],
+          "sample_file": "frontend/src/views/ManagementView.tsx",
+          "code_excerpts": [
+            {
+              "file": "frontend/src/views/ManagementView.tsx",
+              "start_line": 90,
+              "end_line": 93,
+              "snippet": "const authHeaders = async (): Promise<Record<string, string>> => {\n  const token = await getToken();\n  return token ? { Authorization: `Bearer ${token}` } : {};\n};"
+            }
+          ],
+          "implementation_details": "Used for management-specific endpoints (/api/management/executions, /api/management/runs, stop/delete actions) that aren't wired through the Zustand store."
+        }
+      ],
+      "analysis": "ManagementView accesses admin endpoints that don't fit the pipeline store's data model (executions, run management). Rather than adding these to the store, it built its own fetch+auth layer. This is pragmatic but creates a second auth code path. If token refresh logic changes in pipelineStore, ManagementView's authHeaders() would need a parallel update.",
+      "recommendation": "Extract apiGet/apiPost from pipelineStore.ts into a standalone api.ts utility module. Both the store and ManagementView import from this shared module. Interface: export async function apiGet(path: string): Promise<unknown>; export async function apiPost(path: string, body?: unknown): Promise<unknown>;",
+      "evidence_quality": "high",
+      "status": "pending"
+    }
+  ]
+}
