@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from "react";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, GitBranch } from "lucide-react";
 import { usePipelineStore } from "../data/pipelineStore";
 import { QualityTags, ScoreBar, Badge } from "../components/SharedUI";
-import type { Prediction } from "../types";
+import type { ExploitationTree, ExploitationStep } from "../types";
 
 const difficultyLevel = (d?: string): "critical" | "high" | "medium" | "neutral" => {
   if (!d) return "neutral";
@@ -12,65 +12,146 @@ const difficultyLevel = (d?: string): "critical" | "high" | "medium" | "neutral"
   return "medium";
 };
 
-function PredictionCard({
-  pred,
+function StepNode({
+  step,
+  depth,
   isExpanded,
-  onToggleId,
+  onToggle,
 }: {
-  pred: Prediction;
+  step: ExploitationStep;
+  depth: number;
   isExpanded: boolean;
-  onToggleId: (id: string) => void;
+  onToggle: (id: string) => void;
 }) {
+  const hasDetail = step.description || step.actor_action || step.enabling_qualities?.length > 0;
+  return (
+    <div className="tree-step" style={{ paddingLeft: `${depth * 24 + 8}px` }}>
+      <div
+        className={`tree-step-content${hasDetail ? " clickable" : ""}`}
+        role={hasDetail ? "button" : undefined}
+        tabIndex={hasDetail ? 0 : undefined}
+        onClick={hasDetail ? () => onToggle(step.step_id) : undefined}
+        onKeyDown={hasDetail ? (e) => {
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onToggle(step.step_id); }
+        } : undefined}
+      >
+        <div className="tree-step-header">
+          <span className="tree-step-order">{step.step_order}</span>
+          <span className="tree-step-title">{step.title}</span>
+          {step.is_branch_point && (
+            <span className="tree-branch-badge">
+              <GitBranch size={12} /> branch
+            </span>
+          )}
+          {step.branch_label && (
+            <Badge level="neutral">{step.branch_label}</Badge>
+          )}
+          {step.enabling_qualities?.length > 0 && !isExpanded && (
+            <span className="tree-step-qual-count">
+              {step.enabling_qualities.length}q
+            </span>
+          )}
+        </div>
+        {isExpanded && (
+          <div className="tree-step-detail">
+            {step.description && (
+              <div className="tree-step-desc">{step.description}</div>
+            )}
+            {step.actor_action && (
+              <div className="tree-step-actor">{step.actor_action}</div>
+            )}
+            {step.enabling_qualities?.length > 0 && (
+              <div className="tree-step-qualities">
+                <QualityTags ids={step.enabling_qualities} />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function buildStepTree(steps: ExploitationStep[]): { step: ExploitationStep; depth: number }[] {
+  const result: { step: ExploitationStep; depth: number }[] = [];
+  const depthMap = new Map<string, number>();
+
+  for (const step of steps) {
+    const parentDepth = step.parent_step_id ? (depthMap.get(step.parent_step_id) ?? 0) : 0;
+    const depth = step.parent_step_id ? parentDepth + 1 : 0;
+    depthMap.set(step.step_id, depth);
+    result.push({ step, depth });
+  }
+  return result;
+}
+
+function TreeCard({
+  tree,
+  isExpanded,
+  onToggle,
+}: {
+  tree: ExploitationTree;
+  isExpanded: boolean;
+  onToggle: (id: string) => void;
+}) {
+  const stepTree = buildStepTree(tree.steps || []);
+  const branchCount = (tree.steps || []).filter((s) => s.is_branch_point).length;
+  const [expandedStep, setExpandedStep] = useState<string | null>(null);
+  const toggleStep = useCallback(
+    (id: string) => setExpandedStep((prev) => (prev === id ? null : id)),
+    [],
+  );
+
   return (
     <div className="panel stagger-in">
       <div
         className="panel-header clickable"
         role="button"
         tabIndex={0}
-        onClick={() => onToggleId(pred.prediction_id)}
+        onClick={() => onToggle(tree.tree_id)}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            onToggleId(pred.prediction_id);
+            onToggle(tree.tree_id);
           }
         }}
       >
         <div className="prediction-header-left">
           {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-          <div>
-            <h3 className="prediction-policy-name">{pred.policy_name}</h3>
-            <div className="prediction-lifecycle-stage">
-              {pred.lifecycle_stage}
-            </div>
-          </div>
+          <h3 className="prediction-policy-name">{tree.policy_name}</h3>
         </div>
         <div className="prediction-header-right">
-          <ScoreBar score={pred.convergence_score} threshold={3} />
-          <Badge level={difficultyLevel(pred.detection_difficulty)}>
-            {pred.detection_difficulty?.split("\u2014")[0]?.trim() || "Unknown"}
+          <ScoreBar score={tree.convergence_score} threshold={3} />
+          <Badge level={difficultyLevel(tree.detection_difficulty)}>
+            {tree.detection_difficulty?.split("\u2014")[0]?.trim() || "Unknown"}
           </Badge>
+          <span className="tree-header-stat">{tree.step_count} steps</span>
+          {branchCount > 0 && (
+            <span className="tree-header-stat">{branchCount} branches</span>
+          )}
         </div>
       </div>
 
       {isExpanded && (
         <div className="panel-body panel-body-bordered">
-          <div className="detail-grid-wide">
-            <div>
-              <div className="detail-label">Predicted Exploitation Mechanics</div>
-              <div className="prediction-detail-text">{pred.mechanics}</div>
-            </div>
-            <div>
-              <div className="detail-label">Enabling Qualities</div>
-              <div className="mb-3">
-                <QualityTags ids={pred.enabling_qualities} />
-              </div>
-              <div className="detail-label">Actor Profile</div>
-              <div className="prediction-detail-text">{pred.actor_profile}</div>
-              <div className="detail-label">Detection Difficulty</div>
-              <div className="prediction-detail-text">
-                {pred.detection_difficulty}
-              </div>
-            </div>
+          <div className="tree-meta-row">
+            <span className="tree-meta-item">
+              <span className="tree-meta-label">Actor</span> {tree.actor_profile}
+            </span>
+            <span className="tree-meta-item">
+              <span className="tree-meta-label">Lifecycle</span> {tree.lifecycle_stage}
+            </span>
+          </div>
+          <div className="tree-steps">
+            {stepTree.map(({ step, depth }) => (
+              <StepNode
+                key={step.step_id}
+                step={step}
+                depth={depth}
+                isExpanded={expandedStep === step.step_id}
+                onToggle={toggleStep}
+              />
+            ))}
           </div>
         </div>
       )}
@@ -79,26 +160,29 @@ function PredictionCard({
 }
 
 export default function PredictionView() {
-  const predictions = usePipelineStore((s) => s.predictions);
-  const [expandedPred, setExpandedPred] = useState<string | null>(null);
-  const togglePred = useCallback((id: string) => setExpandedPred((prev) => (prev === id ? null : id)), []);
+  const trees = usePipelineStore((s) => s.exploitation_trees);
+  const [expandedTree, setExpandedTree] = useState<string | null>(null);
+  const toggle = useCallback(
+    (id: string) => setExpandedTree((prev) => (prev === id ? null : id)),
+    [],
+  );
 
   return (
     <div>
       <div className="view-header stagger-in">
-        <h2>Exploitation Predictions</h2>
+        <h2>Exploitation Trees</h2>
         <div className="view-desc">
-          Structurally-entailed predictions for {predictions.length} high-risk policies — every prediction cites
-          specific enabling qualities
+          {trees.length} exploitation trees — each models a branching attack pathway for a
+          high-risk policy, with steps linked to enabling qualities
         </div>
       </div>
 
-      {predictions.map((pred) => (
-        <PredictionCard
-          key={pred.prediction_id}
-          pred={pred}
-          isExpanded={expandedPred === pred.prediction_id}
-          onToggleId={togglePred}
+      {trees.map((tree) => (
+        <TreeCard
+          key={tree.tree_id}
+          tree={tree}
+          isExpanded={expandedTree === tree.tree_id}
+          onToggle={toggle}
         />
       ))}
     </div>

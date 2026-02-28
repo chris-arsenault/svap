@@ -231,6 +231,75 @@ def delete_corpus(conn, dry_run=False):
     print("\nDone. Full corpus reset complete.")
 
 
+STAGES56_TABLES = [
+    "detection_patterns",
+    "step_qualities",
+    "exploitation_steps",
+    "exploitation_trees",
+    "predictions",
+    "prediction_qualities",
+]
+
+
+def _count_stage_logs(conn, stages):
+    """Count stage_log and stage_processing_log rows for given stages."""
+    with conn.cursor() as cur:
+        cur.execute("SELECT COUNT(*) FROM stage_log WHERE stage = ANY(%s)", (stages,))
+        sl = cur.fetchone()[0]
+        cur.execute("SELECT COUNT(*) FROM stage_processing_log WHERE stage = ANY(%s)", (stages,))
+        pl = cur.fetchone()[0]
+    return sl, pl
+
+
+def _delete_stage_logs(conn, stages):
+    """Delete stage_log and stage_processing_log rows for given stages."""
+    with conn.cursor() as cur:
+        cur.execute("DELETE FROM stage_log WHERE stage = ANY(%s)", (stages,))
+        sl = cur.rowcount
+        cur.execute("DELETE FROM stage_processing_log WHERE stage = ANY(%s)", (stages,))
+        pl = cur.rowcount
+    return sl, pl
+
+
+def delete_stages56(conn, dry_run=False):
+    """Delete exploitation trees, steps, detection patterns, and stage 5/6 log entries.
+
+    This lets you rerun stages 5-6 without redoing stages 0-4.
+    """
+    stages = [5, 6]
+    counts = _count_tables(conn, STAGES56_TABLES)
+    sl_count, pl_count = _count_stage_logs(conn, stages)
+
+    total = sum(counts.values()) + sl_count + pl_count
+    if total == 0:
+        print("No stage 5/6 data to delete.")
+        return
+
+    print(f"\n{'Table':<30} {'Rows':>8}")
+    print("-" * 40)
+    for table in STAGES56_TABLES:
+        if counts[table] > 0:
+            print(f"  {table:<28} {counts[table]:>8}")
+    if sl_count:
+        print(f"  {'stage_log (stages 5-6)':<28} {sl_count:>8}")
+    if pl_count:
+        print(f"  {'stage_processing_log (5-6)':<28} {pl_count:>8}")
+    print(f"  {'TOTAL':<28} {total:>8}")
+
+    if dry_run:
+        print("\n[DRY RUN] No data was deleted.")
+        return
+
+    with conn.cursor() as cur:
+        for table in STAGES56_TABLES:
+            if counts[table] > 0:
+                cur.execute(f"TRUNCATE {table} CASCADE")
+                print(f"  Truncated {table} ({counts[table]} rows)")
+    _delete_stage_logs(conn, stages)
+    conn.commit()
+    print("\nDone. Stages 5-6 data cleared — ready to rerun.")
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Reset pipeline data. Use --all for runs only, --corpus for everything.",
@@ -241,11 +310,13 @@ def main():
     group.add_argument("--prefix", help="Delete runs matching a prefix")
     group.add_argument("--all", action="store_true", help="Delete ALL per-run data (keeps corpus)")
     group.add_argument("--corpus", action="store_true", help="Full reset: wipe corpus + all runs")
+    group.add_argument("--stages56", action="store_true",
+                       help="Clear exploitation trees, detection patterns, and stage 5/6 logs")
     parser.add_argument("--dry-run", action="store_true", help="Show what would be deleted")
 
     args = parser.parse_args()
 
-    if not any([args.list, args.run_id, args.prefix, args.all, args.corpus]):
+    if not any([args.list, args.run_id, args.prefix, args.all, args.corpus, args.stages56]):
         parser.print_help()
         return
 
@@ -254,6 +325,10 @@ def main():
     try:
         if args.list:
             list_runs(conn)
+            return
+
+        if args.stages56:
+            delete_stages56(conn, dry_run=args.dry_run)
             return
 
         if args.corpus:

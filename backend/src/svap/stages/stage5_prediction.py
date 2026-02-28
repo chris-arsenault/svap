@@ -1,15 +1,15 @@
 """
-Stage 5: Exploitation Prediction
+Stage 5: Exploitation Tree Generation
 
-For each high-scoring policy from Stage 4, generates specific predictions about
-what exploitation would look like. Predictions are constrained to be structurally
-entailed by the vulnerability qualities present — not free-form speculation.
+For each high-scoring policy from Stage 4, generates a structured exploitation
+tree showing all plausible exploitation paths. Trees have shared early steps
+that branch into divergent exploitation paths, each citing enabling qualities.
 
 HUMAN GATE: This stage ends in 'pending_review' status. SMEs must validate
-that predictions are structurally sound before detection resources are allocated.
+that trees are structurally sound before detection resources are allocated.
 
 Input:  Scored policies (Stage 4) + Taxonomy + Calibration threshold
-Output: Exploitation predictions in the `predictions` table
+Output: Exploitation trees in `exploitation_trees` + `exploitation_steps` tables
 """
 
 import hashlib
@@ -19,14 +19,14 @@ from svap import delta
 from svap.bedrock_client import BedrockClient
 from svap.storage import SVAPStorage
 
-SYSTEM_PROMPT = """You are a structural analyst predicting exploitation patterns. You NEVER
-speculate freely. Every prediction must be CAUSED by a specific vulnerability quality or
+SYSTEM_PROMPT = """You are a structural analyst building exploitation decision trees. You NEVER
+speculate freely. Every step must be CAUSED by a specific vulnerability quality or
 combination of qualities present in the policy. If you cannot cite which structural quality
-enables a predicted behavior, do not include it.
+enables a step, do not include it.
 
-Think like an adversary who has studied this policy's structural properties and is designing
-an exploitation scheme that takes maximum advantage of each vulnerability quality. The most
-dangerous schemes exploit the INTERACTION between multiple qualities, not just individual ones."""
+Think like an adversary mapping all viable exploitation paths through this policy's structural
+properties. The most dangerous paths exploit the INTERACTION between multiple qualities. Shared
+setup steps appear once; distinct exploitation mechanisms branch into separate paths."""
 
 
 def _build_policy_profiles(policy_scores):
@@ -77,35 +77,59 @@ def _invoke_llm(client, prompt):
     return client.invoke_json(prompt, system=SYSTEM_PROMPT, temperature=0.3, max_tokens=4096)
 
 
-def _store_predictions(storage, run_id, policy_id, profile, result):
-    """Parse LLM result and write predictions to DB. Returns count."""
-    predictions = result if isinstance(result, list) else result.get("predictions", [result])
-    count = 0
-    for i, pred_data in enumerate(predictions):
-        pred_id = hashlib.sha256(
-            f"{policy_id}:pred:{i}".encode()
-        ).hexdigest()[:12]
+def _store_tree(storage, run_id, policy_id, profile, result):
+    """Parse LLM result and write exploitation tree + steps to DB. Returns step count."""
+    tree_id = hashlib.sha256(policy_id.encode()).hexdigest()[:12]
+    tree = {
+        "tree_id": tree_id,
+        "policy_id": policy_id,
+        "convergence_score": profile["count"],
+        "actor_profile": result.get("actor_profile", ""),
+        "lifecycle_stage": result.get("lifecycle_stage", ""),
+        "detection_difficulty": result.get("detection_difficulty", ""),
+    }
+    storage.insert_exploitation_tree(run_id, tree)
 
-        pred = {
-            "prediction_id": pred_id,
-            "policy_id": policy_id,
-            "convergence_score": profile["count"],
-            "mechanics": pred_data.get("mechanics", ""),
-            "enabling_qualities": pred_data.get("enabling_qualities", profile["qualities"]),
-            "actor_profile": pred_data.get("actor_profile", ""),
-            "lifecycle_stage": pred_data.get("lifecycle_stage", ""),
-            "detection_difficulty": pred_data.get("detection_difficulty", ""),
+    steps = result.get("steps", [])
+    if not steps:
+        return 0
+
+    order_to_id = {}
+    for step_data in steps:
+        order = step_data["step_order"]
+        step_id = hashlib.sha256(
+            f"{policy_id}:step:{order}:{step_data['title'][:50]}".encode()
+        ).hexdigest()[:12]
+        order_to_id[order] = step_id
+
+        parent_order = step_data.get("parent_step_order")
+        parent_id = order_to_id.get(parent_order) if parent_order else None
+        if parent_order and parent_id is None:
+            print(f"    WARNING: step {order} references parent_step_order={parent_order} "
+                  f"which hasn't been seen yet — treating as root")
+
+        step = {
+            "step_id": step_id,
+            "tree_id": tree_id,
+            "parent_step_id": parent_id,
+            "step_order": order,
+            "title": step_data["title"],
+            "description": step_data.get("description", ""),
+            "actor_action": step_data.get("actor_action", ""),
+            "is_branch_point": step_data.get("is_branch_point", False),
+            "branch_label": step_data.get("branch_label"),
         }
-        storage.insert_prediction(run_id, pred)
-        count += 1
-    return count
+        qualities = step_data.get("enabling_qualities", [])
+        storage.insert_exploitation_step(step, qualities)
+
+    return len(steps)
 
 
 def _run_parallel_predictions(storage, client, run_id, jobs, max_concurrency):
-    """Execute LLM calls in parallel and store results. Returns (total, failed)."""
+    """Execute LLM calls in parallel and store results. Returns (total_steps, failed)."""
     print(f"  Submitting {len(jobs)} parallel Bedrock calls (concurrency={max_concurrency})...")
 
-    total_predictions = 0
+    total_steps = 0
     failed_policies = []
     with ThreadPoolExecutor(max_workers=max_concurrency) as executor:
         future_to_policy = {
@@ -116,23 +140,23 @@ def _run_parallel_predictions(storage, client, run_id, jobs, max_concurrency):
             policy_id, profile, h = future_to_policy[future]
             try:
                 result = future.result()
-                count = _store_predictions(storage, run_id, policy_id, profile, result)
+                count = _store_tree(storage, run_id, policy_id, profile, result)
                 storage.record_processing(5, policy_id, h, run_id)
-                total_predictions += count
-                print(f"    {profile['name']}: {count} predictions (total: {total_predictions})")
+                total_steps += count
+                print(f"    {profile['name']}: {count} steps (total: {total_steps})")
             except Exception as e:
                 print(f"    FAILED {profile['name']}: {e}")
                 failed_policies.append(policy_id)
 
     if failed_policies:
-        print(f"\n  WARNING: {len(failed_policies)} policies failed prediction generation")
+        print(f"\n  WARNING: {len(failed_policies)} policies failed tree generation")
 
-    return total_predictions, failed_policies
+    return total_steps, failed_policies
 
 
 def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
-    """Execute Stage 5: Generate exploitation predictions for high-scoring policies."""
-    print("Stage 5: Exploitation Prediction")
+    """Execute Stage 5: Generate exploitation trees for high-scoring policies."""
+    print("Stage 5: Exploitation Tree Generation")
     storage.log_stage_start(run_id, 5)
 
     try:
@@ -150,10 +174,10 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
 
         if not high_risk:
             print(f"  No policies scored at or above threshold ({threshold}).")
-            storage.log_stage_complete(run_id, 5, {"predictions_generated": 0})
+            storage.log_stage_complete(run_id, 5, {"trees_generated": 0})
             return
 
-        # ── Delta detection ─────────────────────────────────────────
+        # -- Delta detection -----------------------------------------------
         cal_fp = delta.calibration_fingerprint(calibration)
         stored = storage.get_processing_hashes(5)
 
@@ -167,19 +191,19 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
         if not to_predict:
             print(f"  All {len(high_risk)} high-risk policies unchanged — skipping.")
             storage.log_stage_complete(run_id, 5, {
-                "predictions_generated": 0,
+                "trees_generated": 0,
                 "skipped_unchanged": len(high_risk),
             })
             return
 
         print(
             f"  {len(to_predict)}/{len(high_risk)} policies changed "
-            f"(threshold={threshold}), generating predictions..."
+            f"(threshold={threshold}), generating exploitation trees..."
         )
 
-        # ── Delete stale data BEFORE LLM calls ─────────────────────
+        # -- Delete stale data BEFORE LLM calls ----------------------------
         for policy_id, _profile, _h in to_predict:
-            storage.delete_predictions_for_policy(policy_id)
+            storage.delete_tree_for_policy(policy_id)
 
         quality_lookup = {q["quality_id"]: q for q in taxonomy}
         max_concurrency = config.get("pipeline", {}).get("max_concurrency", 5)
@@ -193,21 +217,22 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
             prompt = _build_prompt(client, policy_id, profile, policy, quality_lookup, policy_scores)
             jobs.append((policy_id, profile, h, prompt))
 
-        total_predictions, failed_policies = _run_parallel_predictions(
+        total_steps, failed_policies = _run_parallel_predictions(
             storage, client, run_id, jobs, max_concurrency,
         )
 
-        if total_predictions > 0:
+        if total_steps > 0:
             storage.log_stage_pending_review(run_id, 5)
-            print(f"\n  Stage 5 complete: {total_predictions} predictions generated.")
+            print(f"\n  Stage 5 complete: {total_steps} steps generated across {len(jobs) - len(failed_policies)} trees.")
             print("  HUMAN REVIEW REQUIRED before proceeding to Stage 6.")
             print("    Approve with: python -m svap.orchestrator approve --stage 5")
         else:
             storage.log_stage_complete(run_id, 5, {
-                "predictions_generated": 0,
+                "trees_generated": 0,
+                "steps_generated": 0,
                 "all_failed": len(failed_policies),
             })
-            print(f"\n  Stage 5 complete: no predictions generated ({len(failed_policies)} failed).")
+            print(f"\n  Stage 5 complete: no steps generated ({len(failed_policies)} failed).")
 
     except Exception as e:
         storage.log_stage_failed(run_id, 5, str(e))

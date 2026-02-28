@@ -148,7 +148,7 @@ def _migrate(conn):
 # To add a migration: append a new entry with version = SCHEMA_VERSION + 1,
 # then bump SCHEMA_VERSION to match.
 
-SCHEMA_VERSION = 5
+SCHEMA_VERSION = 6
 
 MIGRATIONS: list[tuple[int, list[str]]] = [
     # ── v1: Initial schema (all tables) ──────────────────────────────
@@ -544,6 +544,87 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
              AND qa.evidence_finding_ids != ''
            ON CONFLICT DO NOTHING""",
     ]),
+    # ── v6: Exploitation tree decomposition (replaces flat predictions) ──
+    (6, [
+        # New: exploitation trees — one per policy
+        """CREATE TABLE IF NOT EXISTS exploitation_trees (
+            tree_id             TEXT PRIMARY KEY,
+            policy_id           TEXT NOT NULL UNIQUE,
+            convergence_score   INTEGER NOT NULL,
+            actor_profile       TEXT,
+            lifecycle_stage     TEXT,
+            detection_difficulty TEXT,
+            review_status       TEXT DEFAULT 'draft'
+                CHECK(review_status IN ('draft','approved','rejected','revised')),
+            reviewer_notes      TEXT,
+            run_id              TEXT,
+            created_at          TEXT NOT NULL,
+            FOREIGN KEY (policy_id) REFERENCES policies(policy_id)
+        )""",
+        # New: exploitation steps within a tree
+        """CREATE TABLE IF NOT EXISTS exploitation_steps (
+            step_id             TEXT PRIMARY KEY,
+            tree_id             TEXT NOT NULL,
+            parent_step_id      TEXT,
+            step_order          INTEGER NOT NULL,
+            title               TEXT NOT NULL,
+            description         TEXT NOT NULL,
+            actor_action        TEXT,
+            is_branch_point     BOOLEAN DEFAULT FALSE,
+            branch_label        TEXT,
+            created_at          TEXT NOT NULL,
+            FOREIGN KEY (tree_id) REFERENCES exploitation_trees(tree_id) ON DELETE CASCADE,
+            FOREIGN KEY (parent_step_id) REFERENCES exploitation_steps(step_id) ON DELETE CASCADE
+        )""",
+        "CREATE INDEX IF NOT EXISTS idx_steps_tree ON exploitation_steps(tree_id)",
+        "CREATE INDEX IF NOT EXISTS idx_steps_parent ON exploitation_steps(parent_step_id)",
+        # New: step → quality junction
+        """CREATE TABLE IF NOT EXISTS step_qualities (
+            step_id     TEXT NOT NULL REFERENCES exploitation_steps(step_id) ON DELETE CASCADE,
+            quality_id  TEXT NOT NULL REFERENCES taxonomy(quality_id),
+            PRIMARY KEY (step_id, quality_id)
+        )""",
+        # Migrate: create tree per policy from existing predictions
+        """INSERT INTO exploitation_trees (tree_id, policy_id, convergence_score,
+               actor_profile, lifecycle_stage, detection_difficulty,
+               review_status, reviewer_notes, run_id, created_at)
+           SELECT DISTINCT ON (policy_id)
+               substring(encode(sha256(policy_id::bytea), 'hex') from 1 for 12),
+               policy_id, convergence_score, actor_profile, lifecycle_stage,
+               detection_difficulty, review_status, reviewer_notes, run_id, created_at
+           FROM predictions
+           ORDER BY policy_id, created_at DESC
+           ON CONFLICT DO NOTHING""",
+        # Migrate: predictions become flat root steps
+        """INSERT INTO exploitation_steps (step_id, tree_id, parent_step_id,
+               step_order, title, description, actor_action, created_at)
+           SELECT prediction_id,
+               substring(encode(sha256(policy_id::bytea), 'hex') from 1 for 12),
+               NULL,
+               row_number() OVER (PARTITION BY policy_id ORDER BY prediction_id),
+               'Legacy prediction (regenerate for step decomposition)',
+               mechanics, actor_profile, created_at
+           FROM predictions
+           ON CONFLICT DO NOTHING""",
+        # Migrate: prediction_qualities → step_qualities
+        """INSERT INTO step_qualities (step_id, quality_id)
+           SELECT prediction_id, quality_id FROM prediction_qualities
+           ON CONFLICT DO NOTHING""",
+        # Migrate: add step_id to detection_patterns
+        "ALTER TABLE detection_patterns ADD COLUMN IF NOT EXISTS step_id TEXT",
+        "UPDATE detection_patterns SET step_id = prediction_id WHERE step_id IS NULL",
+        # Add FK for new step_id column
+        """DO $$ BEGIN
+            ALTER TABLE detection_patterns ADD CONSTRAINT detection_patterns_step_fkey
+                FOREIGN KEY (step_id) REFERENCES exploitation_steps(step_id) ON DELETE CASCADE;
+        EXCEPTION WHEN duplicate_object THEN NULL;
+        END $$""",
+        "CREATE INDEX IF NOT EXISTS idx_patterns_step ON detection_patterns(step_id)",
+        # Drop old prediction_id FK (keep column for now — clean up in v7)
+        "ALTER TABLE detection_patterns DROP CONSTRAINT IF EXISTS detection_patterns_prediction_id_fkey",
+        # Invalidate stage 5 + 6 processing logs to force regeneration
+        "DELETE FROM stage_processing_log WHERE stage IN (5, 6)",
+    ]),
 ]
 
 
@@ -644,10 +725,9 @@ class SVAPStorage:
         self._safe_commit()
 
     def delete_predictions_for_policy(self, policy_id: str):
-        """Delete predictions + cascaded detection patterns + stage 6 log for a policy.
+        """DEPRECATED: use delete_tree_for_policy(). Remove in v7.
 
-        Uses explicit transaction for atomicity (connection is autocommit).
-        detection_patterns and prediction_qualities cascade from predictions FK.
+        Delete predictions + cascaded detection patterns + stage 6 log for a policy.
         """
         old = self.conn.autocommit
         try:
@@ -672,7 +752,7 @@ class SVAPStorage:
             self.conn.autocommit = old
 
     def delete_patterns_for_prediction(self, prediction_id: str):
-        """Delete all detection patterns for a prediction."""
+        """DEPRECATED: use delete_patterns_for_step(). Remove in v7."""
         with self.conn.cursor() as cur:
             cur.execute(
                 "DELETE FROM detection_patterns WHERE prediction_id = %s",
@@ -723,6 +803,11 @@ class SVAPStorage:
                 "UPDATE stage_log SET status='approved' WHERE run_id=%s AND stage=%s AND status='pending_review'",
                 (run_id, stage),
             )
+            # Stage 5 approval also marks exploitation trees as approved
+            if stage == 5:
+                cur.execute(
+                    "UPDATE exploitation_trees SET review_status='approved' WHERE review_status='draft'"
+                )
         self._safe_commit()
 
     def get_stage_status(self, run_id: str, stage: int) -> str | None:
@@ -743,6 +828,26 @@ class SVAPStorage:
             )
             rows = cur.fetchall()
         return [dict(r) for r in rows]
+
+    def get_corpus_counts(self) -> dict:
+        """Fast count query for change detection — no full row fetches."""
+        with self.conn.cursor() as cur:
+            cur.execute("""
+                SELECT
+                    (SELECT COUNT(*) FROM cases) AS cases,
+                    (SELECT COUNT(*) FROM taxonomy) AS taxonomy_qualities,
+                    (SELECT COUNT(*) FROM policies) AS policies,
+                    (SELECT COUNT(*) FROM exploitation_trees) AS exploitation_trees,
+                    (SELECT COUNT(*) FROM detection_patterns) AS detection_patterns
+            """)
+            row = cur.fetchone()
+        return {
+            "cases": row[0],
+            "taxonomy_qualities": row[1],
+            "policies": row[2],
+            "exploitation_trees": row[3],
+            "detection_patterns": row[4],
+        }
 
     # ── Stage 1: Cases ──────────────────────────────────────────────
 
@@ -1003,9 +1108,9 @@ class SVAPStorage:
             rows = cur.fetchall()
         return [dict(r) for r in rows]
 
-    # ── Stage 5: Predictions ────────────────────────────────────────
+    # ── Stage 5: Predictions (DEPRECATED — use exploitation tree methods) ──
 
-    def insert_prediction(self, run_id: str, pred: dict):
+    def insert_prediction(self, run_id: str, pred: dict):  # DEPRECATED: remove in v7
         qualities = pred.get("enabling_qualities", [])
         if isinstance(qualities, str):
             qualities = json.loads(qualities)
@@ -1056,7 +1161,7 @@ class SVAPStorage:
         finally:
             self.conn.autocommit = old
 
-    def get_predictions(self) -> list[dict]:
+    def get_predictions(self) -> list[dict]:  # DEPRECATED: remove in v7
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             cur.execute(
                 """SELECT pr.*, p.name as policy_name
@@ -1066,19 +1171,205 @@ class SVAPStorage:
             rows = cur.fetchall()
         return [dict(r) for r in rows]
 
+    # ── Exploitation Trees (replaces flat predictions) ──────────────
+
+    def insert_exploitation_tree(self, run_id: str, tree: dict):
+        """Insert or update an exploitation tree for a policy."""
+        with self.conn.cursor() as cur:
+            cur.execute(
+                """INSERT INTO exploitation_trees
+                (tree_id, policy_id, convergence_score, actor_profile,
+                 lifecycle_stage, detection_difficulty, review_status, run_id, created_at)
+                VALUES (%s, %s, %s, %s, %s, %s, 'draft', %s, %s)
+                ON CONFLICT (tree_id) DO UPDATE SET
+                    convergence_score = EXCLUDED.convergence_score,
+                    actor_profile = EXCLUDED.actor_profile,
+                    lifecycle_stage = EXCLUDED.lifecycle_stage,
+                    detection_difficulty = EXCLUDED.detection_difficulty,
+                    review_status = EXCLUDED.review_status,
+                    run_id = EXCLUDED.run_id,
+                    created_at = EXCLUDED.created_at""",
+                (
+                    tree["tree_id"],
+                    tree["policy_id"],
+                    tree["convergence_score"],
+                    tree.get("actor_profile"),
+                    tree.get("lifecycle_stage"),
+                    tree.get("detection_difficulty"),
+                    run_id,
+                    _now(),
+                ),
+            )
+        self._safe_commit()
+
+    def insert_exploitation_step(self, step: dict, quality_ids: list[str]):
+        """Insert a step and its quality junction rows in a transaction."""
+        old = self.conn.autocommit
+        try:
+            self.conn.autocommit = False
+            with self.conn.cursor() as cur:
+                cur.execute(
+                    """INSERT INTO exploitation_steps
+                    (step_id, tree_id, parent_step_id, step_order, title,
+                     description, actor_action, is_branch_point, branch_label, created_at)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    ON CONFLICT (step_id) DO UPDATE SET
+                        tree_id = EXCLUDED.tree_id,
+                        parent_step_id = EXCLUDED.parent_step_id,
+                        step_order = EXCLUDED.step_order,
+                        title = EXCLUDED.title,
+                        description = EXCLUDED.description,
+                        actor_action = EXCLUDED.actor_action,
+                        is_branch_point = EXCLUDED.is_branch_point,
+                        branch_label = EXCLUDED.branch_label,
+                        created_at = EXCLUDED.created_at""",
+                    (
+                        step["step_id"],
+                        step["tree_id"],
+                        step.get("parent_step_id"),
+                        step["step_order"],
+                        step["title"],
+                        step["description"],
+                        step.get("actor_action"),
+                        step.get("is_branch_point", False),
+                        step.get("branch_label"),
+                        _now(),
+                    ),
+                )
+                for qid in quality_ids:
+                    cur.execute(
+                        "INSERT INTO step_qualities (step_id, quality_id) "
+                        "VALUES (%s, %s) ON CONFLICT DO NOTHING",
+                        (step["step_id"], qid),
+                    )
+            self.conn.commit()
+        except Exception:
+            self.conn.rollback()
+            raise
+        finally:
+            self.conn.autocommit = old
+
+    def get_exploitation_trees(self, approved_only: bool = False) -> list[dict]:
+        """Get all exploitation trees with policy names and step counts."""
+        with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            where = "WHERE et.review_status = 'approved'" if approved_only else ""
+            cur.execute(
+                f"""SELECT et.*, p.name as policy_name,
+                       (SELECT count(*) FROM exploitation_steps es
+                        WHERE es.tree_id = et.tree_id) as step_count
+                   FROM exploitation_trees et
+                   JOIN policies p ON et.policy_id = p.policy_id
+                   {where}
+                   ORDER BY et.convergence_score DESC"""
+            )
+            rows = cur.fetchall()
+        return [dict(r) for r in rows]
+
+    def get_exploitation_steps(self, tree_id: str) -> list[dict]:
+        """Get all steps for a tree, ordered by step_order, with quality IDs."""
+        with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute(
+                """SELECT es.*,
+                       COALESCE(
+                           (SELECT json_agg(sq.quality_id ORDER BY sq.quality_id)
+                            FROM step_qualities sq WHERE sq.step_id = es.step_id),
+                           '[]'::json
+                       ) as enabling_qualities
+                   FROM exploitation_steps es
+                   WHERE es.tree_id = %s
+                   ORDER BY es.step_order""",
+                (tree_id,),
+            )
+            rows = cur.fetchall()
+        result = []
+        for r in rows:
+            r = dict(r)
+            # json_agg returns a JSON array, parse if string
+            if isinstance(r.get("enabling_qualities"), str):
+                r["enabling_qualities"] = json.loads(r["enabling_qualities"])
+            result.append(r)
+        return result
+
+    def get_all_exploitation_steps(self) -> list[dict]:
+        """Get all steps across all trees, with quality IDs and policy info."""
+        with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute(
+                """SELECT es.*, et.policy_id, p.name as policy_name,
+                       COALESCE(
+                           (SELECT json_agg(sq.quality_id ORDER BY sq.quality_id)
+                            FROM step_qualities sq WHERE sq.step_id = es.step_id),
+                           '[]'::json
+                       ) as enabling_qualities
+                   FROM exploitation_steps es
+                   JOIN exploitation_trees et ON es.tree_id = et.tree_id
+                   JOIN policies p ON et.policy_id = p.policy_id
+                   ORDER BY et.convergence_score DESC, es.step_order""",
+            )
+            rows = cur.fetchall()
+        result = []
+        for r in rows:
+            r = dict(r)
+            if isinstance(r.get("enabling_qualities"), str):
+                r["enabling_qualities"] = json.loads(r["enabling_qualities"])
+            result.append(r)
+        return result
+
+    def delete_tree_for_policy(self, policy_id: str):
+        """Delete a policy's exploitation tree + cascaded steps/patterns + stage 6 log.
+
+        Uses explicit transaction for atomicity (connection is autocommit).
+        exploitation_steps, step_qualities, detection_patterns cascade from FK.
+        """
+        old = self.conn.autocommit
+        try:
+            self.conn.autocommit = False
+            with self.conn.cursor() as cur:
+                # Get step IDs for stage 6 log cleanup
+                cur.execute(
+                    """SELECT es.step_id FROM exploitation_steps es
+                       JOIN exploitation_trees et ON es.tree_id = et.tree_id
+                       WHERE et.policy_id = %s""",
+                    (policy_id,),
+                )
+                step_ids = [r[0] for r in cur.fetchall()]
+                if step_ids:
+                    cur.execute(
+                        "DELETE FROM stage_processing_log WHERE stage = 6 AND entity_id = ANY(%s)",
+                        (step_ids,),
+                    )
+                cur.execute(
+                    "DELETE FROM exploitation_trees WHERE policy_id = %s",
+                    (policy_id,),
+                )
+            self.conn.commit()
+        except Exception:
+            self.conn.rollback()
+            raise
+        finally:
+            self.conn.autocommit = old
+
+    def delete_patterns_for_step(self, step_id: str):
+        """Delete all detection patterns for a step."""
+        with self.conn.cursor() as cur:
+            cur.execute(
+                "DELETE FROM detection_patterns WHERE step_id = %s",
+                (step_id,),
+            )
+        self._safe_commit()
+
     # ── Stage 6: Detection Patterns ─────────────────────────────────
 
     def insert_detection_pattern(self, run_id: str, pattern: dict):
         with self.conn.cursor() as cur:
             cur.execute(
                 """INSERT INTO detection_patterns
-                (pattern_id, run_id, prediction_id, data_source, anomaly_signal,
+                (pattern_id, run_id, step_id, data_source, anomaly_signal,
                  baseline, false_positive_risk, detection_latency, priority,
                  implementation_notes, created_at)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 ON CONFLICT (pattern_id) DO UPDATE SET
                     run_id = EXCLUDED.run_id,
-                    prediction_id = EXCLUDED.prediction_id,
+                    step_id = EXCLUDED.step_id,
                     data_source = EXCLUDED.data_source,
                     anomaly_signal = EXCLUDED.anomaly_signal,
                     baseline = EXCLUDED.baseline,
@@ -1090,7 +1381,7 @@ class SVAPStorage:
                 (
                     pattern["pattern_id"],
                     run_id,
-                    pattern["prediction_id"],
+                    pattern["step_id"],
                     pattern["data_source"],
                     pattern["anomaly_signal"],
                     pattern.get("baseline"),
@@ -1106,10 +1397,12 @@ class SVAPStorage:
     def get_detection_patterns(self) -> list[dict]:
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             cur.execute(
-                """SELECT dp.*, pr.mechanics as prediction_mechanics, p.name as policy_name
+                """SELECT dp.*, es.title as step_title, es.step_id,
+                          et.tree_id, p.name as policy_name
                    FROM detection_patterns dp
-                   JOIN predictions pr ON dp.prediction_id = pr.prediction_id
-                   JOIN policies p ON pr.policy_id = p.policy_id
+                   JOIN exploitation_steps es ON dp.step_id = es.step_id
+                   JOIN exploitation_trees et ON es.tree_id = et.tree_id
+                   JOIN policies p ON et.policy_id = p.policy_id
                    ORDER BY dp.priority, dp.detection_latency"""
             )
             rows = cur.fetchall()
@@ -1122,20 +1415,24 @@ class SVAPStorage:
 
         Returns: {
             pattern: {...},
-            prediction: {...},
+            step: {...},
+            tree: {...},
             policy: {...},
             qualities: [{quality, cases: [{case, enforcement_source}]}],
         }
         """
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-            # Pattern → prediction → policy
+            # Pattern → step → tree → policy
             cur.execute(
-                """SELECT dp.*, pr.prediction_id, pr.mechanics, pr.actor_profile,
-                          pr.detection_difficulty, pr.convergence_score,
+                """SELECT dp.*, es.step_id, es.title as step_title,
+                          es.description as step_description, es.actor_action,
+                          et.tree_id, et.actor_profile, et.detection_difficulty,
+                          et.convergence_score,
                           p.policy_id, p.name AS policy_name, p.description AS policy_description
                    FROM detection_patterns dp
-                   JOIN predictions pr ON dp.prediction_id = pr.prediction_id
-                   JOIN policies p ON pr.policy_id = p.policy_id
+                   JOIN exploitation_steps es ON dp.step_id = es.step_id
+                   JOIN exploitation_trees et ON es.tree_id = et.tree_id
+                   JOIN policies p ON et.policy_id = p.policy_id
                    WHERE dp.pattern_id = %s""",
                 (pattern_id,),
             )
@@ -1144,19 +1441,18 @@ class SVAPStorage:
                 return None
             row = dict(row)
 
-            # Qualities via junction table
+            # Qualities via step junction table
             cur.execute(
                 """SELECT t.quality_id, t.name, t.definition, t.recognition_test
-                   FROM prediction_qualities pq
-                   JOIN taxonomy t ON pq.quality_id = t.quality_id
-                   WHERE pq.prediction_id = %s
+                   FROM step_qualities sq
+                   JOIN taxonomy t ON sq.quality_id = t.quality_id
+                   WHERE sq.step_id = %s
                    ORDER BY t.quality_id""",
-                (row["prediction_id"],),
+                (row["step_id"],),
             )
             qualities = []
             for q in cur.fetchall():
                 q = dict(q)
-                # Cases where this quality was observed
                 cur.execute(
                     """SELECT c.case_id, c.case_name, c.exploited_policy,
                               c.scheme_mechanics, c.source_doc_id,
@@ -1179,9 +1475,14 @@ class SVAPStorage:
                     "baseline": row["baseline"],
                     "priority": row["priority"],
                 },
-                "prediction": {
-                    "prediction_id": row["prediction_id"],
-                    "mechanics": row["mechanics"],
+                "step": {
+                    "step_id": row["step_id"],
+                    "title": row["step_title"],
+                    "description": row["step_description"],
+                    "actor_action": row["actor_action"],
+                },
+                "tree": {
+                    "tree_id": row["tree_id"],
                     "actor_profile": row["actor_profile"],
                     "detection_difficulty": row["detection_difficulty"],
                     "convergence_score": row["convergence_score"],

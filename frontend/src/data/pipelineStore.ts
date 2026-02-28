@@ -63,6 +63,24 @@ function buildQualityMap(taxonomy: Quality[]): Record<string, Quality> {
   return map;
 }
 
+/** Compare slices by JSON.stringify — returns only changed keys, or null if nothing changed. */
+function changedSlices(
+  current: PipelineStore,
+  incoming: Partial<PipelineStore>,
+): Partial<PipelineStore> | null {
+  const diff: Partial<PipelineStore> = {};
+  let changed = false;
+  for (const key of Object.keys(incoming)) {
+    const k = key as keyof PipelineStore;
+    if (JSON.stringify(current[k]) !== JSON.stringify(incoming[k])) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (diff as any)[k] = incoming[k];
+      changed = true;
+    }
+  }
+  return changed ? diff : null;
+}
+
 // ── Store shape ──────────────────────────────────────────────────────────
 
 export interface PipelineStore {
@@ -75,7 +93,7 @@ export interface PipelineStore {
   cases: FallbackData["cases"];
   taxonomy: FallbackData["taxonomy"];
   policies: FallbackData["policies"];
-  predictions: FallbackData["predictions"];
+  exploitation_trees: FallbackData["exploitation_trees"];
   detection_patterns: FallbackData["detection_patterns"];
   case_convergence: unknown[];
   policy_convergence: unknown[];
@@ -140,16 +158,18 @@ export const usePipelineStore = create<PipelineStore>((set, get) => {
       const apiData: FallbackData = await res.json();
       const pipeline_status = deduplicatePipelineStatus(apiData.pipeline_status || []);
       const taxonomy = apiData.taxonomy || [];
-      set({
+
+      // Build incoming data, then only set slices that actually changed
+      const incoming = {
         run_id: apiData.run_id,
-        source: "api",
+        source: "api" as const,
         pipeline_status,
         counts: apiData.counts,
         calibration: apiData.calibration,
         cases: apiData.cases || [],
         taxonomy,
         policies: apiData.policies || [],
-        predictions: apiData.predictions || [],
+        exploitation_trees: apiData.exploitation_trees || [],
         detection_patterns: apiData.detection_patterns || [],
         case_convergence: apiData.case_convergence || [],
         policy_convergence: apiData.policy_convergence || [],
@@ -159,9 +179,10 @@ export const usePipelineStore = create<PipelineStore>((set, get) => {
         scanned_programs: apiData.scanned_programs || [],
         threshold: apiData.calibration?.threshold ?? 3,
         qualityMap: buildQualityMap(taxonomy),
-        apiAvailable: true,
-        loading: false,
-      });
+      };
+      const diff = changedSlices(get(), incoming);
+      // Always set status flags; only set data slices if something changed
+      set({ apiAvailable: true, loading: false, ...(diff || {}) });
     } catch (err) {
       const message = (err as Error).message || "Unknown error";
       console.error("SVAP API unreachable:", message);
@@ -187,12 +208,12 @@ export const usePipelineStore = create<PipelineStore>((set, get) => {
     run_id: "",
     source: "api",
     pipeline_status: [],
-    counts: { cases: 0, taxonomy_qualities: 0, policies: 0, predictions: 0, detection_patterns: 0 },
+    counts: { cases: 0, taxonomy_qualities: 0, policies: 0, exploitation_trees: 0, detection_patterns: 0 },
     calibration: { threshold: 3 },
     cases: [],
     taxonomy: [],
     policies: [],
-    predictions: [],
+    exploitation_trees: [],
     detection_patterns: [],
     case_convergence: [],
     policy_convergence: [],
@@ -229,7 +250,10 @@ export const usePipelineStore = create<PipelineStore>((set, get) => {
     refresh: fetchDashboard,
 
     updatePipelineStatus: (stages: PipelineStageStatus[]) => {
-      set({ pipeline_status: deduplicatePipelineStatus(stages) });
+      const incoming = deduplicatePipelineStatus(stages);
+      if (JSON.stringify(get().pipeline_status) !== JSON.stringify(incoming)) {
+        set({ pipeline_status: incoming });
+      }
     },
 
     runPipeline: async () => {
@@ -346,13 +370,15 @@ export const usePipelineStore = create<PipelineStore>((set, get) => {
     fetchFindings: async (policyId: string) => {
       const res = await apiGet(`/research/findings/${policyId}`);
       if (!res.ok) return [];
-      return res.json();
+      const data = await res.json();
+      return data.findings || [];
     },
 
     fetchAssessments: async (policyId: string) => {
       const res = await apiGet(`/research/assessments/${policyId}`);
       if (!res.ok) return [];
-      return res.json();
+      const data = await res.json();
+      return data.assessments || [];
     },
   };
 });

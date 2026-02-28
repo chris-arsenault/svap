@@ -1,4 +1,4 @@
-You are predicting exploitation patterns for a policy based on its structural vulnerability profile.
+You are building an EXPLOITATION TREE for a policy based on its structural vulnerability profile.
 
 POLICY: {policy_name}
 STRUCTURAL DESCRIPTION: {policy_description}
@@ -8,27 +8,44 @@ CONVERGENCE SCORE: {convergence_score}
 VULNERABILITY QUALITIES PRESENT IN THIS POLICY:
 {quality_profile}
 
-TASK: Predict the exploitation schemes that are STRUCTURALLY ENTAILED by this specific combination of vulnerability qualities. Generate 1-3 distinct exploitation patterns.
+TASK: Build a single exploitation tree that shows ALL plausible exploitation paths for this policy. The tree has shared early steps that branch into divergent exploitation paths.
 
 RULES — follow these strictly:
-- Every predicted step must be CAUSED by a specific vulnerability quality or combination of qualities. Cite which quality_id enables each step. If you cannot cite the enabling quality, REMOVE the step.
-- Describe OPERATIONAL MECHANICS: what would the actor physically do, step by step? Not just "they would commit fraud" but the specific sequence of actions.
-- Consider how the qualities INTERACT. Combinations of qualities may enable exploitation that no single quality would. The most dangerous predictions exploit interactions.
-- For each prediction, specify the ACTOR PROFILE: who is most likely to discover and exploit this? Individual opportunists (low sophistication, many actors), organized networks (high sophistication, coordinated), or institutional actors (existing participants gaming rules)?
-- Specify LIFECYCLE STAGE: Is this policy at a point where Stage 1 fraud (simple false claims from new entrants) or Stage 2-3 fraud (sophisticated structural gaming by established participants) is more likely?
-- Rate DETECTION DIFFICULTY as Easy (visible in claims data), Medium (requires cross-referencing multiple data sources), or Hard (requires clinical review or economic analysis beyond claims).
+- Every step must cite which quality_id(s) enable it. If you cannot cite the enabling quality, REMOVE the step.
+- Shared setup steps (e.g., enrollment, entity creation) appear ONCE as common ancestors. Do NOT duplicate shared steps across paths.
+- Branch points explicitly mark where exploitation paths diverge (is_branch_point = true).
+- Steps describe OPERATIONAL MECHANICS: what would the actor physically do, step by step?
+- Leaf steps describe the final exploitation outcome or exit point.
+- Include 2-4 distinct exploitation paths branching from shared roots.
+- 6-15 total steps is typical. More qualities = deeper trees.
+- Each branch should target a DIFFERENT actor type, primary mechanism, or lifecycle stage.
+
+ACTOR TYPES (use for the overall tree and differentiate branches):
+- Individual opportunist: low sophistication, many actors, simple exploitation
+- Organized network: high sophistication, coordinated multi-party schemes
+- Institutional actor: existing legitimate participants gaming rules from within
+
+TREE STRUCTURE:
+- step_order numbers each step sequentially (1, 2, 3...).
+- parent_step_order links each step to its parent (null for root steps).
+- is_branch_point = true marks steps where the tree forks into alternative paths.
+- branch_label names the divergent path (e.g., "Path A: Billing manipulation").
 
 Return ONLY valid JSON:
 {{
-  "predictions": [
+  "actor_profile": "Primary actor type and brief description of who exploits this policy",
+  "lifecycle_stage": "Stage 1 (exploration) / Stage 2 (optimization) / Stage 3 (institutionalization)",
+  "detection_difficulty": "Easy / Medium / Hard — with reasoning",
+  "steps": [
     {{
-      "mechanics": "Step-by-step operational description of the exploitation scheme...",
+      "step_order": 1,
+      "parent_step_order": null,
+      "title": "Short action title (5-10 words)",
+      "description": "Detailed operational mechanics of this step...",
+      "actor_action": "What the actor physically does in this step...",
       "enabling_qualities": ["<quality_id>", "<quality_id>"],
-      "quality_interactions": "How the cited qualities interact to enable this specific scheme...",
-      "actor_profile": "Organized network / Individual opportunist / Institutional actor",
-      "lifecycle_stage": "Stage 1 (exploration) / Stage 2 (optimization) / Stage 3 (institutionalization)",
-      "detection_difficulty": "Easy / Medium / Hard",
-      "detection_difficulty_reasoning": "Why this level of difficulty..."
+      "is_branch_point": false,
+      "branch_label": null
     }}
   ]
 }}

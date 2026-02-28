@@ -22,8 +22,8 @@ from datetime import UTC, datetime
 from svap.api_schemas import (
     enrich_cases,
     enrich_policies,
-    enrich_predictions,
     enrich_taxonomy,
+    enrich_trees,
 )
 from svap.hhs_data import (
     ENFORCEMENT_SOURCES,
@@ -171,8 +171,9 @@ def _dashboard(event):
 
 def _status(event):
     storage = get_storage()
-    run_id = get_active_run_id(storage)
-    return {"run_id": run_id, "stages": storage.get_pipeline_status(run_id)}
+    run_id = storage.get_latest_run() or ""
+    stages = storage.get_pipeline_status(run_id) if run_id else []
+    return {"run_id": run_id, "stages": stages, "counts": storage.get_corpus_counts()}
 
 
 def _list_cases(event):
@@ -243,18 +244,21 @@ def _get_policy(event):
     if not policy:
         raise ApiError(404, f"Policy {policy_id} not found")
 
-    predictions = enrich_predictions(storage.get_predictions())
+    trees = storage.get_exploitation_trees()
+    all_steps = storage.get_all_exploitation_steps()
     patterns = storage.get_detection_patterns()
 
-    policy_scores = [s for s in scores if s["policy_id"] == policy_id]
-    policy_predictions = [p for p in predictions if p["policy_id"] == policy_id]
-    pred_ids = {p["prediction_id"] for p in policy_predictions}
-    policy_patterns = [d for d in patterns if d["prediction_id"] in pred_ids]
+    policy_trees = enrich_trees(
+        [t for t in trees if t["policy_id"] == policy_id],
+        [s for s in all_steps if s["policy_id"] == policy_id],
+    )
+    step_ids = {s["step_id"] for t in policy_trees for s in t.get("steps", [])}
+    policy_patterns = [d for d in patterns if d.get("step_id") in step_ids]
 
     return {
         **policy,
-        "scores": policy_scores,
-        "predictions": policy_predictions,
+        "scores": [s for s in scores if s["policy_id"] == policy_id],
+        "exploitation_trees": policy_trees,
         "detection_patterns": policy_patterns,
         "context": get_policy_context(policy.get("name", "")),
         "data_sources": get_data_sources_for_policy(policy.get("name", "")),
@@ -263,7 +267,9 @@ def _get_policy(event):
 
 def _list_predictions(event):
     storage = get_storage()
-    return enrich_predictions(storage.get_predictions())
+    trees = storage.get_exploitation_trees()
+    all_steps = storage.get_all_exploitation_steps()
+    return enrich_trees(trees, all_steps)
 
 
 def _list_detection_patterns(event):

@@ -46,7 +46,7 @@ const NAV_ITEMS: NavItem[] = [
   { path: "/matrix", label: "Convergence", icon: Grid },
 
   { section: "Results" },
-  { path: "/predictions", label: "Predictions", icon: AlertTriangle, countKey: "predictions" },
+  { path: "/predictions", label: "Exploitation Trees", icon: AlertTriangle, countKey: "exploitation_trees" },
   { path: "/detection", label: "Detection", icon: Radio, countKey: "detection_patterns" },
 
   { section: "Research" },

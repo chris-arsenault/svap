@@ -17,8 +17,8 @@ from svap.api_schemas import (
     build_policy_convergence,
     enrich_cases,
     enrich_policies,
-    enrich_predictions,
     enrich_taxonomy,
+    enrich_trees,
 )
 
 # Load static reference data from seed JSON files
@@ -54,14 +54,15 @@ def get_dashboard_data(storage, run_id: str) -> dict:
     convergence_matrix = storage.get_convergence_matrix()
     policy_scores = storage.get_policy_scores()
     calibration = storage.get_calibration()
-    predictions = storage.get_predictions()
+    trees = storage.get_exploitation_trees()
+    all_steps = storage.get_all_exploitation_steps()
     patterns = storage.get_detection_patterns()
 
     # Enrich with computed fields
     enriched_cases = enrich_cases(cases, convergence_matrix)
     enriched_taxonomy = enrich_taxonomy(taxonomy, convergence_matrix)
     enriched_policies = enrich_policies(policies, policy_scores, calibration)
-    enriched_predictions = enrich_predictions(predictions)
+    enriched_trees = enrich_trees(trees, all_steps)
 
     return {
         "run_id": run_id,
@@ -71,14 +72,14 @@ def get_dashboard_data(storage, run_id: str) -> dict:
             "cases": len(cases),
             "taxonomy_qualities": len(taxonomy),
             "policies": len(policies),
-            "predictions": len(predictions),
+            "exploitation_trees": len(trees),
             "detection_patterns": len(patterns),
         },
         "calibration": calibration or {"threshold": 3},
         "cases": enriched_cases,
         "taxonomy": enriched_taxonomy,
         "policies": enriched_policies,
-        "predictions": enriched_predictions,
+        "exploitation_trees": enriched_trees,
         "detection_patterns": patterns,
         "case_convergence": build_case_convergence(cases, convergence_matrix),
         "policy_convergence": build_policy_convergence(enriched_policies),

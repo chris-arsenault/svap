@@ -87,8 +87,8 @@ def compute_risk_level(score: int, threshold: int) -> str:
         return "low"
 
 
-def enrich_predictions(predictions: list[dict]) -> list[dict]:
-    """Parse enabling_qualities from JSON string if needed."""
+def enrich_predictions(predictions: list[dict]) -> list[dict]:  # DEPRECATED: remove in v7
+    """DEPRECATED: use enrich_trees(). Parse enabling_qualities from JSON string."""
     import json
 
     for pred in predictions:
@@ -98,6 +98,17 @@ def enrich_predictions(predictions: list[dict]) -> list[dict]:
             except (json.JSONDecodeError, TypeError):
                 pred["enabling_qualities"] = []
     return predictions
+
+
+def enrich_trees(trees: list[dict], all_steps: list[dict]) -> list[dict]:
+    """Nest exploitation steps into their parent trees."""
+    steps_by_tree: dict[str, list[dict]] = defaultdict(list)
+    for step in all_steps:
+        steps_by_tree[step["tree_id"]].append(step)
+
+    for tree in trees:
+        tree["steps"] = steps_by_tree.get(tree["tree_id"], [])
+    return trees
 
 
 def build_case_convergence(cases: list[dict], convergence_matrix: list[dict]) -> list[dict]:

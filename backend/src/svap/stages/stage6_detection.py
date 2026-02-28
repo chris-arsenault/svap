@@ -21,24 +21,28 @@ from svap.rag import ContextAssembler
 from svap.storage import SVAPStorage
 
 SYSTEM_PROMPT = """You are a fraud detection analyst designing monitoring rules. You translate
-predicted exploitation mechanics into specific, queryable anomaly signals. Every pattern
+predicted exploitation steps into specific, queryable anomaly signals. Every pattern
 must specify: what data source to query, what specific measurable condition to test, what
 the normal baseline looks like, what false positives to expect, and how quickly the signal
-becomes visible after exploitation begins.
+becomes visible after the exploitation step begins.
 
 Be concrete. "Monitor for unusual billing patterns" is useless. "Flag providers billing
->16 hours/day of personal care services, where normal P95 is 10 hours/day" is actionable."""
+>16 hours/day of personal care services, where normal P95 is 10 hours/day" is actionable.
+
+Focus narrowly on the SPECIFIC STEP you are given, not the broader exploitation scheme."""
 
 
-def _build_prompt(client, pred, data_sources_context):
-    """Build the LLM prompt for a single prediction. No I/O besides template read."""
+def _build_prompt(client, step, tree, tree_summary, data_sources_context):
+    """Build the LLM prompt for a single exploitation step."""
+    qualities_str = ", ".join(step.get("enabling_qualities", []))
     return client.render_prompt(
         "stage6_detect.txt",
-        policy_name=pred["policy_name"],
-        prediction_mechanics=pred["mechanics"],
-        enabling_qualities=pred["enabling_qualities"],
-        actor_profile=pred.get("actor_profile", "Unknown"),
-        detection_difficulty=pred.get("detection_difficulty", "Unknown"),
+        policy_name=step.get("policy_name", tree.get("policy_name", "")),
+        step_title=step["title"],
+        step_description=step["description"],
+        step_actor_action=step.get("actor_action", ""),
+        step_qualities=qualities_str,
+        tree_summary=tree_summary,
         data_sources=data_sources_context,
     )
 
@@ -48,18 +52,18 @@ def _invoke_llm(client, prompt):
     return client.invoke_json(prompt, system=SYSTEM_PROMPT, max_tokens=8192)
 
 
-def _store_patterns(storage, run_id, pred, result):
+def _store_patterns(storage, run_id, step, result):
     """Parse LLM result and write detection patterns to DB. Returns count."""
     patterns = result if isinstance(result, list) else result.get("patterns", [result])
     count = 0
     for i, pat_data in enumerate(patterns):
         pat_id = hashlib.sha256(
-            f"{pred['prediction_id']}:pat:{i}".encode()
+            f"{step['step_id']}:pat:{i}".encode()
         ).hexdigest()[:12]
 
         pattern = {
             "pattern_id": pat_id,
-            "prediction_id": pred["prediction_id"],
+            "step_id": step["step_id"],
             "data_source": pat_data.get("data_source", ""),
             "anomaly_signal": pat_data.get("anomaly_signal", ""),
             "baseline": pat_data.get("baseline", ""),
@@ -71,6 +75,20 @@ def _store_patterns(storage, run_id, pred, result):
         storage.insert_detection_pattern(run_id, pattern)
         count += 1
     return count
+
+
+def _build_tree_summary(tree, steps):
+    """Build a concise text summary of the exploitation tree for context."""
+    lines = [f"Exploitation tree for {tree.get('policy_name', 'Unknown')}:"]
+    lines.append(f"  Actor: {tree.get('actor_profile', 'Unknown')}")
+    lines.append(f"  Lifecycle: {tree.get('lifecycle_stage', 'Unknown')}")
+    lines.append(f"  Steps ({len(steps)} total):")
+    for s in steps:
+        indent = "    "
+        branch = " [BRANCH POINT]" if s.get("is_branch_point") else ""
+        label = f" ({s['branch_label']})" if s.get("branch_label") else ""
+        lines.append(f"{indent}{s['step_order']}. {s['title']}{branch}{label}")
+    return "\n".join(lines)
 
 
 def _print_pattern_summary(all_patterns):
@@ -95,37 +113,62 @@ def _get_data_sources_context(storage, config):
     return context or _default_data_sources()
 
 
+def _load_steps_from_trees(storage, trees):
+    """Load all exploitation steps from approved trees with context."""
+    all_steps = []
+    for tree in trees:
+        steps = storage.get_exploitation_steps(tree["tree_id"])
+        summary = _build_tree_summary(tree, steps)
+        for step in steps:
+            step["policy_name"] = tree["policy_name"]
+            all_steps.append((step, tree, summary))
+    return all_steps
+
+
+def _detect_changed_steps(storage, all_steps):
+    """Return steps whose content hash changed since last run."""
+    stored = storage.get_processing_hashes(6)
+    changed = []
+    for step, tree, summary in all_steps:
+        quals_str = ":".join(sorted(step.get("enabling_qualities", [])))
+        h = delta.compute_hash(step["description"], quals_str)
+        if stored.get(step["step_id"]) != h:
+            changed.append((step, tree, summary, h))
+    return changed
+
+
 def _run_parallel_detection(storage, client, run_id, jobs, max_concurrency):
     """Execute LLM calls in parallel and store results. Returns (total, failed)."""
     print(f"  Submitting {len(jobs)} parallel Bedrock calls (concurrency={max_concurrency})...")
 
     total_patterns = 0
-    failed_predictions = []
+    failed_steps = []
     with ThreadPoolExecutor(max_workers=max_concurrency) as executor:
-        future_to_pred = {
-            executor.submit(_invoke_llm, client, prompt): (pred, h)
-            for pred, h, prompt in jobs
+        future_to_step = {
+            executor.submit(_invoke_llm, client, prompt): (step, h)
+            for step, h, prompt in jobs
         }
-        for future in as_completed(future_to_pred):
-            pred, h = future_to_pred[future]
+        for future in as_completed(future_to_step):
+            step, h = future_to_step[future]
             try:
                 result = future.result()
-                count = _store_patterns(storage, run_id, pred, result)
-                storage.record_processing(6, pred["prediction_id"], h, run_id)
+                count = _store_patterns(storage, run_id, step, result)
+                storage.record_processing(6, step["step_id"], h, run_id)
                 total_patterns += count
-                print(f"    {pred['policy_name']}: {count} patterns (total: {total_patterns})")
+                policy = step.get("policy_name", "")
+                print(f"    {policy}/{step['title']}: {count} patterns (total: {total_patterns})")
             except Exception as e:
-                print(f"    FAILED {pred['policy_name']}: {e}")
-                failed_predictions.append(pred["prediction_id"])
+                print(f"    FAILED {step['title']}: {e}")
+                failed_steps.append(step["step_id"])
 
-    if failed_predictions:
-        print(f"\n  WARNING: {len(failed_predictions)} predictions failed pattern generation")
+    if failed_steps:
+        print(f"\n  WARNING: {len(failed_steps)} steps failed pattern generation")
 
-    return total_patterns, failed_predictions
+    return total_patterns, failed_steps
 
 
 def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
-    """Execute Stage 6: Generate detection patterns for approved predictions."""
+    """Execute Stage 6: Generate detection patterns for approved exploitation steps."""
     print("Stage 6: Detection Pattern Generation")
     storage.log_stage_start(run_id, 6)
 
@@ -133,35 +176,32 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
         stage5_status = storage.get_stage_status(run_id, 5)
         if stage5_status not in ("approved", "completed"):
             raise ValueError(
-                f"Stage 5 status is '{stage5_status}'. Predictions must be approved first."
+                f"Stage 5 status is '{stage5_status}'. Trees must be approved first."
             )
 
-        predictions = storage.get_predictions()
-        if not predictions:
-            raise ValueError("No predictions found. Run Stage 5 first.")
+        trees = storage.get_exploitation_trees(approved_only=True)
+        if not trees:
+            raise ValueError("No approved exploitation trees found. Run Stage 5 first.")
+
+        all_steps = _load_steps_from_trees(storage, trees)
+        if not all_steps:
+            raise ValueError("No exploitation steps found. Run Stage 5 first.")
 
         # ── Delta detection ─────────────────────────────────────────
-        stored = storage.get_processing_hashes(6)
-
-        to_detect = []
-        for pred in predictions:
-            h = delta.compute_hash(pred["mechanics"], pred["enabling_qualities"])
-            if stored.get(pred["prediction_id"]) != h:
-                to_detect.append((pred, h))
-
+        to_detect = _detect_changed_steps(storage, all_steps)
         if not to_detect:
-            print(f"  All {len(predictions)} predictions unchanged — skipping.")
+            print(f"  All {len(all_steps)} steps unchanged — skipping.")
             storage.log_stage_complete(run_id, 6, {
                 "patterns_generated": 0,
-                "skipped_unchanged": len(predictions),
+                "skipped_unchanged": len(all_steps),
             })
             return
 
-        print(f"  {len(to_detect)}/{len(predictions)} predictions changed, generating patterns...")
+        print(f"  {len(to_detect)}/{len(all_steps)} steps changed, generating patterns...")
 
         # ── Delete stale patterns BEFORE LLM calls ──────────────────
-        for pred, _h in to_detect:
-            storage.delete_patterns_for_prediction(pred["prediction_id"])
+        for step, _tree, _summary, _h in to_detect:
+            storage.delete_patterns_for_step(step["step_id"])
 
         data_sources_context = _get_data_sources_context(storage, config)
 
@@ -169,11 +209,11 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
 
         # Build all prompts (fast, sequential)
         jobs = []
-        for pred, h in to_detect:
-            prompt = _build_prompt(client, pred, data_sources_context)
-            jobs.append((pred, h, prompt))
+        for step, tree, summary, h in to_detect:
+            prompt = _build_prompt(client, step, tree, summary, data_sources_context)
+            jobs.append((step, h, prompt))
 
-        total_patterns, failed_predictions = _run_parallel_detection(
+        total_patterns, failed_steps = _run_parallel_detection(
             storage, client, run_id, jobs, max_concurrency,
         )
 
@@ -182,9 +222,8 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
         _print_pattern_summary(all_patterns)
 
         result_meta = {"patterns_generated": total_patterns}
-        if failed_predictions:
-            result_meta["failed_predictions"] = len(failed_predictions)
-
+        if failed_steps:
+            result_meta["failed_steps"] = len(failed_steps)
         storage.log_stage_complete(run_id, 6, result_meta)
 
     except Exception as e:

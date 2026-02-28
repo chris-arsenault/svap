@@ -1,7 +1,7 @@
 .PHONY: lint lint-fix format format-check \
        lint-frontend lint-fix-frontend format-frontend format-check-frontend \
        lint-backend lint-fix-backend format-backend format-check-backend \
-       seed reset reset-corpus reset-runs reset-dry-run runs
+       seed reset reset-corpus reset-runs reset-dry-run reset-trees runs
 
 lint: lint-frontend lint-backend
 lint-fix: lint-fix-frontend lint-fix-backend
@@ -48,6 +48,9 @@ reset-runs:
 
 reset-dry-run:
 	cd backend && uv run scripts/reset_runs.py --corpus --dry-run
+
+reset-trees:
+	cd backend && uv run scripts/reset_runs.py --stages56 $(ARGS)
 
 runs:
 	cd backend && uv run scripts/reset_runs.py --list

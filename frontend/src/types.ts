@@ -11,7 +11,7 @@ export interface Counts {
   cases: number;
   taxonomy_qualities: number;
   policies: number;
-  predictions: number;
+  exploitation_trees: number;
   detection_patterns: number;
 }
 
@@ -44,20 +44,39 @@ export interface Policy {
   qualities: string[];
 }
 
-export interface Prediction {
-  prediction_id: string;
+export interface ExploitationStep {
+  step_id: string;
+  tree_id: string;
+  step_order: number;
+  title: string;
+  description: string;
+  actor_action: string;
+  is_branch_point: boolean;
+  branch_label: string | null;
+  parent_step_id: string | null;
+  enabling_qualities: string[];
+  policy_id?: string;
+  policy_name?: string;
+}
+
+export interface ExploitationTree {
+  tree_id: string;
   policy_id: string;
   policy_name: string;
   convergence_score: number;
+  actor_profile: string;
   lifecycle_stage: string;
   detection_difficulty: string;
-  mechanics: string;
-  enabling_qualities: string[];
-  actor_profile: string;
+  review_status: string;
+  step_count: number;
+  steps: ExploitationStep[];
 }
 
 export interface DetectionPattern {
   pattern_id: string;
+  step_id: string;
+  step_title: string;
+  tree_id: string;
   priority: RiskLevel;
   policy_name: string;
   anomaly_signal: string;
@@ -65,6 +84,7 @@ export interface DetectionPattern {
   data_source: string;
   baseline: string;
   false_positive_risk: string;
+  implementation_notes: string;
 }
 
 export type ValidationStatus = "pending" | "valid" | "invalid" | "error";
@@ -94,7 +114,7 @@ export interface FallbackData {
   cases: Case[];
   taxonomy: Quality[];
   policies: Policy[];
-  predictions: Prediction[];
+  exploitation_trees: ExploitationTree[];
   detection_patterns: DetectionPattern[];
   case_convergence: unknown[];
   policy_convergence: unknown[];

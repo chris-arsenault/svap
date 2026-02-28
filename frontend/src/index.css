@@ -1236,6 +1236,106 @@ html, body, #root {
   white-space: pre-wrap;
 }
 
+/* Exploitation Tree Steps */
+.tree-header-stat {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+.tree-meta-row {
+  display: flex;
+  gap: var(--sp-5);
+  margin-bottom: var(--sp-3);
+  flex-wrap: wrap;
+}
+.tree-meta-item {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.tree-meta-label {
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-right: var(--sp-1);
+}
+.tree-steps { border-left: 2px solid var(--border-subtle); margin-left: var(--sp-3); }
+.tree-step {
+  position: relative;
+  padding: 2px 0;
+}
+.tree-step::before {
+  content: "";
+  position: absolute;
+  left: -2px;
+  top: 50%;
+  width: 10px;
+  height: 2px;
+  background: var(--border-subtle);
+}
+.tree-step-content {
+  border-radius: var(--radius-sm);
+  padding: 3px var(--sp-2);
+  transition: background 0.1s;
+}
+.tree-step-content.clickable:hover { background: var(--bg-hover); }
+.tree-step-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+.tree-step-order {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  min-width: 16px;
+  text-align: center;
+}
+.tree-step-title {
+  font-weight: 500;
+  font-size: 12px;
+  color: var(--text-primary);
+}
+.tree-step-qual-count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+.tree-branch-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+.tree-step-detail {
+  padding: var(--sp-1) 0 var(--sp-1) 28px;
+}
+.tree-step-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.tree-step-actor {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: 2px;
+}
+.tree-step-qualities { margin-top: 4px; }
+.pattern-step-title {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
 /* TaxonomyView */
 .quality-grid {
   display: grid;

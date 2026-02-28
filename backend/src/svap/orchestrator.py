@@ -275,14 +275,14 @@ def cmd_status(args, config):
     cases = storage.get_cases()
     taxonomy = storage.get_taxonomy()
     policies = storage.get_policies()
-    predictions = storage.get_predictions()
+    trees = storage.get_exploitation_trees()
     patterns = storage.get_detection_patterns()
 
     print("\n  Data Summary:")
-    print(f"    Cases:             {len(cases)}")
+    print(f"    Cases:              {len(cases)}")
     print(f"    Taxonomy qualities: {len(taxonomy)}")
-    print(f"    Policies scanned:  {len(policies)}")
-    print(f"    Predictions:       {len(predictions)}")
+    print(f"    Policies scanned:   {len(policies)}")
+    print(f"    Exploitation trees: {len(trees)}")
     print(f"    Detection patterns: {len(patterns)}")
 
     storage.close()
@@ -366,7 +366,8 @@ def _export_json(storage, run_id, export_dir):
         "calibration": storage.get_calibration(),
         "policies": storage.get_policies(),
         "policy_scores": storage.get_policy_scores(),
-        "predictions": storage.get_predictions(),
+        "exploitation_trees": storage.get_exploitation_trees(),
+        "exploitation_steps": storage.get_all_exploitation_steps(),
         "detection_patterns": storage.get_detection_patterns(),
     }
     out_path = export_dir / f"svap_export_{run_id}.json"
@@ -375,10 +376,31 @@ def _export_json(storage, run_id, export_dir):
     print(f"Exported to {out_path}")
 
 
+def _format_trees(storage, trees):
+    """Format exploitation trees section for markdown export."""
+    lines = ["\n## Exploitation Trees\n"]
+    for tree in trees:
+        lines.append(
+            f"### {tree.get('policy_name', 'Unknown')} (score={tree['convergence_score']})\n"
+        )
+        lines.append(f"**Actor Profile:** {tree.get('actor_profile', 'N/A')}\n")
+        lines.append(f"**Lifecycle Stage:** {tree.get('lifecycle_stage', 'N/A')}\n")
+        lines.append(f"**Detection Difficulty:** {tree.get('detection_difficulty', 'N/A')}\n")
+        steps = storage.get_exploitation_steps(tree["tree_id"])
+        if steps:
+            lines.append("\n**Steps:**\n")
+            for step in steps:
+                branch = " [BRANCH]" if step.get("is_branch_point") else ""
+                label = f" ({step['branch_label']})" if step.get("branch_label") else ""
+                lines.append(f"{step['step_order']}. **{step['title']}**{branch}{label}\n")
+                lines.append(f"   {step['description']}\n")
+    return lines
+
+
 def _export_markdown(storage, run_id, export_dir):
     """Export results as a readable Markdown report."""
     taxonomy = storage.get_taxonomy()
-    predictions = storage.get_predictions()
+    trees = storage.get_exploitation_trees()
     patterns = storage.get_detection_patterns()
     calibration = storage.get_calibration()
 
@@ -397,16 +419,8 @@ def _export_markdown(storage, run_id, export_dir):
         lines.append(f"**Threshold:** {calibration['threshold']}\n")
         lines.append(f"**Notes:** {calibration['correlation_notes']}\n")
 
-    if predictions:
-        lines.append("\n## Exploitation Predictions (by priority)\n")
-        for pred in predictions:
-            lines.append(
-                f"### {pred.get('policy_name', 'Unknown')} (score={pred['convergence_score']})\n"
-            )
-            lines.append(f"**Mechanics:** {pred['mechanics']}\n")
-            lines.append(f"**Actor Profile:** {pred.get('actor_profile', 'N/A')}\n")
-            lines.append(f"**Lifecycle Stage:** {pred.get('lifecycle_stage', 'N/A')}\n")
-            lines.append(f"**Detection Difficulty:** {pred.get('detection_difficulty', 'N/A')}\n")
+    if trees:
+        lines.extend(_format_trees(storage, trees))
 
     if patterns:
         lines.append("\n## Detection Patterns\n")
@@ -414,6 +428,8 @@ def _export_markdown(storage, run_id, export_dir):
             lines.append(
                 f"### [{pat.get('priority', 'medium').upper()}] {pat.get('policy_name', '')}\n"
             )
+            if pat.get("step_title"):
+                lines.append(f"**Step:** {pat['step_title']}\n")
             lines.append(f"**Data Source:** {pat['data_source']}\n")
             lines.append(f"**Anomaly Signal:** {pat['anomaly_signal']}\n")
             lines.append(f"**Baseline:** {pat.get('baseline', 'N/A')}\n")

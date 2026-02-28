@@ -63,6 +63,11 @@ function PatternCard({
               <span className="pattern-policy-name">
                 {pat.policy_name}
               </span>
+              {pat.step_title && (
+                <span className="pattern-step-title">
+                  {"\u2014"} {pat.step_title}
+                </span>
+              )}
             </div>
             <div className="pattern-anomaly-signal">
               {pat.anomaly_signal}
@@ -106,7 +111,7 @@ export default function DetectionView() {
       <div className="view-header stagger-in">
         <h2>Detection Patterns</h2>
         <div className="view-desc">
-          {detection_patterns.length} actionable anomaly signals derived from exploitation predictions
+          {detection_patterns.length} actionable anomaly signals derived from exploitation steps
         </div>
       </div>
 

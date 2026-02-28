@@ -68,7 +68,7 @@ function HighRiskTable({
       <div className="panel-header">
         <h3>Highest-Risk Policies</h3>
         <button className="btn" onClick={() => navigate("/predictions")}>
-          View predictions {"\u2192"}
+          View exploitation trees {"\u2192"}
         </button>
       </div>
       <div className="panel-body dense">
