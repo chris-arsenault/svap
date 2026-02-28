@@ -1,0 +1,116 @@
+[
+  {
+    "dominantSignal": "categoryProfile",
+    "filePath": "frontend/src/index.css",
+    "prefixA": "split-view",
+    "prefixB": "detail-grid",
+    "rulesA": 3,
+    "rulesB": 3,
+    "score": 0.7568,
+    "signals": {
+      "categoryProfile": 1.0,
+      "customPropertyVocab": 1.0,
+      "propertyFrequency": 0.9507,
+      "ruleExactMatch": 0.6667,
+      "ruleSetMatch": 0.6667,
+      "selectorPrefixOverlap": 0.0
+    },
+    "unitA": "frontend/src/index.css::split-view",
+    "unitB": "frontend/src/index.css::detail-grid"
+  },
+  {
+    "dominantSignal": "categoryProfile",
+    "filePath": "frontend/src/index.css",
+    "prefixA": "stage-dot",
+    "prefixB": "score-pip",
+    "rulesA": 7,
+    "rulesB": 6,
+    "score": 0.5634,
+    "signals": {
+      "categoryProfile": 0.9601,
+      "customPropertyVocab": 0.4286,
+      "propertyFrequency": 0.8919,
+      "ruleExactMatch": 0.3077,
+      "ruleSetMatch": 0.6154,
+      "selectorPrefixOverlap": 0.0
+    },
+    "unitA": "frontend/src/index.css::stage-dot",
+    "unitB": "frontend/src/index.css::score-pip"
+  },
+  {
+    "dominantSignal": "categoryProfile",
+    "filePath": "frontend/src/index.css",
+    "prefixA": "detection-step",
+    "prefixB": "tree-step",
+    "rulesA": 7,
+    "rulesB": 11,
+    "score": 0.5419,
+    "signals": {
+      "categoryProfile": 0.8944,
+      "customPropertyVocab": 0.7,
+      "propertyFrequency": 0.8566,
+      "ruleExactMatch": 0.3333,
+      "ruleSetMatch": 0.4444,
+      "selectorPrefixOverlap": 0.0
+    },
+    "unitA": "frontend/src/index.css::detection-step",
+    "unitB": "frontend/src/index.css::tree-step"
+  },
+  {
+    "dominantSignal": "categoryProfile",
+    "filePath": "frontend/src/index.css",
+    "prefixA": "detection-priority",
+    "prefixB": "stage-chip",
+    "rulesA": 6,
+    "rulesB": 5,
+    "score": 0.4784,
+    "signals": {
+      "categoryProfile": 0.9808,
+      "customPropertyVocab": 0.0909,
+      "propertyFrequency": 0.9469,
+      "ruleExactMatch": 0.0,
+      "ruleSetMatch": 0.7273,
+      "selectorPrefixOverlap": 0.0
+    },
+    "unitA": "frontend/src/index.css::detection-priority",
+    "unitB": "frontend/src/index.css::stage-chip"
+  },
+  {
+    "dominantSignal": "categoryProfile",
+    "filePath": "frontend/src/index.css",
+    "prefixA": "detection-step",
+    "prefixB": "detection-pattern",
+    "rulesA": 7,
+    "rulesB": 7,
+    "score": 0.4302,
+    "signals": {
+      "categoryProfile": 0.8681,
+      "customPropertyVocab": 0.6,
+      "propertyFrequency": 0.6669,
+      "ruleExactMatch": 0.1429,
+      "ruleSetMatch": 0.4286,
+      "selectorPrefixOverlap": 0.0
+    },
+    "unitA": "frontend/src/index.css::detection-step",
+    "unitB": "frontend/src/index.css::detection-pattern"
+  },
+  {
+    "dominantSignal": "categoryProfile",
+    "filePath": "frontend/src/index.css",
+    "prefixA": "tree-label",
+    "prefixB": "detection-step",
+    "rulesA": 3,
+    "rulesB": 7,
+    "score": 0.4098,
+    "signals": {
+      "categoryProfile": 0.8889,
+      "customPropertyVocab": 0.625,
+      "propertyFrequency": 0.7419,
+      "ruleExactMatch": 0.2,
+      "ruleSetMatch": 0.2,
+      "selectorPrefixOverlap": 0.0
+    },
+    "unitA": "frontend/src/index.css::tree-label",
+    "unitB": "frontend/src/index.css::detection-step"
+  }
+]

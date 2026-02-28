@@ -3,7 +3,7 @@
   "tags": [],
   "mode": "online",
   "sync": {
-    "eslint-rule": "eslint-rules/",
+    "eslint-rule": "frontend/eslint-rules/",
     "adr": "docs/adr/",
     "pattern": "docs/patterns/",
     "checklist": "docs/"

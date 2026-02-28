@@ -78,7 +78,7 @@ All MFE apps converge on **component-local pure CSS** with **global framework st
 
 ## Enforcement
 
-- **ESLint rule:** `local/no-inline-styles` — warns on any `style=` JSX attribute. See `eslint-rules/no-inline-styles.js`.
+- **ESLint rule:** `local/no-inline-styles` — warns on any `style=` JSX attribute. See `frontend/eslint-rules/no-inline-styles.js`.
 - **Review checklist:** New components must have a co-located `.css` file if they need styling. No `style={{}}` in new code.
 - **Pattern documentation:** `docs/patterns/css-architecture.md`
 

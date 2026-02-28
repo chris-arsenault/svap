@@ -14,6 +14,7 @@ Input:  Enforcement sources from the database (seeded from enforcement_sources.j
 Output: Documents in the RAG store (doc_type='enforcement'), summaries in enforcement_sources
 """
 
+import logging
 import os
 import re
 import ssl
@@ -24,6 +25,8 @@ from html.parser import HTMLParser
 from svap.bedrock_client import BedrockClient
 from svap.rag import DocumentIngester
 from svap.storage import SVAPStorage
+
+logger = logging.getLogger(__name__)
 
 CONFIG_BUCKET = os.environ.get("SVAP_CONFIG_BUCKET", "")
 
@@ -152,27 +155,27 @@ def _fetch_missing_documents(storage, sources, config):
         url = source.get("url")
 
         if source["has_document"]:
-            print(f"  Skipping (has document): {name}")
+            logger.info("Skipping (has document): %s", name)
             skipped += 1
             continue
 
         if not url:
-            print(f"  Skipping (no URL): {name}")
+            logger.info("Skipping (no URL): %s", name)
             skipped += 1
             continue
 
-        print(f"  Fetching: {name}")
+        logger.info("Fetching: %s", name)
         try:
             html = _fetch_url(url)
             text = _extract_text(html)
 
             if len(text) < 200:
-                print(f"    Skipped: text too short ({len(text)} chars)")
+                logger.info("Skipped: text too short (%d chars)", len(text))
                 failed += 1
                 continue
 
             if _is_binary_content(text):
-                print("    Skipped: binary/non-readable content (PDF or image)")
+                logger.info("Skipped: binary/non-readable content (PDF or image)")
                 failed += 1
                 continue
 
@@ -192,11 +195,11 @@ def _fetch_missing_documents(storage, sources, config):
             _store_to_s3(s3_key, html.encode("utf-8"), "text/html")
 
             storage.update_enforcement_source_document(source_id, s3_key=s3_key, doc_id=doc_id)
-            print(f"    Ingested: {len(text)} chars, {n_chunks} chunks")
+            logger.info("Ingested: %d chars, %d chunks", len(text), n_chunks)
             fetched += 1
 
         except Exception as e:
-            print(f"    Failed to fetch {url}: {e}")
+            logger.error("Failed to fetch %s: %s", url, e)
             failed += 1
 
     return fetched, skipped, failed
@@ -212,11 +215,11 @@ def _validate_pending_documents(storage, client):
         if not source["has_document"] or source["validation_status"] != "pending":
             continue
 
-        print(f"  Validating: {source['name']}")
+        logger.info("Validating: %s", source['name'])
         try:
             doc = next((d for d in docs if d["doc_id"] == source["doc_id"]), None)
             if not doc:
-                print("    Document not found in RAG store")
+                logger.warning("Document not found in RAG store")
                 storage.update_enforcement_source_summary(
                     source["source_id"], "Document not found in RAG store", "error"
                 )
@@ -225,11 +228,11 @@ def _validate_pending_documents(storage, client):
             summary, is_valid = _validate_document(client, source, doc["full_text"])
             status = "valid" if is_valid else "invalid"
             storage.update_enforcement_source_summary(source["source_id"], summary, status)
-            print(f"    {status}: {summary[:80]}...")
+            logger.info("%s: %s...", status, summary[:80])
             validated += 1
 
         except Exception as e:
-            print(f"    Validation failed: {e}")
+            logger.error("Validation failed: %s", e)
             storage.update_enforcement_source_summary(
                 source["source_id"], f"Validation error: {e}", "error"
             )
@@ -244,7 +247,7 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
     Reads sources from the database. Skips sources that already have documents.
     After fetching, validates all pending documents with the LLM.
     """
-    print("Stage 0: Enforcement Source Fetching")
+    logger.info("Stage 0: Enforcement Source Fetching")
     storage.log_stage_start(run_id, 0)
 
     try:
@@ -263,9 +266,9 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
                 "documents_validated": validated,
             },
         )
-        print(
-            f"  Stage 0 complete: {fetched} fetched, {skipped} skipped, "
-            f"{failed} failed, {validated} validated."
+        logger.info(
+            "Stage 0 complete: %d fetched, %d skipped, %d failed, %d validated.",
+            fetched, skipped, failed, validated,
         )
 
     except Exception as e:

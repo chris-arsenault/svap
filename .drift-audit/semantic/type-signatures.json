@@ -1,0 +1,584 @@
+{
+  "frontend/src/App.tsx::default": {
+    "arity": 0,
+    "canonical": "() => import(\"/home/tsonu/src/svap/frontend/node_modules/@types/react/jsx-runtime\").JSX.Element",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "af0ccbfade9bbaebb91ae2ad0da391f80a8879d55e35e418c7ed406937db05fc"
+  },
+  "frontend/src/auth.ts::getSession": {
+    "arity": 0,
+    "canonical": "() => Promise<CognitoUserSession | null>",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "72e978440ac34160b6ea5cc6c69ebcb02e399a121b46a7581920b13e9f187c99"
+  },
+  "frontend/src/auth.ts::getToken": {
+    "arity": 0,
+    "canonical": "() => Promise<string | null>",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "af9526fdea33abdb18788082a4a3c17e43fccebda43a71bc848e8263960a8053"
+  },
+  "frontend/src/auth.ts::signIn": {
+    "arity": 2,
+    "canonical": "(string, string) => Promise<CognitoUserSession>",
+    "loose_hash": "64bc25df0503a39e3ad6c12976640a86ec37a76a4c21e4db1a183bbf30e89703",
+    "strict_hash": "be4672ebc39457917153783d0a50307b3fd5d8065d322fe0923b6ffb318dd86c"
+  },
+  "frontend/src/auth.ts::signOut": {
+    "arity": 0,
+    "canonical": "() => void",
+    "loose_hash": "709fd0b0d4f1c0044d4f0014ae384189ad0566eba39c1e6354e506f7543e4a14",
+    "strict_hash": "e68193f01476e9facfba17113081b2bdc59407bcc5ef358a09e0a612b88cb1cc"
+  },
+  "frontend/src/components/SharedUI.tsx::Badge": {
+    "arity": 1,
+    "canonical": "(BadgeProps) => import(\"/home/tsonu/src/svap/frontend/node_modules/@types/react/jsx-runtime\").JSX.Element",
+    "loose_hash": "408e89eb9cd7d1ea3c57460a34bf9cdc666197f0c8e8c2608207f341cad140c9",
+    "strict_hash": "a87a9fcec366c79159468c08be49bd925cff1399bb57f0c367a7a82403ed8395"
+  },
+  "frontend/src/components/SharedUI.tsx::ErrorBanner": {
+    "arity": 1,
+    "canonical": "({ error: string | null; onDismiss?: () => void }) => import(\"/home/tsonu/src/svap/frontend/node_modules/@types/react/jsx-runtime\").JSX.Element | null",
+    "loose_hash": "cf06129cb3174c0c848bce88dda12f36c48297f3c83bdf96cf87eb39996a218b",
+    "strict_hash": "2018540a6c944988b4958a6fd391283bc0bb3b4e10a739820fb70493f2c123e6"
+  },
+  "frontend/src/components/SharedUI.tsx::QualityTag": {
+    "arity": 1,
+    "canonical": "({ id: string }) => import(\"/home/tsonu/src/svap/frontend/node_modules/@types/react/jsx-runtime\").JSX.Element",
+    "loose_hash": "b8145b6529a4c1adc4904d1d01a896a2b6937c3b8201035399ddbaf45baa5f02",
+    "strict_hash": "a10d11dc6b281d30ed2cae4b9b511822b158944da1c75c8a629b051ed6e7d8e6"
+  },
+  "frontend/src/components/SharedUI.tsx::QualityTags": {
+    "arity": 1,
+    "canonical": "({ ids: string[] }) => import(\"/home/tsonu/src/svap/frontend/node_modules/@types/react/jsx-runtime\").JSX.Element",
+    "loose_hash": "38abe1a45af1fef01c15ec8e4b6ce76aef12e386ec9512c40affd6c490d9e6ed",
+    "strict_hash": "6a10dc4cbdc4a04470714a0e1159a28f2aaca228b061b89a1800628e9ac15867"
+  },
+  "frontend/src/components/SharedUI.tsx::RiskBadge": {
+    "arity": 1,
+    "canonical": "({ level: RiskLevel }) => import(\"/home/tsonu/src/svap/frontend/node_modules/@types/react/jsx-runtime\").JSX.Element",
+    "loose_hash": "b8145b6529a4c1adc4904d1d01a896a2b6937c3b8201035399ddbaf45baa5f02",
+    "strict_hash": "b0cd49fbfd1bd2a5afc282c0944715ee7b34a774a45e1879cdd5b95df67ba6e3"
+  },
+  "frontend/src/components/SharedUI.tsx::ScoreBar": {
+    "arity": 1,
+    "canonical": "(ScoreBarProps) => import(\"/home/tsonu/src/svap/frontend/node_modules/@types/react/jsx-runtime\").JSX.Element",
+    "loose_hash": "408e89eb9cd7d1ea3c57460a34bf9cdc666197f0c8e8c2608207f341cad140c9",
+    "strict_hash": "619b1b19edd659fc325d5af47c8ebe4ceb71897c1ddb23824d6089ae07eb22d6"
+  },
+  "frontend/src/components/SharedUI.tsx::StageDot": {
+    "arity": 1,
+    "canonical": "({ status: StageStatus }) => import(\"/home/tsonu/src/svap/frontend/node_modules/@types/react/jsx-runtime\").JSX.Element",
+    "loose_hash": "b8145b6529a4c1adc4904d1d01a896a2b6937c3b8201035399ddbaf45baa5f02",
+    "strict_hash": "ba1cf0f86e21b44b5330af452f86185e2b85df3a7787a62ba8046e64d46a751e"
+  },
+  "frontend/src/components/Sidebar.tsx::default": {
+    "arity": 1,
+    "canonical": "(SidebarProps) => import(\"/home/tsonu/src/svap/frontend/node_modules/@types/react/jsx-runtime\").JSX.Element",
+    "loose_hash": "408e89eb9cd7d1ea3c57460a34bf9cdc666197f0c8e8c2608207f341cad140c9",
+    "strict_hash": "732b2d80bf1fd90b728d05baa02b87b962c669f0be26f40308c76dca86447ca4"
+  },
+  "frontend/src/config.ts::config": {
+    "arity": 0,
+    "canonical": "() => unknown",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "867316882290011f9442488c1da6ab019e753b48b4d910f6781a4eb6a990158c"
+  },
+  "frontend/src/data/api.ts::API_BASE": {
+    "arity": 0,
+    "canonical": "() => unknown",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "867316882290011f9442488c1da6ab019e753b48b4d910f6781a4eb6a990158c"
+  },
+  "frontend/src/data/api.ts::apiGet": {
+    "arity": 2,
+    "canonical": "(string, { signal?: AbortSignal }) => Promise<Response>",
+    "loose_hash": "59810e4e9c9e08a1cc9f9790015b93b7980d9196e9c75ebd1523c97a1131be83",
+    "strict_hash": "7630c967acbe08213ef20f218339365893f655a5f84f21383e336ed8d9cdd5b9"
+  },
+  "frontend/src/data/api.ts::apiPost": {
+    "arity": 2,
+    "canonical": "(string, unknown) => Promise<unknown>",
+    "loose_hash": "64bc25df0503a39e3ad6c12976640a86ec37a76a4c21e4db1a183bbf30e89703",
+    "strict_hash": "5838da3d8976a325d51c492ebdf5f3c8220fef38a8a7b8c9358be52c76d49b53"
+  },
+  "frontend/src/data/fallback.ts::FALLBACK_DATA": {
+    "arity": 0,
+    "canonical": "() => unknown",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "867316882290011f9442488c1da6ab019e753b48b4d910f6781a4eb6a990158c"
+  },
+  "frontend/src/data/pipelineStore.ts::PipelineStore": {
+    "arity": 0,
+    "canonical": "() => unknown",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "867316882290011f9442488c1da6ab019e753b48b4d910f6781a4eb6a990158c"
+  },
+  "frontend/src/data/pipelineStore.ts::usePipelineStore": {
+    "arity": 0,
+    "canonical": "() => unknown",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "867316882290011f9442488c1da6ab019e753b48b4d910f6781a4eb6a990158c"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useApiAvailable": {
+    "arity": 0,
+    "canonical": "() => boolean",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "c46f6985a6f57886bfb77076e8f4ef9d8cfe890076ea4809754c0659bbea1b75"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useApproveStage": {
+    "arity": 0,
+    "canonical": "() => (stage: number) => Promise<unknown>",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "b62565ffa7b78b12a64b5dbfd4a6e76fb42c3a18edada58f8f6ec2fb032337b2"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useCases": {
+    "arity": 0,
+    "canonical": "() => import(\"/home/tsonu/src/svap/frontend/src/types\").Case[]",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "692eb53ce4edbae3159c297e1b61ea90409d9ecbd4a626e7a3b1f8dba93090c1"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useCounts": {
+    "arity": 0,
+    "canonical": "() => import(\"/home/tsonu/src/svap/frontend/src/types\").Counts",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "ecf57d5952369c40545c3b32a154f7add1daf97b16db8f71b23facec56363ae9"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useCreateSource": {
+    "arity": 0,
+    "canonical": "() => (source: { name: string; url?: string; description?: string; }) => Promise<unknown>",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "052bb646c070f200bebfdd41f1c92dc17b07de8258e4e42de56b015a517e21ed"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useDataSources": {
+    "arity": 0,
+    "canonical": "() => Record<string, unknown>",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "a37934c2a3fa524dd2186b270d1ad8efa15df01572148d505d4ba317702465f9"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useDeleteSource": {
+    "arity": 0,
+    "canonical": "() => (sourceId: string) => Promise<unknown>",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "de9c5a60870e8c292fbfafff2514642152c7e2471895348be849a89ed74e8b6d"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useDetectionPatterns": {
+    "arity": 0,
+    "canonical": "() => import(\"/home/tsonu/src/svap/frontend/src/types\").DetectionPattern[]",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "d105998259cd8c304aa780519a509e30657fcb6b543bb8ea4f933658132ea6b9"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useDimensions": {
+    "arity": 0,
+    "canonical": "() => import(\"/home/tsonu/src/svap/frontend/src/types\").Dimension[]",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "f649525ce3a5ac7eb14403dbefafbb7a47bfa7eee5793380031ef96ef9a5c155"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useEnforcementSources": {
+    "arity": 0,
+    "canonical": "() => import(\"/home/tsonu/src/svap/frontend/src/types\").EnforcementSource[]",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "8a1659ec3ee3c837169fa01680157aabf51fce074ee87f20dea9e5386cfca69d"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useError": {
+    "arity": 0,
+    "canonical": "() => string | null",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "56416b82684faca9f783f842379b29fc0b9a82a0300d616df839ce1277071b50"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useExploitationTrees": {
+    "arity": 0,
+    "canonical": "() => import(\"/home/tsonu/src/svap/frontend/src/types\").ExploitationTree[]",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "75922770d1ddb56f0e2f157102da8b38c88e37d9bba934fcd7a2eeec0305c28d"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useFetchAssessments": {
+    "arity": 0,
+    "canonical": "() => (policyId: string) => Promise<import(\"/home/tsonu/src/svap/frontend/src/types\").QualityAssessment[]>",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "8a5c57d52aa83a9b96ebabcff0ba92fad4c643a6338f4030a918ec4a550bc7d6"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useFetchDimensions": {
+    "arity": 0,
+    "canonical": "() => () => Promise<void>",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "634a5cecb4081380462c5a562d952a0247064bdd746ac0c7eaa7489dc5a1052f"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useFetchDiscovery": {
+    "arity": 0,
+    "canonical": "() => () => Promise<void>",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "634a5cecb4081380462c5a562d952a0247064bdd746ac0c7eaa7489dc5a1052f"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useFetchFindings": {
+    "arity": 0,
+    "canonical": "() => (policyId: string) => Promise<import(\"/home/tsonu/src/svap/frontend/src/types\").StructuralFinding[]>",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "88c4b382108571299c9ac88f869b4f5a45e3e2e754363979e7a710983b90322c"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useFetchResearchSessions": {
+    "arity": 0,
+    "canonical": "() => () => Promise<void>",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "634a5cecb4081380462c5a562d952a0247064bdd746ac0c7eaa7489dc5a1052f"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useFetchTriageResults": {
+    "arity": 0,
+    "canonical": "() => () => Promise<void>",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "634a5cecb4081380462c5a562d952a0247064bdd746ac0c7eaa7489dc5a1052f"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useLoading": {
+    "arity": 0,
+    "canonical": "() => boolean",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "c46f6985a6f57886bfb77076e8f4ef9d8cfe890076ea4809754c0659bbea1b75"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::usePipelineStatus": {
+    "arity": 0,
+    "canonical": "() => import(\"/home/tsonu/src/svap/frontend/src/types\").PipelineStageStatus[]",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "de9d7db8659025b2e427079cd477fa945171f2db16043bf07a217ec0aa73e7d1"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::usePolicies": {
+    "arity": 0,
+    "canonical": "() => import(\"/home/tsonu/src/svap/frontend/src/types\").Policy[]",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "2c11685b32b9d65eb8b96b2d3fd0215d550a2f60de769adb9ef8e54d9547c291"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::usePolicyCatalog": {
+    "arity": 0,
+    "canonical": "() => Record<string, unknown>",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "a37934c2a3fa524dd2186b270d1ad8efa15df01572148d505d4ba317702465f9"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useQuality": {
+    "arity": 1,
+    "canonical": "(string) => import(\"/home/tsonu/src/svap/frontend/src/types\").Quality",
+    "loose_hash": "408e89eb9cd7d1ea3c57460a34bf9cdc666197f0c8e8c2608207f341cad140c9",
+    "strict_hash": "5a0242ee6fcc98a7b44f21a3dcf950e27415563ce1f772b90ac784be73fc0de1"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useRefresh": {
+    "arity": 0,
+    "canonical": "() => () => Promise<void>",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "634a5cecb4081380462c5a562d952a0247064bdd746ac0c7eaa7489dc5a1052f"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useResearchSessions": {
+    "arity": 0,
+    "canonical": "() => import(\"/home/tsonu/src/svap/frontend/src/types\").ResearchSession[]",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "1b5e7964fecb1cb95fc3d3098609ef7e1cff2f2254a3de9240d6385e7f3e2121"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useReviewCandidate": {
+    "arity": 0,
+    "canonical": "() => (candidateId: string, action: \"accept\" | \"reject\") => Promise<unknown>",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "c7956c9a8440e93df27c79de9d38e889cba047e3667adc9c8590569cda53c819"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useRunDeepResearch": {
+    "arity": 0,
+    "canonical": "() => (policyIds?: string[]) => Promise<unknown>",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "97fa9430410b0bf389904d61a1a4007b6978b67befa5c9a97b54eab42f45b9c2"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useRunDiscoveryFeeds": {
+    "arity": 0,
+    "canonical": "() => () => Promise<unknown>",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "b3c305bb8b622ddd8559b824a560be8f65b8f1f89ad6c3930c719390bce95314"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useRunId": {
+    "arity": 0,
+    "canonical": "() => string",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "d148275d54f36dfea9ff7991d95bdbe7420719658f85fb6fa7d16c3616993271"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useRunPipeline": {
+    "arity": 0,
+    "canonical": "() => () => Promise<unknown>",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "b3c305bb8b622ddd8559b824a560be8f65b8f1f89ad6c3930c719390bce95314"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useRunTriage": {
+    "arity": 0,
+    "canonical": "() => () => Promise<unknown>",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "b3c305bb8b622ddd8559b824a560be8f65b8f1f89ad6c3930c719390bce95314"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useScannedPrograms": {
+    "arity": 0,
+    "canonical": "() => string[]",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "430ed964fda83cef5379744599c7e5739696aac52059cab39e286631615dcaa6"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline": {
+    "arity": 0,
+    "canonical": "() => () => Promise<unknown>",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "b3c305bb8b622ddd8559b824a560be8f65b8f1f89ad6c3930c719390bce95314"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useSourceCandidates": {
+    "arity": 0,
+    "canonical": "() => import(\"/home/tsonu/src/svap/frontend/src/types\").SourceCandidate[]",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "009c0fe5108ef5461dfd16662e06ef2dc2e34fd2314aa2dcebf0157505014759"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useSourceFeeds": {
+    "arity": 0,
+    "canonical": "() => import(\"/home/tsonu/src/svap/frontend/src/types\").SourceFeed[]",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "6e916f5c45bf3c40ea0331091fb5eba82409812aba1b1dc181f398ca6e6fcd03"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useTaxonomy": {
+    "arity": 0,
+    "canonical": "() => import(\"/home/tsonu/src/svap/frontend/src/types\").Quality[]",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "42f70a8ec111ac868fe32467e4148ab3e133d2f33fb85fadd1ec7d969be39d52"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useThreshold": {
+    "arity": 0,
+    "canonical": "() => number",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "9a22e1ebcb6673bc22b514aafe50f5b2853545fe0f2f53c490f6d06f2cba89ab"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useTriageResults": {
+    "arity": 0,
+    "canonical": "() => import(\"/home/tsonu/src/svap/frontend/src/types\").TriageResult[]",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "63b1fe1e726b822a0e411eab93c70235cdb57a02453342268f0c6bc91f9d8862"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useUpdatePipelineStatus": {
+    "arity": 0,
+    "canonical": "() => (stages: import(\"/home/tsonu/src/svap/frontend/src/types\").PipelineStageStatus[]) => void",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "26c261201acfe21a4e979ceec4a03590867ea82d6d6c7d12cbba61516b7ed8fa"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useUploadSourceDocument": {
+    "arity": 0,
+    "canonical": "() => (sourceId: string, file: File) => Promise<unknown>",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "1c88f6eff5342f12accadea69a066ddeaa6e392ed66b6ce040d5514930f60f98"
+  },
+  "frontend/src/data/useStatusSubscription.ts::useStatusSubscription": {
+    "arity": 0,
+    "canonical": "() => void",
+    "loose_hash": "709fd0b0d4f1c0044d4f0014ae384189ad0566eba39c1e6354e506f7543e4a14",
+    "strict_hash": "e68193f01476e9facfba17113081b2bdc59407bcc5ef358a09e0a612b88cb1cc"
+  },
+  "frontend/src/hooks.ts::useAsyncAction": {
+    "arity": 0,
+    "canonical": "() => { busy: string | null; error: string | null; run: (label: string, fn: () => Promise<unknown>) => Promise<void>; clearError: () => void; }",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "28e901e23b81a523fa3dd92d69a6401e9aee0ea1c6c08140a1eb40fb38786b9c"
+  },
+  "frontend/src/types.ts::Case": {
+    "arity": 0,
+    "canonical": "() => unknown",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "867316882290011f9442488c1da6ab019e753b48b4d910f6781a4eb6a990158c"
+  },
+  "frontend/src/types.ts::Counts": {
+    "arity": 0,
+    "canonical": "() => unknown",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "867316882290011f9442488c1da6ab019e753b48b4d910f6781a4eb6a990158c"
+  },
+  "frontend/src/types.ts::DetectionPattern": {
+    "arity": 0,
+    "canonical": "() => unknown",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "867316882290011f9442488c1da6ab019e753b48b4d910f6781a4eb6a990158c"
+  },
+  "frontend/src/types.ts::Dimension": {
+    "arity": 0,
+    "canonical": "() => unknown",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "867316882290011f9442488c1da6ab019e753b48b4d910f6781a4eb6a990158c"
+  },
+  "frontend/src/types.ts::EnforcementSource": {
+    "arity": 0,
+    "canonical": "() => unknown",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "867316882290011f9442488c1da6ab019e753b48b4d910f6781a4eb6a990158c"
+  },
+  "frontend/src/types.ts::ExploitationStep": {
+    "arity": 0,
+    "canonical": "() => unknown",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "867316882290011f9442488c1da6ab019e753b48b4d910f6781a4eb6a990158c"
+  },
+  "frontend/src/types.ts::ExploitationTree": {
+    "arity": 0,
+    "canonical": "() => unknown",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "867316882290011f9442488c1da6ab019e753b48b4d910f6781a4eb6a990158c"
+  },
+  "frontend/src/types.ts::FallbackData": {
+    "arity": 0,
+    "canonical": "() => unknown",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "867316882290011f9442488c1da6ab019e753b48b4d910f6781a4eb6a990158c"
+  },
+  "frontend/src/types.ts::PipelineStageStatus": {
+    "arity": 0,
+    "canonical": "() => unknown",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "867316882290011f9442488c1da6ab019e753b48b4d910f6781a4eb6a990158c"
+  },
+  "frontend/src/types.ts::Policy": {
+    "arity": 0,
+    "canonical": "() => unknown",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "867316882290011f9442488c1da6ab019e753b48b4d910f6781a4eb6a990158c"
+  },
+  "frontend/src/types.ts::Quality": {
+    "arity": 0,
+    "canonical": "() => unknown",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "867316882290011f9442488c1da6ab019e753b48b4d910f6781a4eb6a990158c"
+  },
+  "frontend/src/types.ts::QualityAssessment": {
+    "arity": 0,
+    "canonical": "() => unknown",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "867316882290011f9442488c1da6ab019e753b48b4d910f6781a4eb6a990158c"
+  },
+  "frontend/src/types.ts::ResearchSession": {
+    "arity": 0,
+    "canonical": "() => unknown",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "867316882290011f9442488c1da6ab019e753b48b4d910f6781a4eb6a990158c"
+  },
+  "frontend/src/types.ts::RiskLevel": {
+    "arity": 0,
+    "canonical": "() => unknown",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "867316882290011f9442488c1da6ab019e753b48b4d910f6781a4eb6a990158c"
+  },
+  "frontend/src/types.ts::SourceCandidate": {
+    "arity": 0,
+    "canonical": "() => unknown",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "867316882290011f9442488c1da6ab019e753b48b4d910f6781a4eb6a990158c"
+  },
+  "frontend/src/types.ts::SourceFeed": {
+    "arity": 0,
+    "canonical": "() => unknown",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "867316882290011f9442488c1da6ab019e753b48b4d910f6781a4eb6a990158c"
+  },
+  "frontend/src/types.ts::StageStatus": {
+    "arity": 0,
+    "canonical": "() => unknown",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "867316882290011f9442488c1da6ab019e753b48b4d910f6781a4eb6a990158c"
+  },
+  "frontend/src/types.ts::StructuralFinding": {
+    "arity": 0,
+    "canonical": "() => unknown",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "867316882290011f9442488c1da6ab019e753b48b4d910f6781a4eb6a990158c"
+  },
+  "frontend/src/types.ts::TriageResult": {
+    "arity": 0,
+    "canonical": "() => unknown",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "867316882290011f9442488c1da6ab019e753b48b4d910f6781a4eb6a990158c"
+  },
+  "frontend/src/types.ts::ValidationStatus": {
+    "arity": 0,
+    "canonical": "() => unknown",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "867316882290011f9442488c1da6ab019e753b48b4d910f6781a4eb6a990158c"
+  },
+  "frontend/src/utils.ts::formatDollars": {
+    "arity": 1,
+    "canonical": "(number | null) => string",
+    "loose_hash": "408e89eb9cd7d1ea3c57460a34bf9cdc666197f0c8e8c2608207f341cad140c9",
+    "strict_hash": "11a31193a33f0f03149741118c8587c2314effcd3734ad7114599ee19fa3d785"
+  },
+  "frontend/src/utils.ts::scoreColor": {
+    "arity": 2,
+    "canonical": "(number, number) => string",
+    "loose_hash": "64bc25df0503a39e3ad6c12976640a86ec37a76a4c21e4db1a183bbf30e89703",
+    "strict_hash": "d1e3063cb21ae1b924480a2a320e6a828a1df681cc2b66093a7b8edce2dc8bb3"
+  },
+  "frontend/src/utils.ts::scoreLevel": {
+    "arity": 2,
+    "canonical": "(number, number) => string",
+    "loose_hash": "64bc25df0503a39e3ad6c12976640a86ec37a76a4c21e4db1a183bbf30e89703",
+    "strict_hash": "d1e3063cb21ae1b924480a2a320e6a828a1df681cc2b66093a7b8edce2dc8bb3"
+  },
+  "frontend/src/views/CaseSourcing.tsx::default": {
+    "arity": 0,
+    "canonical": "() => import(\"/home/tsonu/src/svap/frontend/node_modules/@types/react/jsx-runtime\").JSX.Element",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "af0ccbfade9bbaebb91ae2ad0da391f80a8879d55e35e418c7ed406937db05fc"
+  },
+  "frontend/src/views/ConvergenceMatrix.tsx::default": {
+    "arity": 0,
+    "canonical": "() => import(\"/home/tsonu/src/svap/frontend/node_modules/@types/react/jsx-runtime\").JSX.Element",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "af0ccbfade9bbaebb91ae2ad0da391f80a8879d55e35e418c7ed406937db05fc"
+  },
+  "frontend/src/views/Dashboard.tsx::default": {
+    "arity": 0,
+    "canonical": "() => import(\"/home/tsonu/src/svap/frontend/node_modules/@types/react/jsx-runtime\").JSX.Element",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "af0ccbfade9bbaebb91ae2ad0da391f80a8879d55e35e418c7ed406937db05fc"
+  },
+  "frontend/src/views/DetectionView.tsx::default": {
+    "arity": 0,
+    "canonical": "() => import(\"/home/tsonu/src/svap/frontend/node_modules/@types/react/jsx-runtime\").JSX.Element",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "af0ccbfade9bbaebb91ae2ad0da391f80a8879d55e35e418c7ed406937db05fc"
+  },
+  "frontend/src/views/DimensionRegistryView.tsx::default": {
+    "arity": 0,
+    "canonical": "() => import(\"/home/tsonu/src/svap/frontend/node_modules/@types/react/jsx-runtime\").JSX.Element",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "af0ccbfade9bbaebb91ae2ad0da391f80a8879d55e35e418c7ed406937db05fc"
+  },
+  "frontend/src/views/DiscoveryView.tsx::default": {
+    "arity": 0,
+    "canonical": "() => import(\"/home/tsonu/src/svap/frontend/node_modules/@types/react/jsx-runtime\").JSX.Element",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "af0ccbfade9bbaebb91ae2ad0da391f80a8879d55e35e418c7ed406937db05fc"
+  },
+  "frontend/src/views/ManagementView.tsx::default": {
+    "arity": 0,
+    "canonical": "() => import(\"/home/tsonu/src/svap/frontend/node_modules/@types/react/jsx-runtime\").JSX.Element",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "af0ccbfade9bbaebb91ae2ad0da391f80a8879d55e35e418c7ed406937db05fc"
+  },
+  "frontend/src/views/PolicyExplorer.tsx::default": {
+    "arity": 0,
+    "canonical": "() => import(\"/home/tsonu/src/svap/frontend/node_modules/@types/react/jsx-runtime\").JSX.Element",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "af0ccbfade9bbaebb91ae2ad0da391f80a8879d55e35e418c7ed406937db05fc"
+  },
+  "frontend/src/views/PredictionView.tsx::default": {
+    "arity": 0,
+    "canonical": "() => import(\"/home/tsonu/src/svap/frontend/node_modules/@types/react/jsx-runtime\").JSX.Element",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "af0ccbfade9bbaebb91ae2ad0da391f80a8879d55e35e418c7ed406937db05fc"
+  },
+  "frontend/src/views/ResearchView.tsx::default": {
+    "arity": 0,
+    "canonical": "() => import(\"/home/tsonu/src/svap/frontend/node_modules/@types/react/jsx-runtime\").JSX.Element",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "af0ccbfade9bbaebb91ae2ad0da391f80a8879d55e35e418c7ed406937db05fc"
+  },
+  "frontend/src/views/SourcesView.tsx::default": {
+    "arity": 0,
+    "canonical": "() => import(\"/home/tsonu/src/svap/frontend/node_modules/@types/react/jsx-runtime\").JSX.Element",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "af0ccbfade9bbaebb91ae2ad0da391f80a8879d55e35e418c7ed406937db05fc"
+  },
+  "frontend/src/views/TaxonomyView.tsx::default": {
+    "arity": 0,
+    "canonical": "() => import(\"/home/tsonu/src/svap/frontend/node_modules/@types/react/jsx-runtime\").JSX.Element",
+    "loose_hash": "ffab7a06c28c70b951f8cc06d3da0cb89d679100d47a87e49cf47681ce0ac6da",
+    "strict_hash": "af0ccbfade9bbaebb91ae2ad0da391f80a8879d55e35e418c7ed406937db05fc"
+  }
+}

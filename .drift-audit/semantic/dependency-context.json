@@ -1,0 +1,2026 @@
+{
+  "frontend/src/App.tsx::default": {
+    "consumerProfile": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "cooccurrenceVector": {},
+    "neighborhoodHash_r1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "neighborhoodHash_r2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "frontend/src/auth.ts::getSession": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/auth.ts::signIn": 1.0,
+      "frontend/src/auth.ts::signOut": 1.0,
+      "frontend/src/data/pipelineStore.ts::usePipelineStore": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useError": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useLoading": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRefresh": 1.0,
+      "frontend/src/data/useStatusSubscription.ts::useStatusSubscription": 1.0
+    },
+    "neighborhoodHash_r1": "fcfd8fe3037904142fea611f3e9b77c9b642e3e65e1c169ff3822b5ec50857f5",
+    "neighborhoodHash_r2": "fcfd8fe3037904142fea611f3e9b77c9b642e3e65e1c169ff3822b5ec50857f5"
+  },
+  "frontend/src/auth.ts::getToken": {
+    "consumerProfile": [
+      0.06,
+      1.0,
+      0.3333333333333333
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/config.ts::config": 1.0
+    },
+    "neighborhoodHash_r1": "bc4489bc4295bad2651a34810e6742b5040dc992f3446f5c9ac62ed4190396de",
+    "neighborhoodHash_r2": "bdd5f5a7eaaa73fc6ac9730570f33e60af85230f94d64d3dbe81781d4103a636"
+  },
+  "frontend/src/auth.ts::signIn": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/auth.ts::getSession": 1.0,
+      "frontend/src/auth.ts::signOut": 1.0,
+      "frontend/src/data/pipelineStore.ts::usePipelineStore": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useError": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useLoading": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRefresh": 1.0,
+      "frontend/src/data/useStatusSubscription.ts::useStatusSubscription": 1.0
+    },
+    "neighborhoodHash_r1": "fcfd8fe3037904142fea611f3e9b77c9b642e3e65e1c169ff3822b5ec50857f5",
+    "neighborhoodHash_r2": "fcfd8fe3037904142fea611f3e9b77c9b642e3e65e1c169ff3822b5ec50857f5"
+  },
+  "frontend/src/auth.ts::signOut": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/auth.ts::getSession": 1.0,
+      "frontend/src/auth.ts::signIn": 1.0,
+      "frontend/src/data/pipelineStore.ts::usePipelineStore": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useError": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useLoading": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRefresh": 1.0,
+      "frontend/src/data/useStatusSubscription.ts::useStatusSubscription": 1.0
+    },
+    "neighborhoodHash_r1": "fcfd8fe3037904142fea611f3e9b77c9b642e3e65e1c169ff3822b5ec50857f5",
+    "neighborhoodHash_r2": "fcfd8fe3037904142fea611f3e9b77c9b642e3e65e1c169ff3822b5ec50857f5"
+  },
+  "frontend/src/components/SharedUI.tsx::Badge": {
+    "consumerProfile": [
+      0.12,
+      0.0,
+      0.16666666666666666
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 0.5,
+      "frontend/src/components/SharedUI.tsx::QualityTag": 0.16666666666666666,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 0.5,
+      "frontend/src/data/api.ts::apiGet": 0.16666666666666666,
+      "frontend/src/data/api.ts::apiPost": 0.16666666666666666,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchDiscovery": 0.16666666666666666,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchTriageResults": 0.16666666666666666,
+      "frontend/src/data/usePipelineSelectors.ts::useRefresh": 0.16666666666666666,
+      "frontend/src/data/usePipelineSelectors.ts::useReviewCandidate": 0.16666666666666666,
+      "frontend/src/data/usePipelineSelectors.ts::useRunDeepResearch": 0.16666666666666666,
+      "frontend/src/data/usePipelineSelectors.ts::useRunDiscoveryFeeds": 0.16666666666666666,
+      "frontend/src/data/usePipelineSelectors.ts::useRunPipeline": 0.16666666666666666,
+      "frontend/src/data/usePipelineSelectors.ts::useRunTriage": 0.16666666666666666,
+      "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline": 0.16666666666666666,
+      "frontend/src/data/usePipelineSelectors.ts::useSourceCandidates": 0.16666666666666666,
+      "frontend/src/data/usePipelineSelectors.ts::useSourceFeeds": 0.16666666666666666,
+      "frontend/src/hooks.ts::useAsyncAction": 0.5,
+      "frontend/src/types.ts::QualityAssessment": 0.16666666666666666,
+      "frontend/src/types.ts::SourceCandidate": 0.16666666666666666,
+      "frontend/src/types.ts::StructuralFinding": 0.16666666666666666
+    },
+    "neighborhoodHash_r1": "4d853302547dd757f00da8e2772a81692c081e59929fa449fad4b137c7faf209",
+    "neighborhoodHash_r2": "4d853302547dd757f00da8e2772a81692c081e59929fa449fad4b137c7faf209"
+  },
+  "frontend/src/components/SharedUI.tsx::ErrorBanner": {
+    "consumerProfile": [
+      0.1,
+      0.0,
+      0.2
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 0.6,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 0.4,
+      "frontend/src/components/SharedUI.tsx::RiskBadge": 0.2,
+      "frontend/src/components/SharedUI.tsx::ScoreBar": 0.2,
+      "frontend/src/components/SharedUI.tsx::StageDot": 0.2,
+      "frontend/src/data/pipelineStore.ts::usePipelineStore": 0.2,
+      "frontend/src/data/usePipelineSelectors.ts::useApiAvailable": 0.2,
+      "frontend/src/data/usePipelineSelectors.ts::useApproveStage": 0.2,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchDiscovery": 0.2,
+      "frontend/src/data/usePipelineSelectors.ts::usePipelineStatus": 0.2,
+      "frontend/src/data/usePipelineSelectors.ts::useRefresh": 0.4,
+      "frontend/src/data/usePipelineSelectors.ts::useRunId": 0.2,
+      "frontend/src/data/usePipelineSelectors.ts::useRunPipeline": 0.4,
+      "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline": 0.4,
+      "frontend/src/hooks.ts::useAsyncAction": 1.0,
+      "frontend/src/types.ts::Case": 0.2,
+      "frontend/src/types.ts::Policy": 0.2,
+      "frontend/src/types.ts::SourceCandidate": 0.2,
+      "frontend/src/types.ts::StageStatus": 0.2,
+      "frontend/src/utils.ts::formatDollars": 0.2
+    },
+    "neighborhoodHash_r1": "3bdb72a2de4d0514cf0c8bdfc443538420938fad33c6ff69039e790dea1c7e56",
+    "neighborhoodHash_r2": "3bdb72a2de4d0514cf0c8bdfc443538420938fad33c6ff69039e790dea1c7e56"
+  },
+  "frontend/src/components/SharedUI.tsx::QualityTag": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 1.0,
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchAssessments": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchFindings": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchResearchSessions": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchTriageResults": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::usePolicies": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useResearchSessions": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRunDeepResearch": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRunTriage": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useTriageResults": 1.0,
+      "frontend/src/hooks.ts::useAsyncAction": 1.0,
+      "frontend/src/types.ts::QualityAssessment": 1.0,
+      "frontend/src/types.ts::StructuralFinding": 1.0
+    },
+    "neighborhoodHash_r1": "ee02d0047cb0cedfe6168b42a21df9f6e62cf0d40ab867a5513d047326fafa44",
+    "neighborhoodHash_r2": "ee02d0047cb0cedfe6168b42a21df9f6e62cf0d40ab867a5513d047326fafa44"
+  },
+  "frontend/src/components/SharedUI.tsx::QualityTags": {
+    "consumerProfile": [
+      0.12,
+      0.0,
+      0.16666666666666666
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 0.5,
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 0.3333333333333333,
+      "frontend/src/components/SharedUI.tsx::RiskBadge": 0.3333333333333333,
+      "frontend/src/components/SharedUI.tsx::ScoreBar": 0.5,
+      "frontend/src/components/SharedUI.tsx::StageDot": 0.16666666666666666,
+      "frontend/src/data/pipelineStore.ts::usePipelineStore": 0.16666666666666666,
+      "frontend/src/data/usePipelineSelectors.ts::useApiAvailable": 0.16666666666666666,
+      "frontend/src/data/usePipelineSelectors.ts::useApproveStage": 0.16666666666666666,
+      "frontend/src/data/usePipelineSelectors.ts::usePipelineStatus": 0.16666666666666666,
+      "frontend/src/data/usePipelineSelectors.ts::usePolicies": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useRefresh": 0.16666666666666666,
+      "frontend/src/data/usePipelineSelectors.ts::useRunId": 0.16666666666666666,
+      "frontend/src/data/usePipelineSelectors.ts::useRunPipeline": 0.16666666666666666,
+      "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline": 0.16666666666666666,
+      "frontend/src/hooks.ts::useAsyncAction": 0.3333333333333333,
+      "frontend/src/types.ts::Case": 0.3333333333333333,
+      "frontend/src/types.ts::Policy": 0.16666666666666666,
+      "frontend/src/types.ts::StageStatus": 0.16666666666666666,
+      "frontend/src/types.ts::StructuralFinding": 0.16666666666666666,
+      "frontend/src/utils.ts::formatDollars": 0.3333333333333333
+    },
+    "neighborhoodHash_r1": "c0f0ae3152796fc09dced1ea4986059c5f92c84b6cf9e160592dc75cfdb84d9b",
+    "neighborhoodHash_r2": "c0f0ae3152796fc09dced1ea4986059c5f92c84b6cf9e160592dc75cfdb84d9b"
+  },
+  "frontend/src/components/SharedUI.tsx::RiskBadge": {
+    "consumerProfile": [
+      0.04,
+      0.0,
+      0.5
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 0.5,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 1.0,
+      "frontend/src/components/SharedUI.tsx::ScoreBar": 1.0,
+      "frontend/src/components/SharedUI.tsx::StageDot": 0.5,
+      "frontend/src/data/pipelineStore.ts::usePipelineStore": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useApiAvailable": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useApproveStage": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::usePipelineStatus": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::usePolicies": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::usePolicyCatalog": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useRefresh": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useRunId": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useRunPipeline": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useThreshold": 0.5,
+      "frontend/src/hooks.ts::useAsyncAction": 0.5,
+      "frontend/src/types.ts::Case": 0.5,
+      "frontend/src/types.ts::Policy": 0.5,
+      "frontend/src/types.ts::StageStatus": 0.5,
+      "frontend/src/utils.ts::formatDollars": 0.5
+    },
+    "neighborhoodHash_r1": "614ea6df046dbb08726405d3bbf3857499451b1f4e2bdb67b77a634361ed8276",
+    "neighborhoodHash_r2": "614ea6df046dbb08726405d3bbf3857499451b1f4e2bdb67b77a634361ed8276"
+  },
+  "frontend/src/components/SharedUI.tsx::ScoreBar": {
+    "consumerProfile": [
+      0.06,
+      0.0,
+      0.3333333333333333
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 0.3333333333333333,
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 0.3333333333333333,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 1.0,
+      "frontend/src/components/SharedUI.tsx::RiskBadge": 0.6666666666666666,
+      "frontend/src/components/SharedUI.tsx::StageDot": 0.3333333333333333,
+      "frontend/src/data/pipelineStore.ts::usePipelineStore": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useApiAvailable": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useApproveStage": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::usePipelineStatus": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useRefresh": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useRunId": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useRunPipeline": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline": 0.3333333333333333,
+      "frontend/src/hooks.ts::useAsyncAction": 0.3333333333333333,
+      "frontend/src/types.ts::Case": 0.3333333333333333,
+      "frontend/src/types.ts::ExploitationStep": 0.3333333333333333,
+      "frontend/src/types.ts::ExploitationTree": 0.3333333333333333,
+      "frontend/src/types.ts::Policy": 0.3333333333333333,
+      "frontend/src/types.ts::StageStatus": 0.3333333333333333,
+      "frontend/src/utils.ts::formatDollars": 0.3333333333333333
+    },
+    "neighborhoodHash_r1": "a20c031cc3c2fd5af930ee60314fbfad27482a1a2ba26a32d230613f76726203",
+    "neighborhoodHash_r2": "a20c031cc3c2fd5af930ee60314fbfad27482a1a2ba26a32d230613f76726203"
+  },
+  "frontend/src/components/SharedUI.tsx::StageDot": {
+    "consumerProfile": [
+      0.04,
+      0.0,
+      0.5
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 0.5,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 0.5,
+      "frontend/src/components/SharedUI.tsx::RiskBadge": 0.5,
+      "frontend/src/components/SharedUI.tsx::ScoreBar": 0.5,
+      "frontend/src/data/pipelineStore.ts::usePipelineStore": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useApiAvailable": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useApproveStage": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useCounts": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::usePipelineStatus": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRefresh": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useRunId": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useRunPipeline": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline": 0.5,
+      "frontend/src/hooks.ts::useAsyncAction": 0.5,
+      "frontend/src/types.ts::Case": 0.5,
+      "frontend/src/types.ts::Counts": 0.5,
+      "frontend/src/types.ts::Policy": 0.5,
+      "frontend/src/types.ts::StageStatus": 0.5,
+      "frontend/src/utils.ts::formatDollars": 0.5
+    },
+    "neighborhoodHash_r1": "b37cecd42806726eeddbcf47a61ccda3db6067bafece6eff3d6ba66d6ad474a9",
+    "neighborhoodHash_r2": "b37cecd42806726eeddbcf47a61ccda3db6067bafece6eff3d6ba66d6ad474a9"
+  },
+  "frontend/src/components/Sidebar.tsx::default": {
+    "consumerProfile": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "cooccurrenceVector": {},
+    "neighborhoodHash_r1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "neighborhoodHash_r2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "frontend/src/config.ts::config": {
+    "consumerProfile": [
+      0.14,
+      1.0,
+      0.14285714285714285
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/auth.ts::getToken": 0.5
+    },
+    "neighborhoodHash_r1": "8fdaa5c69b0ea6ae1ec6d9560fac15de60c02a4968a6492094a75feff02c7b90",
+    "neighborhoodHash_r2": "7a59e0d35b18e578a7c935c4068145b4455c9c612755ca798e01e926fad91122"
+  },
+  "frontend/src/data/api.ts::API_BASE": {
+    "consumerProfile": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "cooccurrenceVector": {},
+    "neighborhoodHash_r1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "neighborhoodHash_r2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "frontend/src/data/api.ts::apiGet": {
+    "consumerProfile": [
+      0.08,
+      2.0,
+      0.25
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 0.3333333333333333,
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 0.3333333333333333,
+      "frontend/src/data/api.ts::apiPost": 0.6666666666666666,
+      "frontend/src/data/pipelineStore.ts::usePipelineStore": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useRefresh": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useRunPipeline": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline": 0.3333333333333333,
+      "frontend/src/hooks.ts::useAsyncAction": 0.3333333333333333,
+      "frontend/src/types.ts::Counts": 0.6666666666666666,
+      "frontend/src/types.ts::Dimension": 0.3333333333333333,
+      "frontend/src/types.ts::FallbackData": 0.3333333333333333,
+      "frontend/src/types.ts::PipelineStageStatus": 0.6666666666666666,
+      "frontend/src/types.ts::Quality": 0.3333333333333333,
+      "frontend/src/types.ts::QualityAssessment": 0.3333333333333333,
+      "frontend/src/types.ts::ResearchSession": 0.3333333333333333,
+      "frontend/src/types.ts::SourceCandidate": 0.3333333333333333,
+      "frontend/src/types.ts::SourceFeed": 0.3333333333333333,
+      "frontend/src/types.ts::StructuralFinding": 0.3333333333333333,
+      "frontend/src/types.ts::TriageResult": 0.3333333333333333
+    },
+    "neighborhoodHash_r1": "42115a4c876a170753fec4934f0fe144c1d28b769759d8442e6775885ac6aed0",
+    "neighborhoodHash_r2": "9e1f66359d275f6ede37a04503c0ab762db309f46f040bbc6537f05bc25e20ee"
+  },
+  "frontend/src/data/api.ts::apiPost": {
+    "consumerProfile": [
+      0.06,
+      1.584962500721156,
+      0.3333333333333333
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 0.5,
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 0.5,
+      "frontend/src/data/api.ts::apiGet": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRefresh": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useRunPipeline": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline": 0.5,
+      "frontend/src/hooks.ts::useAsyncAction": 0.5,
+      "frontend/src/types.ts::Counts": 0.5,
+      "frontend/src/types.ts::Dimension": 0.5,
+      "frontend/src/types.ts::FallbackData": 0.5,
+      "frontend/src/types.ts::PipelineStageStatus": 0.5,
+      "frontend/src/types.ts::Quality": 0.5,
+      "frontend/src/types.ts::QualityAssessment": 0.5,
+      "frontend/src/types.ts::ResearchSession": 0.5,
+      "frontend/src/types.ts::SourceCandidate": 0.5,
+      "frontend/src/types.ts::SourceFeed": 0.5,
+      "frontend/src/types.ts::StructuralFinding": 0.5,
+      "frontend/src/types.ts::TriageResult": 0.5
+    },
+    "neighborhoodHash_r1": "fd3fe70599feaf5a09b4208b27dc9c5aa96ba7c303750e7b93f5fba4ecece6ea",
+    "neighborhoodHash_r2": "9e1f66359d275f6ede37a04503c0ab762db309f46f040bbc6537f05bc25e20ee"
+  },
+  "frontend/src/data/fallback.ts::FALLBACK_DATA": {
+    "consumerProfile": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "cooccurrenceVector": {},
+    "neighborhoodHash_r1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "neighborhoodHash_r2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "frontend/src/data/pipelineStore.ts::PipelineStore": {
+    "consumerProfile": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "cooccurrenceVector": {},
+    "neighborhoodHash_r1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "neighborhoodHash_r2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "frontend/src/data/pipelineStore.ts::usePipelineStore": {
+    "consumerProfile": [
+      0.86,
+      1.0,
+      0.023255813953488372
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/auth.ts::getSession": 0.25,
+      "frontend/src/auth.ts::signIn": 0.25,
+      "frontend/src/auth.ts::signOut": 0.25,
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 0.25,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 0.25,
+      "frontend/src/components/SharedUI.tsx::RiskBadge": 0.25,
+      "frontend/src/components/SharedUI.tsx::ScoreBar": 0.25,
+      "frontend/src/components/SharedUI.tsx::StageDot": 0.25,
+      "frontend/src/data/usePipelineSelectors.ts::useApproveStage": 0.25,
+      "frontend/src/data/usePipelineSelectors.ts::useError": 0.25,
+      "frontend/src/data/usePipelineSelectors.ts::useLoading": 0.25,
+      "frontend/src/data/usePipelineSelectors.ts::useRefresh": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useRunPipeline": 0.25,
+      "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline": 0.25,
+      "frontend/src/data/useStatusSubscription.ts::useStatusSubscription": 0.25,
+      "frontend/src/hooks.ts::useAsyncAction": 0.25,
+      "frontend/src/types.ts::Case": 0.25,
+      "frontend/src/types.ts::Policy": 0.25,
+      "frontend/src/types.ts::StageStatus": 0.25,
+      "frontend/src/utils.ts::formatDollars": 0.25
+    },
+    "neighborhoodHash_r1": "d025e426d252975d93f221fc1c5cc4db3a0835147665c63e293804afaa0a088c",
+    "neighborhoodHash_r2": "9681ee7ef463449c7f8009152a03508685d996525105b97662a343cb5473cd62"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useApiAvailable": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 1.0,
+      "frontend/src/components/SharedUI.tsx::RiskBadge": 1.0,
+      "frontend/src/components/SharedUI.tsx::ScoreBar": 1.0,
+      "frontend/src/components/SharedUI.tsx::StageDot": 1.0,
+      "frontend/src/data/pipelineStore.ts::usePipelineStore": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useApproveStage": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::usePipelineStatus": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRefresh": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRunId": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRunPipeline": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline": 1.0,
+      "frontend/src/hooks.ts::useAsyncAction": 1.0,
+      "frontend/src/types.ts::Case": 1.0,
+      "frontend/src/types.ts::Policy": 1.0,
+      "frontend/src/types.ts::StageStatus": 1.0,
+      "frontend/src/utils.ts::formatDollars": 1.0
+    },
+    "neighborhoodHash_r1": "c61fd8e43cdd75b13e5da333ae3d5a08124c0c67c448e553047552c2f72c827b",
+    "neighborhoodHash_r2": "c61fd8e43cdd75b13e5da333ae3d5a08124c0c67c448e553047552c2f72c827b"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useApproveStage": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 1.0,
+      "frontend/src/components/SharedUI.tsx::RiskBadge": 1.0,
+      "frontend/src/components/SharedUI.tsx::ScoreBar": 1.0,
+      "frontend/src/components/SharedUI.tsx::StageDot": 1.0,
+      "frontend/src/data/pipelineStore.ts::usePipelineStore": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useApiAvailable": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::usePipelineStatus": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRefresh": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRunId": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRunPipeline": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline": 1.0,
+      "frontend/src/hooks.ts::useAsyncAction": 1.0,
+      "frontend/src/types.ts::Case": 1.0,
+      "frontend/src/types.ts::Policy": 1.0,
+      "frontend/src/types.ts::StageStatus": 1.0,
+      "frontend/src/utils.ts::formatDollars": 1.0
+    },
+    "neighborhoodHash_r1": "c61fd8e43cdd75b13e5da333ae3d5a08124c0c67c448e553047552c2f72c827b",
+    "neighborhoodHash_r2": "c61fd8e43cdd75b13e5da333ae3d5a08124c0c67c448e553047552c2f72c827b"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useCases": {
+    "consumerProfile": [
+      0.06,
+      0.0,
+      0.3333333333333333
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::QualityTags": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useEnforcementSources": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::usePolicies": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useTaxonomy": 0.6666666666666666,
+      "frontend/src/data/usePipelineSelectors.ts::useThreshold": 0.3333333333333333,
+      "frontend/src/types.ts::Case": 1.0,
+      "frontend/src/types.ts::EnforcementSource": 0.3333333333333333,
+      "frontend/src/types.ts::Policy": 0.3333333333333333,
+      "frontend/src/types.ts::Quality": 0.6666666666666666,
+      "frontend/src/utils.ts::formatDollars": 0.6666666666666666,
+      "frontend/src/utils.ts::scoreColor": 0.3333333333333333
+    },
+    "neighborhoodHash_r1": "9ca79f3704912d1cac9f32b666b105f4c9fe1a668ac79a008a620cd7425ab195",
+    "neighborhoodHash_r2": "9ca79f3704912d1cac9f32b666b105f4c9fe1a668ac79a008a620cd7425ab195"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useCounts": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::StageDot": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::usePipelineStatus": 1.0,
+      "frontend/src/types.ts::Counts": 1.0
+    },
+    "neighborhoodHash_r1": "c294d696ed12828cfe35fc9acecd864f77c1718442a8e46583905b8eec881cd3",
+    "neighborhoodHash_r2": "c294d696ed12828cfe35fc9acecd864f77c1718442a8e46583905b8eec881cd3"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useCreateSource": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useDeleteSource": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useEnforcementSources": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useUploadSourceDocument": 1.0,
+      "frontend/src/hooks.ts::useAsyncAction": 1.0,
+      "frontend/src/types.ts::EnforcementSource": 1.0,
+      "frontend/src/types.ts::ValidationStatus": 1.0
+    },
+    "neighborhoodHash_r1": "370e408ed3f2839649aa4fb6ddd69d496219558cd26f6b37a04ddddd1c4fe775",
+    "neighborhoodHash_r2": "370e408ed3f2839649aa4fb6ddd69d496219558cd26f6b37a04ddddd1c4fe775"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useDataSources": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::QualityTags": 1.0,
+      "frontend/src/components/SharedUI.tsx::RiskBadge": 1.0,
+      "frontend/src/components/SharedUI.tsx::ScoreBar": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::usePolicies": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::usePolicyCatalog": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useScannedPrograms": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useThreshold": 1.0
+    },
+    "neighborhoodHash_r1": "8346a2cce9e70d9b489239606721f7c9949f553181602794307958a03dccad21",
+    "neighborhoodHash_r2": "8346a2cce9e70d9b489239606721f7c9949f553181602794307958a03dccad21"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useDeleteSource": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useCreateSource": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useEnforcementSources": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useUploadSourceDocument": 1.0,
+      "frontend/src/hooks.ts::useAsyncAction": 1.0,
+      "frontend/src/types.ts::EnforcementSource": 1.0,
+      "frontend/src/types.ts::ValidationStatus": 1.0
+    },
+    "neighborhoodHash_r1": "370e408ed3f2839649aa4fb6ddd69d496219558cd26f6b37a04ddddd1c4fe775",
+    "neighborhoodHash_r2": "370e408ed3f2839649aa4fb6ddd69d496219558cd26f6b37a04ddddd1c4fe775"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useDetectionPatterns": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 1.0,
+      "frontend/src/types.ts::DetectionPattern": 1.0,
+      "frontend/src/types.ts::RiskLevel": 1.0
+    },
+    "neighborhoodHash_r1": "e38b82ceee84ee43e1d3cb62a3519538efe53387660b3e99be00aa680064c763",
+    "neighborhoodHash_r2": "e38b82ceee84ee43e1d3cb62a3519538efe53387660b3e99be00aa680064c763"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useDimensions": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchDimensions": 1.0
+    },
+    "neighborhoodHash_r1": "9bde3e9fc0895798904c349fc8c03bd2fac1c285a7ff1354ff55b002c178b0f4",
+    "neighborhoodHash_r2": "9bde3e9fc0895798904c349fc8c03bd2fac1c285a7ff1354ff55b002c178b0f4"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useEnforcementSources": {
+    "consumerProfile": [
+      0.04,
+      0.0,
+      0.5
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 0.5,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useCases": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useCreateSource": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useDeleteSource": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useUploadSourceDocument": 0.5,
+      "frontend/src/hooks.ts::useAsyncAction": 0.5,
+      "frontend/src/types.ts::Case": 0.5,
+      "frontend/src/types.ts::EnforcementSource": 1.0,
+      "frontend/src/types.ts::ValidationStatus": 0.5,
+      "frontend/src/utils.ts::formatDollars": 0.5
+    },
+    "neighborhoodHash_r1": "4dad2fc72697e4e1ea02d9dc8c0a66bf30f2efc1529eabee7b3188d8aba38145",
+    "neighborhoodHash_r2": "4dad2fc72697e4e1ea02d9dc8c0a66bf30f2efc1529eabee7b3188d8aba38145"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useError": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/auth.ts::getSession": 1.0,
+      "frontend/src/auth.ts::signIn": 1.0,
+      "frontend/src/auth.ts::signOut": 1.0,
+      "frontend/src/data/pipelineStore.ts::usePipelineStore": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useLoading": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRefresh": 1.0,
+      "frontend/src/data/useStatusSubscription.ts::useStatusSubscription": 1.0
+    },
+    "neighborhoodHash_r1": "fcfd8fe3037904142fea611f3e9b77c9b642e3e65e1c169ff3822b5ec50857f5",
+    "neighborhoodHash_r2": "fcfd8fe3037904142fea611f3e9b77c9b642e3e65e1c169ff3822b5ec50857f5"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useExploitationTrees": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 1.0,
+      "frontend/src/components/SharedUI.tsx::ScoreBar": 1.0,
+      "frontend/src/types.ts::ExploitationStep": 1.0,
+      "frontend/src/types.ts::ExploitationTree": 1.0
+    },
+    "neighborhoodHash_r1": "d3b921ec65d396524f42e8108d63e9074bf018e6c1cc2232a4d984f8d35332e4",
+    "neighborhoodHash_r2": "d3b921ec65d396524f42e8108d63e9074bf018e6c1cc2232a4d984f8d35332e4"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useFetchAssessments": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 1.0,
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTag": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchFindings": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchResearchSessions": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchTriageResults": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::usePolicies": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useResearchSessions": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRunDeepResearch": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRunTriage": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useTriageResults": 1.0,
+      "frontend/src/hooks.ts::useAsyncAction": 1.0,
+      "frontend/src/types.ts::QualityAssessment": 1.0,
+      "frontend/src/types.ts::StructuralFinding": 1.0
+    },
+    "neighborhoodHash_r1": "ee02d0047cb0cedfe6168b42a21df9f6e62cf0d40ab867a5513d047326fafa44",
+    "neighborhoodHash_r2": "ee02d0047cb0cedfe6168b42a21df9f6e62cf0d40ab867a5513d047326fafa44"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useFetchDimensions": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useDimensions": 1.0
+    },
+    "neighborhoodHash_r1": "9bde3e9fc0895798904c349fc8c03bd2fac1c285a7ff1354ff55b002c178b0f4",
+    "neighborhoodHash_r2": "9bde3e9fc0895798904c349fc8c03bd2fac1c285a7ff1354ff55b002c178b0f4"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useFetchDiscovery": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 1.0,
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useReviewCandidate": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRunDiscoveryFeeds": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useSourceCandidates": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useSourceFeeds": 1.0,
+      "frontend/src/hooks.ts::useAsyncAction": 1.0,
+      "frontend/src/types.ts::SourceCandidate": 1.0
+    },
+    "neighborhoodHash_r1": "8e58d776ce808c98e6996764f7842e4bba93c0dcb4ec86c344e225716c3389f1",
+    "neighborhoodHash_r2": "8e58d776ce808c98e6996764f7842e4bba93c0dcb4ec86c344e225716c3389f1"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useFetchFindings": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 1.0,
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTag": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchAssessments": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchResearchSessions": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchTriageResults": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::usePolicies": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useResearchSessions": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRunDeepResearch": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRunTriage": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useTriageResults": 1.0,
+      "frontend/src/hooks.ts::useAsyncAction": 1.0,
+      "frontend/src/types.ts::QualityAssessment": 1.0,
+      "frontend/src/types.ts::StructuralFinding": 1.0
+    },
+    "neighborhoodHash_r1": "ee02d0047cb0cedfe6168b42a21df9f6e62cf0d40ab867a5513d047326fafa44",
+    "neighborhoodHash_r2": "ee02d0047cb0cedfe6168b42a21df9f6e62cf0d40ab867a5513d047326fafa44"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useFetchResearchSessions": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 1.0,
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTag": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchAssessments": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchFindings": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchTriageResults": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::usePolicies": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useResearchSessions": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRunDeepResearch": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRunTriage": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useTriageResults": 1.0,
+      "frontend/src/hooks.ts::useAsyncAction": 1.0,
+      "frontend/src/types.ts::QualityAssessment": 1.0,
+      "frontend/src/types.ts::StructuralFinding": 1.0
+    },
+    "neighborhoodHash_r1": "ee02d0047cb0cedfe6168b42a21df9f6e62cf0d40ab867a5513d047326fafa44",
+    "neighborhoodHash_r2": "ee02d0047cb0cedfe6168b42a21df9f6e62cf0d40ab867a5513d047326fafa44"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useFetchTriageResults": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 1.0,
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTag": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchAssessments": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchFindings": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchResearchSessions": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::usePolicies": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useResearchSessions": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRunDeepResearch": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRunTriage": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useTriageResults": 1.0,
+      "frontend/src/hooks.ts::useAsyncAction": 1.0,
+      "frontend/src/types.ts::QualityAssessment": 1.0,
+      "frontend/src/types.ts::StructuralFinding": 1.0
+    },
+    "neighborhoodHash_r1": "ee02d0047cb0cedfe6168b42a21df9f6e62cf0d40ab867a5513d047326fafa44",
+    "neighborhoodHash_r2": "ee02d0047cb0cedfe6168b42a21df9f6e62cf0d40ab867a5513d047326fafa44"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useLoading": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/auth.ts::getSession": 1.0,
+      "frontend/src/auth.ts::signIn": 1.0,
+      "frontend/src/auth.ts::signOut": 1.0,
+      "frontend/src/data/pipelineStore.ts::usePipelineStore": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useError": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRefresh": 1.0,
+      "frontend/src/data/useStatusSubscription.ts::useStatusSubscription": 1.0
+    },
+    "neighborhoodHash_r1": "fcfd8fe3037904142fea611f3e9b77c9b642e3e65e1c169ff3822b5ec50857f5",
+    "neighborhoodHash_r2": "fcfd8fe3037904142fea611f3e9b77c9b642e3e65e1c169ff3822b5ec50857f5"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::usePipelineStatus": {
+    "consumerProfile": [
+      0.04,
+      0.0,
+      0.5
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 0.5,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 0.5,
+      "frontend/src/components/SharedUI.tsx::RiskBadge": 0.5,
+      "frontend/src/components/SharedUI.tsx::ScoreBar": 0.5,
+      "frontend/src/components/SharedUI.tsx::StageDot": 1.0,
+      "frontend/src/data/pipelineStore.ts::usePipelineStore": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useApiAvailable": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useApproveStage": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useCounts": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useRefresh": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useRunId": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useRunPipeline": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline": 0.5,
+      "frontend/src/hooks.ts::useAsyncAction": 0.5,
+      "frontend/src/types.ts::Case": 0.5,
+      "frontend/src/types.ts::Counts": 0.5,
+      "frontend/src/types.ts::Policy": 0.5,
+      "frontend/src/types.ts::StageStatus": 0.5,
+      "frontend/src/utils.ts::formatDollars": 0.5
+    },
+    "neighborhoodHash_r1": "b37cecd42806726eeddbcf47a61ccda3db6067bafece6eff3d6ba66d6ad474a9",
+    "neighborhoodHash_r2": "b37cecd42806726eeddbcf47a61ccda3db6067bafece6eff3d6ba66d6ad474a9"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::usePolicies": {
+    "consumerProfile": [
+      0.06,
+      0.0,
+      0.3333333333333333
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 0.3333333333333333,
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 0.3333333333333333,
+      "frontend/src/components/SharedUI.tsx::QualityTag": 0.3333333333333333,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 0.6666666666666666,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchAssessments": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchFindings": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchResearchSessions": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchTriageResults": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useResearchSessions": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useRunDeepResearch": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useRunTriage": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useThreshold": 0.6666666666666666,
+      "frontend/src/data/usePipelineSelectors.ts::useTriageResults": 0.3333333333333333,
+      "frontend/src/hooks.ts::useAsyncAction": 0.3333333333333333,
+      "frontend/src/types.ts::Case": 0.3333333333333333,
+      "frontend/src/types.ts::Policy": 0.3333333333333333,
+      "frontend/src/types.ts::Quality": 0.3333333333333333,
+      "frontend/src/types.ts::QualityAssessment": 0.3333333333333333,
+      "frontend/src/types.ts::StructuralFinding": 0.3333333333333333,
+      "frontend/src/utils.ts::scoreColor": 0.3333333333333333
+    },
+    "neighborhoodHash_r1": "46454da80d5899e5ff096a46803f39f4e31343a358a8713f27723674352a98b8",
+    "neighborhoodHash_r2": "46454da80d5899e5ff096a46803f39f4e31343a358a8713f27723674352a98b8"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::usePolicyCatalog": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::QualityTags": 1.0,
+      "frontend/src/components/SharedUI.tsx::RiskBadge": 1.0,
+      "frontend/src/components/SharedUI.tsx::ScoreBar": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useDataSources": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::usePolicies": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useScannedPrograms": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useThreshold": 1.0
+    },
+    "neighborhoodHash_r1": "8346a2cce9e70d9b489239606721f7c9949f553181602794307958a03dccad21",
+    "neighborhoodHash_r2": "8346a2cce9e70d9b489239606721f7c9949f553181602794307958a03dccad21"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useQuality": {
+    "consumerProfile": [
+      0.14,
+      0.0,
+      0.14285714285714285
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/types.ts::RiskLevel": 1.0,
+      "frontend/src/types.ts::StageStatus": 1.0,
+      "frontend/src/utils.ts::scoreColor": 1.0,
+      "frontend/src/utils.ts::scoreLevel": 1.0
+    },
+    "neighborhoodHash_r1": "ebbf5e7f871d601508133a5a3fc8c46b459949695279ff3cb1c8f2da31df4038",
+    "neighborhoodHash_r2": "11b60cc8d219f3d3455ed6bf386616c4f982fc1eccef170d68ef02e75f6a5bcc"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useRefresh": {
+    "consumerProfile": [
+      0.06,
+      0.0,
+      0.3333333333333333
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/auth.ts::getSession": 0.3333333333333333,
+      "frontend/src/auth.ts::signIn": 0.3333333333333333,
+      "frontend/src/auth.ts::signOut": 0.3333333333333333,
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 0.6666666666666666,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 0.3333333333333333,
+      "frontend/src/components/SharedUI.tsx::RiskBadge": 0.3333333333333333,
+      "frontend/src/components/SharedUI.tsx::ScoreBar": 0.3333333333333333,
+      "frontend/src/components/SharedUI.tsx::StageDot": 0.3333333333333333,
+      "frontend/src/data/pipelineStore.ts::usePipelineStore": 0.6666666666666666,
+      "frontend/src/data/usePipelineSelectors.ts::useApproveStage": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useError": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useLoading": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useRunPipeline": 0.6666666666666666,
+      "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline": 0.6666666666666666,
+      "frontend/src/data/useStatusSubscription.ts::useStatusSubscription": 0.3333333333333333,
+      "frontend/src/hooks.ts::useAsyncAction": 0.6666666666666666,
+      "frontend/src/types.ts::Case": 0.3333333333333333,
+      "frontend/src/types.ts::Policy": 0.3333333333333333,
+      "frontend/src/types.ts::StageStatus": 0.3333333333333333,
+      "frontend/src/utils.ts::formatDollars": 0.3333333333333333
+    },
+    "neighborhoodHash_r1": "44db025d19b850a4a0717f9d7b577777bb34d08c5725974a1b85dc41f26b0658",
+    "neighborhoodHash_r2": "44db025d19b850a4a0717f9d7b577777bb34d08c5725974a1b85dc41f26b0658"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useResearchSessions": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 1.0,
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTag": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchAssessments": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchFindings": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchResearchSessions": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchTriageResults": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::usePolicies": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRunDeepResearch": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRunTriage": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useTriageResults": 1.0,
+      "frontend/src/hooks.ts::useAsyncAction": 1.0,
+      "frontend/src/types.ts::QualityAssessment": 1.0,
+      "frontend/src/types.ts::StructuralFinding": 1.0
+    },
+    "neighborhoodHash_r1": "ee02d0047cb0cedfe6168b42a21df9f6e62cf0d40ab867a5513d047326fafa44",
+    "neighborhoodHash_r2": "ee02d0047cb0cedfe6168b42a21df9f6e62cf0d40ab867a5513d047326fafa44"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useReviewCandidate": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 1.0,
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchDiscovery": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRunDiscoveryFeeds": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useSourceCandidates": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useSourceFeeds": 1.0,
+      "frontend/src/hooks.ts::useAsyncAction": 1.0,
+      "frontend/src/types.ts::SourceCandidate": 1.0
+    },
+    "neighborhoodHash_r1": "8e58d776ce808c98e6996764f7842e4bba93c0dcb4ec86c344e225716c3389f1",
+    "neighborhoodHash_r2": "8e58d776ce808c98e6996764f7842e4bba93c0dcb4ec86c344e225716c3389f1"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useRunDeepResearch": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 1.0,
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTag": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchAssessments": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchFindings": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchResearchSessions": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchTriageResults": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::usePolicies": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useResearchSessions": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRunTriage": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useTriageResults": 1.0,
+      "frontend/src/hooks.ts::useAsyncAction": 1.0,
+      "frontend/src/types.ts::QualityAssessment": 1.0,
+      "frontend/src/types.ts::StructuralFinding": 1.0
+    },
+    "neighborhoodHash_r1": "ee02d0047cb0cedfe6168b42a21df9f6e62cf0d40ab867a5513d047326fafa44",
+    "neighborhoodHash_r2": "ee02d0047cb0cedfe6168b42a21df9f6e62cf0d40ab867a5513d047326fafa44"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useRunDiscoveryFeeds": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 1.0,
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchDiscovery": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useReviewCandidate": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useSourceCandidates": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useSourceFeeds": 1.0,
+      "frontend/src/hooks.ts::useAsyncAction": 1.0,
+      "frontend/src/types.ts::SourceCandidate": 1.0
+    },
+    "neighborhoodHash_r1": "8e58d776ce808c98e6996764f7842e4bba93c0dcb4ec86c344e225716c3389f1",
+    "neighborhoodHash_r2": "8e58d776ce808c98e6996764f7842e4bba93c0dcb4ec86c344e225716c3389f1"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useRunId": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 1.0,
+      "frontend/src/components/SharedUI.tsx::RiskBadge": 1.0,
+      "frontend/src/components/SharedUI.tsx::ScoreBar": 1.0,
+      "frontend/src/components/SharedUI.tsx::StageDot": 1.0,
+      "frontend/src/data/pipelineStore.ts::usePipelineStore": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useApiAvailable": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useApproveStage": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::usePipelineStatus": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRefresh": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRunPipeline": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline": 1.0,
+      "frontend/src/hooks.ts::useAsyncAction": 1.0,
+      "frontend/src/types.ts::Case": 1.0,
+      "frontend/src/types.ts::Policy": 1.0,
+      "frontend/src/types.ts::StageStatus": 1.0,
+      "frontend/src/utils.ts::formatDollars": 1.0
+    },
+    "neighborhoodHash_r1": "c61fd8e43cdd75b13e5da333ae3d5a08124c0c67c448e553047552c2f72c827b",
+    "neighborhoodHash_r2": "c61fd8e43cdd75b13e5da333ae3d5a08124c0c67c448e553047552c2f72c827b"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useRunPipeline": {
+    "consumerProfile": [
+      0.04,
+      0.0,
+      0.5
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 0.5,
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 0.5,
+      "frontend/src/components/SharedUI.tsx::RiskBadge": 0.5,
+      "frontend/src/components/SharedUI.tsx::ScoreBar": 0.5,
+      "frontend/src/components/SharedUI.tsx::StageDot": 0.5,
+      "frontend/src/data/api.ts::apiGet": 0.5,
+      "frontend/src/data/api.ts::apiPost": 0.5,
+      "frontend/src/data/pipelineStore.ts::usePipelineStore": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useApiAvailable": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useApproveStage": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::usePipelineStatus": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useRefresh": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRunId": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline": 1.0,
+      "frontend/src/hooks.ts::useAsyncAction": 1.0,
+      "frontend/src/types.ts::Case": 0.5,
+      "frontend/src/types.ts::Policy": 0.5,
+      "frontend/src/types.ts::StageStatus": 0.5,
+      "frontend/src/utils.ts::formatDollars": 0.5
+    },
+    "neighborhoodHash_r1": "2b5a6dbe3ab40db84252efc8067de93c2721987349837773c94e969b0e8053d3",
+    "neighborhoodHash_r2": "2b5a6dbe3ab40db84252efc8067de93c2721987349837773c94e969b0e8053d3"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useRunTriage": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 1.0,
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTag": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchAssessments": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchFindings": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchResearchSessions": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchTriageResults": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::usePolicies": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useResearchSessions": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRunDeepResearch": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useTriageResults": 1.0,
+      "frontend/src/hooks.ts::useAsyncAction": 1.0,
+      "frontend/src/types.ts::QualityAssessment": 1.0,
+      "frontend/src/types.ts::StructuralFinding": 1.0
+    },
+    "neighborhoodHash_r1": "ee02d0047cb0cedfe6168b42a21df9f6e62cf0d40ab867a5513d047326fafa44",
+    "neighborhoodHash_r2": "ee02d0047cb0cedfe6168b42a21df9f6e62cf0d40ab867a5513d047326fafa44"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useScannedPrograms": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::QualityTags": 1.0,
+      "frontend/src/components/SharedUI.tsx::RiskBadge": 1.0,
+      "frontend/src/components/SharedUI.tsx::ScoreBar": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useDataSources": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::usePolicies": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::usePolicyCatalog": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useThreshold": 1.0
+    },
+    "neighborhoodHash_r1": "8346a2cce9e70d9b489239606721f7c9949f553181602794307958a03dccad21",
+    "neighborhoodHash_r2": "8346a2cce9e70d9b489239606721f7c9949f553181602794307958a03dccad21"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline": {
+    "consumerProfile": [
+      0.04,
+      0.0,
+      0.5
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 0.5,
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 0.5,
+      "frontend/src/components/SharedUI.tsx::RiskBadge": 0.5,
+      "frontend/src/components/SharedUI.tsx::ScoreBar": 0.5,
+      "frontend/src/components/SharedUI.tsx::StageDot": 0.5,
+      "frontend/src/data/api.ts::apiGet": 0.5,
+      "frontend/src/data/api.ts::apiPost": 0.5,
+      "frontend/src/data/pipelineStore.ts::usePipelineStore": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useApiAvailable": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useApproveStage": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::usePipelineStatus": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useRefresh": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRunId": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useRunPipeline": 1.0,
+      "frontend/src/hooks.ts::useAsyncAction": 1.0,
+      "frontend/src/types.ts::Case": 0.5,
+      "frontend/src/types.ts::Policy": 0.5,
+      "frontend/src/types.ts::StageStatus": 0.5,
+      "frontend/src/utils.ts::formatDollars": 0.5
+    },
+    "neighborhoodHash_r1": "2b5a6dbe3ab40db84252efc8067de93c2721987349837773c94e969b0e8053d3",
+    "neighborhoodHash_r2": "2b5a6dbe3ab40db84252efc8067de93c2721987349837773c94e969b0e8053d3"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useSourceCandidates": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 1.0,
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchDiscovery": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useReviewCandidate": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRunDiscoveryFeeds": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useSourceFeeds": 1.0,
+      "frontend/src/hooks.ts::useAsyncAction": 1.0,
+      "frontend/src/types.ts::SourceCandidate": 1.0
+    },
+    "neighborhoodHash_r1": "8e58d776ce808c98e6996764f7842e4bba93c0dcb4ec86c344e225716c3389f1",
+    "neighborhoodHash_r2": "8e58d776ce808c98e6996764f7842e4bba93c0dcb4ec86c344e225716c3389f1"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useSourceFeeds": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 1.0,
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchDiscovery": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useReviewCandidate": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRunDiscoveryFeeds": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useSourceCandidates": 1.0,
+      "frontend/src/hooks.ts::useAsyncAction": 1.0,
+      "frontend/src/types.ts::SourceCandidate": 1.0
+    },
+    "neighborhoodHash_r1": "8e58d776ce808c98e6996764f7842e4bba93c0dcb4ec86c344e225716c3389f1",
+    "neighborhoodHash_r2": "8e58d776ce808c98e6996764f7842e4bba93c0dcb4ec86c344e225716c3389f1"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useTaxonomy": {
+    "consumerProfile": [
+      0.04,
+      0.0,
+      0.5
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/data/usePipelineSelectors.ts::useCases": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::usePolicies": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useThreshold": 0.5,
+      "frontend/src/types.ts::Case": 1.0,
+      "frontend/src/types.ts::Policy": 0.5,
+      "frontend/src/types.ts::Quality": 1.0,
+      "frontend/src/utils.ts::formatDollars": 0.5,
+      "frontend/src/utils.ts::scoreColor": 0.5
+    },
+    "neighborhoodHash_r1": "2a26bc6ebe99f812638f52481ef304c77be69b74e19d8803c1245be1ba3691b8",
+    "neighborhoodHash_r2": "2a26bc6ebe99f812638f52481ef304c77be69b74e19d8803c1245be1ba3691b8"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useThreshold": {
+    "consumerProfile": [
+      0.04,
+      0.0,
+      0.5
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::QualityTags": 0.5,
+      "frontend/src/components/SharedUI.tsx::RiskBadge": 0.5,
+      "frontend/src/components/SharedUI.tsx::ScoreBar": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useCases": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useDataSources": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::usePolicies": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::usePolicyCatalog": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useScannedPrograms": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useTaxonomy": 0.5,
+      "frontend/src/types.ts::Case": 0.5,
+      "frontend/src/types.ts::Policy": 0.5,
+      "frontend/src/types.ts::Quality": 0.5,
+      "frontend/src/utils.ts::formatDollars": 0.5,
+      "frontend/src/utils.ts::scoreColor": 0.5
+    },
+    "neighborhoodHash_r1": "d40f28034618f45b0e0ffd85215662c0880109357fc1e63cba4d960a86b3b868",
+    "neighborhoodHash_r2": "d40f28034618f45b0e0ffd85215662c0880109357fc1e63cba4d960a86b3b868"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useTriageResults": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 1.0,
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTag": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchAssessments": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchFindings": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchResearchSessions": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchTriageResults": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::usePolicies": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useResearchSessions": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRunDeepResearch": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRunTriage": 1.0,
+      "frontend/src/hooks.ts::useAsyncAction": 1.0,
+      "frontend/src/types.ts::QualityAssessment": 1.0,
+      "frontend/src/types.ts::StructuralFinding": 1.0
+    },
+    "neighborhoodHash_r1": "ee02d0047cb0cedfe6168b42a21df9f6e62cf0d40ab867a5513d047326fafa44",
+    "neighborhoodHash_r2": "ee02d0047cb0cedfe6168b42a21df9f6e62cf0d40ab867a5513d047326fafa44"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useUpdatePipelineStatus": {
+    "consumerProfile": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "cooccurrenceVector": {},
+    "neighborhoodHash_r1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "neighborhoodHash_r2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useUploadSourceDocument": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useCreateSource": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useDeleteSource": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useEnforcementSources": 1.0,
+      "frontend/src/hooks.ts::useAsyncAction": 1.0,
+      "frontend/src/types.ts::EnforcementSource": 1.0,
+      "frontend/src/types.ts::ValidationStatus": 1.0
+    },
+    "neighborhoodHash_r1": "370e408ed3f2839649aa4fb6ddd69d496219558cd26f6b37a04ddddd1c4fe775",
+    "neighborhoodHash_r2": "370e408ed3f2839649aa4fb6ddd69d496219558cd26f6b37a04ddddd1c4fe775"
+  },
+  "frontend/src/data/useStatusSubscription.ts::useStatusSubscription": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/auth.ts::getSession": 1.0,
+      "frontend/src/auth.ts::signIn": 1.0,
+      "frontend/src/auth.ts::signOut": 1.0,
+      "frontend/src/data/pipelineStore.ts::usePipelineStore": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useError": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useLoading": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useRefresh": 1.0
+    },
+    "neighborhoodHash_r1": "fcfd8fe3037904142fea611f3e9b77c9b642e3e65e1c169ff3822b5ec50857f5",
+    "neighborhoodHash_r2": "fcfd8fe3037904142fea611f3e9b77c9b642e3e65e1c169ff3822b5ec50857f5"
+  },
+  "frontend/src/hooks.ts::useAsyncAction": {
+    "consumerProfile": [
+      0.1,
+      0.0,
+      0.2
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 0.6,
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 0.4,
+      "frontend/src/components/SharedUI.tsx::RiskBadge": 0.2,
+      "frontend/src/components/SharedUI.tsx::ScoreBar": 0.2,
+      "frontend/src/components/SharedUI.tsx::StageDot": 0.2,
+      "frontend/src/data/pipelineStore.ts::usePipelineStore": 0.2,
+      "frontend/src/data/usePipelineSelectors.ts::useApiAvailable": 0.2,
+      "frontend/src/data/usePipelineSelectors.ts::useApproveStage": 0.2,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchDiscovery": 0.2,
+      "frontend/src/data/usePipelineSelectors.ts::usePipelineStatus": 0.2,
+      "frontend/src/data/usePipelineSelectors.ts::useRefresh": 0.4,
+      "frontend/src/data/usePipelineSelectors.ts::useRunId": 0.2,
+      "frontend/src/data/usePipelineSelectors.ts::useRunPipeline": 0.4,
+      "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline": 0.4,
+      "frontend/src/types.ts::Case": 0.2,
+      "frontend/src/types.ts::Policy": 0.2,
+      "frontend/src/types.ts::SourceCandidate": 0.2,
+      "frontend/src/types.ts::StageStatus": 0.2,
+      "frontend/src/utils.ts::formatDollars": 0.2
+    },
+    "neighborhoodHash_r1": "3bdb72a2de4d0514cf0c8bdfc443538420938fad33c6ff69039e790dea1c7e56",
+    "neighborhoodHash_r2": "3bdb72a2de4d0514cf0c8bdfc443538420938fad33c6ff69039e790dea1c7e56"
+  },
+  "frontend/src/types.ts::Case": {
+    "consumerProfile": [
+      0.08,
+      0.0,
+      0.25
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 0.25,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 0.5,
+      "frontend/src/components/SharedUI.tsx::RiskBadge": 0.25,
+      "frontend/src/components/SharedUI.tsx::ScoreBar": 0.25,
+      "frontend/src/components/SharedUI.tsx::StageDot": 0.25,
+      "frontend/src/data/pipelineStore.ts::usePipelineStore": 0.25,
+      "frontend/src/data/usePipelineSelectors.ts::useApiAvailable": 0.25,
+      "frontend/src/data/usePipelineSelectors.ts::useApproveStage": 0.25,
+      "frontend/src/data/usePipelineSelectors.ts::useCases": 0.75,
+      "frontend/src/data/usePipelineSelectors.ts::usePipelineStatus": 0.25,
+      "frontend/src/data/usePipelineSelectors.ts::useRefresh": 0.25,
+      "frontend/src/data/usePipelineSelectors.ts::useRunId": 0.25,
+      "frontend/src/data/usePipelineSelectors.ts::useRunPipeline": 0.25,
+      "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline": 0.25,
+      "frontend/src/data/usePipelineSelectors.ts::useTaxonomy": 0.5,
+      "frontend/src/hooks.ts::useAsyncAction": 0.25,
+      "frontend/src/types.ts::Policy": 0.5,
+      "frontend/src/types.ts::Quality": 0.5,
+      "frontend/src/types.ts::StageStatus": 0.25,
+      "frontend/src/utils.ts::formatDollars": 0.75
+    },
+    "neighborhoodHash_r1": "ca9c39df0892db33959538c830812fca99af0aa23db92e2d298ca332e4eff333",
+    "neighborhoodHash_r2": "ca9c39df0892db33959538c830812fca99af0aa23db92e2d298ca332e4eff333"
+  },
+  "frontend/src/types.ts::Counts": {
+    "consumerProfile": [
+      0.08,
+      2.0,
+      0.25
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::StageDot": 0.3333333333333333,
+      "frontend/src/data/api.ts::apiGet": 0.6666666666666666,
+      "frontend/src/data/api.ts::apiPost": 0.3333333333333333,
+      "frontend/src/data/pipelineStore.ts::usePipelineStore": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useCounts": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::usePipelineStatus": 0.3333333333333333,
+      "frontend/src/types.ts::Dimension": 0.3333333333333333,
+      "frontend/src/types.ts::FallbackData": 0.3333333333333333,
+      "frontend/src/types.ts::PipelineStageStatus": 0.6666666666666666,
+      "frontend/src/types.ts::Quality": 0.3333333333333333,
+      "frontend/src/types.ts::QualityAssessment": 0.3333333333333333,
+      "frontend/src/types.ts::ResearchSession": 0.3333333333333333,
+      "frontend/src/types.ts::SourceCandidate": 0.3333333333333333,
+      "frontend/src/types.ts::SourceFeed": 0.3333333333333333,
+      "frontend/src/types.ts::StructuralFinding": 0.3333333333333333,
+      "frontend/src/types.ts::TriageResult": 0.3333333333333333
+    },
+    "neighborhoodHash_r1": "9a7e08fb5559aa800f51bdff6f2693de7c2559273fa5ca610a5c1c1b51091aac",
+    "neighborhoodHash_r2": "312b206262c83b3933c9e8225922755dfc14406d03fe69abeec781c012ec131c"
+  },
+  "frontend/src/types.ts::DetectionPattern": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useDetectionPatterns": 1.0,
+      "frontend/src/types.ts::RiskLevel": 1.0
+    },
+    "neighborhoodHash_r1": "e38b82ceee84ee43e1d3cb62a3519538efe53387660b3e99be00aa680064c763",
+    "neighborhoodHash_r2": "e38b82ceee84ee43e1d3cb62a3519538efe53387660b3e99be00aa680064c763"
+  },
+  "frontend/src/types.ts::Dimension": {
+    "consumerProfile": [
+      0.04,
+      1.0,
+      0.5
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/data/api.ts::apiGet": 1.0,
+      "frontend/src/data/api.ts::apiPost": 1.0,
+      "frontend/src/types.ts::Counts": 1.0,
+      "frontend/src/types.ts::FallbackData": 1.0,
+      "frontend/src/types.ts::PipelineStageStatus": 1.0,
+      "frontend/src/types.ts::Quality": 1.0,
+      "frontend/src/types.ts::QualityAssessment": 1.0,
+      "frontend/src/types.ts::ResearchSession": 1.0,
+      "frontend/src/types.ts::SourceCandidate": 1.0,
+      "frontend/src/types.ts::SourceFeed": 1.0,
+      "frontend/src/types.ts::StructuralFinding": 1.0,
+      "frontend/src/types.ts::TriageResult": 1.0
+    },
+    "neighborhoodHash_r1": "ebd9246f1f5b49526bfca335e8326f67add11397abd4ecda574a7627f9c8c225",
+    "neighborhoodHash_r2": "b5bc584928cc5278a77a8b358c024853910a83e35f43100768ac9f3ce14a890a"
+  },
+  "frontend/src/types.ts::EnforcementSource": {
+    "consumerProfile": [
+      0.04,
+      0.0,
+      0.5
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 0.5,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useCases": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useCreateSource": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useDeleteSource": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useEnforcementSources": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useUploadSourceDocument": 0.5,
+      "frontend/src/hooks.ts::useAsyncAction": 0.5,
+      "frontend/src/types.ts::Case": 0.5,
+      "frontend/src/types.ts::ValidationStatus": 0.5,
+      "frontend/src/utils.ts::formatDollars": 0.5
+    },
+    "neighborhoodHash_r1": "4dad2fc72697e4e1ea02d9dc8c0a66bf30f2efc1529eabee7b3188d8aba38145",
+    "neighborhoodHash_r2": "4dad2fc72697e4e1ea02d9dc8c0a66bf30f2efc1529eabee7b3188d8aba38145"
+  },
+  "frontend/src/types.ts::ExploitationStep": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 1.0,
+      "frontend/src/components/SharedUI.tsx::ScoreBar": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useExploitationTrees": 1.0,
+      "frontend/src/types.ts::ExploitationTree": 1.0
+    },
+    "neighborhoodHash_r1": "d3b921ec65d396524f42e8108d63e9074bf018e6c1cc2232a4d984f8d35332e4",
+    "neighborhoodHash_r2": "d3b921ec65d396524f42e8108d63e9074bf018e6c1cc2232a4d984f8d35332e4"
+  },
+  "frontend/src/types.ts::ExploitationTree": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 1.0,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 1.0,
+      "frontend/src/components/SharedUI.tsx::ScoreBar": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useExploitationTrees": 1.0,
+      "frontend/src/types.ts::ExploitationStep": 1.0
+    },
+    "neighborhoodHash_r1": "d3b921ec65d396524f42e8108d63e9074bf018e6c1cc2232a4d984f8d35332e4",
+    "neighborhoodHash_r2": "d3b921ec65d396524f42e8108d63e9074bf018e6c1cc2232a4d984f8d35332e4"
+  },
+  "frontend/src/types.ts::FallbackData": {
+    "consumerProfile": [
+      0.06,
+      1.0,
+      0.3333333333333333
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/data/api.ts::apiGet": 0.5,
+      "frontend/src/data/api.ts::apiPost": 0.5,
+      "frontend/src/types.ts::Counts": 0.5,
+      "frontend/src/types.ts::Dimension": 0.5,
+      "frontend/src/types.ts::PipelineStageStatus": 0.5,
+      "frontend/src/types.ts::Quality": 0.5,
+      "frontend/src/types.ts::QualityAssessment": 0.5,
+      "frontend/src/types.ts::ResearchSession": 0.5,
+      "frontend/src/types.ts::SourceCandidate": 0.5,
+      "frontend/src/types.ts::SourceFeed": 0.5,
+      "frontend/src/types.ts::StructuralFinding": 0.5,
+      "frontend/src/types.ts::TriageResult": 0.5
+    },
+    "neighborhoodHash_r1": "a46116b21bedf78f19858550a666be59b521787a71b25454487ad1e9689d5d54",
+    "neighborhoodHash_r2": "9d2a70d4ba4e484b96633ad0f6956fae39af07408a8577df0b259a6efaf27de5"
+  },
+  "frontend/src/types.ts::PipelineStageStatus": {
+    "consumerProfile": [
+      0.06,
+      1.584962500721156,
+      0.3333333333333333
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/data/api.ts::apiGet": 1.0,
+      "frontend/src/data/api.ts::apiPost": 0.5,
+      "frontend/src/data/pipelineStore.ts::usePipelineStore": 0.5,
+      "frontend/src/types.ts::Counts": 1.0,
+      "frontend/src/types.ts::Dimension": 0.5,
+      "frontend/src/types.ts::FallbackData": 0.5,
+      "frontend/src/types.ts::Quality": 0.5,
+      "frontend/src/types.ts::QualityAssessment": 0.5,
+      "frontend/src/types.ts::ResearchSession": 0.5,
+      "frontend/src/types.ts::SourceCandidate": 0.5,
+      "frontend/src/types.ts::SourceFeed": 0.5,
+      "frontend/src/types.ts::StructuralFinding": 0.5,
+      "frontend/src/types.ts::TriageResult": 0.5
+    },
+    "neighborhoodHash_r1": "b84b43642a3b20c33f0f7662e95f52beb07ed2ef92b14a0ec90011c032888cfb",
+    "neighborhoodHash_r2": "b5bc584928cc5278a77a8b358c024853910a83e35f43100768ac9f3ce14a890a"
+  },
+  "frontend/src/types.ts::Policy": {
+    "consumerProfile": [
+      0.04,
+      0.0,
+      0.5
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 0.5,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 0.5,
+      "frontend/src/components/SharedUI.tsx::RiskBadge": 0.5,
+      "frontend/src/components/SharedUI.tsx::ScoreBar": 0.5,
+      "frontend/src/components/SharedUI.tsx::StageDot": 0.5,
+      "frontend/src/data/pipelineStore.ts::usePipelineStore": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useApiAvailable": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useApproveStage": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useCases": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::usePipelineStatus": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useRefresh": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useRunId": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useRunPipeline": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline": 0.5,
+      "frontend/src/hooks.ts::useAsyncAction": 0.5,
+      "frontend/src/types.ts::Case": 1.0,
+      "frontend/src/types.ts::Quality": 0.5,
+      "frontend/src/types.ts::StageStatus": 0.5,
+      "frontend/src/utils.ts::formatDollars": 1.0,
+      "frontend/src/utils.ts::scoreColor": 0.5
+    },
+    "neighborhoodHash_r1": "7f25b1967c6eac88639f477722ea0f7d18ad400fcc53e4fb62654536f82f09f4",
+    "neighborhoodHash_r2": "7f25b1967c6eac88639f477722ea0f7d18ad400fcc53e4fb62654536f82f09f4"
+  },
+  "frontend/src/types.ts::Quality": {
+    "consumerProfile": [
+      0.08,
+      1.584962500721156,
+      0.25
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/data/api.ts::apiGet": 0.3333333333333333,
+      "frontend/src/data/api.ts::apiPost": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useCases": 0.6666666666666666,
+      "frontend/src/data/usePipelineSelectors.ts::usePolicies": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useTaxonomy": 0.6666666666666666,
+      "frontend/src/data/usePipelineSelectors.ts::useThreshold": 0.3333333333333333,
+      "frontend/src/types.ts::Case": 0.6666666666666666,
+      "frontend/src/types.ts::Counts": 0.3333333333333333,
+      "frontend/src/types.ts::Dimension": 0.3333333333333333,
+      "frontend/src/types.ts::FallbackData": 0.3333333333333333,
+      "frontend/src/types.ts::PipelineStageStatus": 0.3333333333333333,
+      "frontend/src/types.ts::Policy": 0.3333333333333333,
+      "frontend/src/types.ts::QualityAssessment": 0.3333333333333333,
+      "frontend/src/types.ts::ResearchSession": 0.3333333333333333,
+      "frontend/src/types.ts::SourceCandidate": 0.3333333333333333,
+      "frontend/src/types.ts::SourceFeed": 0.3333333333333333,
+      "frontend/src/types.ts::StructuralFinding": 0.3333333333333333,
+      "frontend/src/types.ts::TriageResult": 0.3333333333333333,
+      "frontend/src/utils.ts::formatDollars": 0.3333333333333333,
+      "frontend/src/utils.ts::scoreColor": 0.3333333333333333
+    },
+    "neighborhoodHash_r1": "712f29d7fd34bc4d0c006e5c18da78b59b817a3ae7887d1819e2fec3b91f625e",
+    "neighborhoodHash_r2": "f3d84cb1e340dacfa93c0dcb4a655c0e2055020518e829a1a105148b7c4bd39d"
+  },
+  "frontend/src/types.ts::QualityAssessment": {
+    "consumerProfile": [
+      0.06,
+      1.584962500721156,
+      0.3333333333333333
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 0.5,
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 0.5,
+      "frontend/src/components/SharedUI.tsx::QualityTag": 0.5,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchAssessments": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchFindings": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchResearchSessions": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchTriageResults": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::usePolicies": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useResearchSessions": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useRunDeepResearch": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useRunTriage": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useTriageResults": 0.5,
+      "frontend/src/hooks.ts::useAsyncAction": 0.5,
+      "frontend/src/types.ts::Counts": 0.5,
+      "frontend/src/types.ts::FallbackData": 0.5,
+      "frontend/src/types.ts::PipelineStageStatus": 0.5,
+      "frontend/src/types.ts::Quality": 0.5,
+      "frontend/src/types.ts::SourceFeed": 0.5,
+      "frontend/src/types.ts::StructuralFinding": 1.0
+    },
+    "neighborhoodHash_r1": "85989e202eefa65488a540d301af9d4fb7f512cbe529b4b47a467183df801986",
+    "neighborhoodHash_r2": "663da7c6656282886b2aff2036538bc66603a2d6c5328579aa12495d5459997e"
+  },
+  "frontend/src/types.ts::ResearchSession": {
+    "consumerProfile": [
+      0.04,
+      1.0,
+      0.5
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/data/api.ts::apiGet": 1.0,
+      "frontend/src/data/api.ts::apiPost": 1.0,
+      "frontend/src/types.ts::Counts": 1.0,
+      "frontend/src/types.ts::Dimension": 1.0,
+      "frontend/src/types.ts::FallbackData": 1.0,
+      "frontend/src/types.ts::PipelineStageStatus": 1.0,
+      "frontend/src/types.ts::Quality": 1.0,
+      "frontend/src/types.ts::QualityAssessment": 1.0,
+      "frontend/src/types.ts::SourceCandidate": 1.0,
+      "frontend/src/types.ts::SourceFeed": 1.0,
+      "frontend/src/types.ts::StructuralFinding": 1.0,
+      "frontend/src/types.ts::TriageResult": 1.0
+    },
+    "neighborhoodHash_r1": "ebd9246f1f5b49526bfca335e8326f67add11397abd4ecda574a7627f9c8c225",
+    "neighborhoodHash_r2": "b5bc584928cc5278a77a8b358c024853910a83e35f43100768ac9f3ce14a890a"
+  },
+  "frontend/src/types.ts::RiskLevel": {
+    "consumerProfile": [
+      0.16,
+      1.0,
+      0.125
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useDetectionPatterns": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useQuality": 0.5,
+      "frontend/src/types.ts::DetectionPattern": 0.5,
+      "frontend/src/types.ts::StageStatus": 0.5,
+      "frontend/src/utils.ts::scoreColor": 0.5,
+      "frontend/src/utils.ts::scoreLevel": 0.5
+    },
+    "neighborhoodHash_r1": "38da36dde9d9792ab7be56fcd211122bd1bc2c6560e901ec5b23b972c13da7e6",
+    "neighborhoodHash_r2": "11b60cc8d219f3d3455ed6bf386616c4f982fc1eccef170d68ef02e75f6a5bcc"
+  },
+  "frontend/src/types.ts::SourceCandidate": {
+    "consumerProfile": [
+      0.06,
+      1.584962500721156,
+      0.3333333333333333
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 0.5,
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 0.5,
+      "frontend/src/data/api.ts::apiGet": 0.5,
+      "frontend/src/data/api.ts::apiPost": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchDiscovery": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useReviewCandidate": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useRunDiscoveryFeeds": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useSourceCandidates": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useSourceFeeds": 0.5,
+      "frontend/src/hooks.ts::useAsyncAction": 0.5,
+      "frontend/src/types.ts::Counts": 0.5,
+      "frontend/src/types.ts::Dimension": 0.5,
+      "frontend/src/types.ts::FallbackData": 0.5,
+      "frontend/src/types.ts::PipelineStageStatus": 0.5,
+      "frontend/src/types.ts::Quality": 0.5,
+      "frontend/src/types.ts::QualityAssessment": 0.5,
+      "frontend/src/types.ts::ResearchSession": 0.5,
+      "frontend/src/types.ts::SourceFeed": 0.5,
+      "frontend/src/types.ts::StructuralFinding": 0.5,
+      "frontend/src/types.ts::TriageResult": 0.5
+    },
+    "neighborhoodHash_r1": "fd6e14b3813aaf08bbfac167c3a9d0cb9cc7c9592c6e967b3c773f3e209f658c",
+    "neighborhoodHash_r2": "2f057726d24c39203e0983534a50879d28df8884fece029b3f29bb0607a362f0"
+  },
+  "frontend/src/types.ts::SourceFeed": {
+    "consumerProfile": [
+      0.04,
+      1.0,
+      0.5
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/data/api.ts::apiGet": 1.0,
+      "frontend/src/data/api.ts::apiPost": 1.0,
+      "frontend/src/types.ts::Counts": 1.0,
+      "frontend/src/types.ts::Dimension": 1.0,
+      "frontend/src/types.ts::FallbackData": 1.0,
+      "frontend/src/types.ts::PipelineStageStatus": 1.0,
+      "frontend/src/types.ts::Quality": 1.0,
+      "frontend/src/types.ts::QualityAssessment": 1.0,
+      "frontend/src/types.ts::ResearchSession": 1.0,
+      "frontend/src/types.ts::SourceCandidate": 1.0,
+      "frontend/src/types.ts::StructuralFinding": 1.0,
+      "frontend/src/types.ts::TriageResult": 1.0
+    },
+    "neighborhoodHash_r1": "ebd9246f1f5b49526bfca335e8326f67add11397abd4ecda574a7627f9c8c225",
+    "neighborhoodHash_r2": "b5bc584928cc5278a77a8b358c024853910a83e35f43100768ac9f3ce14a890a"
+  },
+  "frontend/src/types.ts::StageStatus": {
+    "consumerProfile": [
+      0.16,
+      1.0,
+      0.125
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 0.5,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 0.5,
+      "frontend/src/components/SharedUI.tsx::RiskBadge": 0.5,
+      "frontend/src/components/SharedUI.tsx::ScoreBar": 0.5,
+      "frontend/src/components/SharedUI.tsx::StageDot": 0.5,
+      "frontend/src/data/pipelineStore.ts::usePipelineStore": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useApiAvailable": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useApproveStage": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::usePipelineStatus": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useRefresh": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useRunId": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useRunPipeline": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline": 0.5,
+      "frontend/src/hooks.ts::useAsyncAction": 0.5,
+      "frontend/src/types.ts::Case": 0.5,
+      "frontend/src/types.ts::Policy": 0.5,
+      "frontend/src/types.ts::RiskLevel": 0.5,
+      "frontend/src/utils.ts::formatDollars": 0.5,
+      "frontend/src/utils.ts::scoreColor": 0.5,
+      "frontend/src/utils.ts::scoreLevel": 0.5
+    },
+    "neighborhoodHash_r1": "eaf5898a62afe429b2658ec0dd39d479ea958ad3e143921f33e0549ea5716be3",
+    "neighborhoodHash_r2": "11b60cc8d219f3d3455ed6bf386616c4f982fc1eccef170d68ef02e75f6a5bcc"
+  },
+  "frontend/src/types.ts::StructuralFinding": {
+    "consumerProfile": [
+      0.06,
+      1.584962500721156,
+      0.3333333333333333
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::Badge": 0.5,
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 0.5,
+      "frontend/src/components/SharedUI.tsx::QualityTag": 0.5,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchAssessments": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchFindings": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchResearchSessions": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useFetchTriageResults": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::usePolicies": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useResearchSessions": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useRunDeepResearch": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useRunTriage": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useTriageResults": 0.5,
+      "frontend/src/hooks.ts::useAsyncAction": 0.5,
+      "frontend/src/types.ts::Counts": 0.5,
+      "frontend/src/types.ts::FallbackData": 0.5,
+      "frontend/src/types.ts::PipelineStageStatus": 0.5,
+      "frontend/src/types.ts::Quality": 0.5,
+      "frontend/src/types.ts::QualityAssessment": 1.0,
+      "frontend/src/types.ts::SourceFeed": 0.5
+    },
+    "neighborhoodHash_r1": "85989e202eefa65488a540d301af9d4fb7f512cbe529b4b47a467183df801986",
+    "neighborhoodHash_r2": "663da7c6656282886b2aff2036538bc66603a2d6c5328579aa12495d5459997e"
+  },
+  "frontend/src/types.ts::TriageResult": {
+    "consumerProfile": [
+      0.04,
+      1.0,
+      0.5
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/data/api.ts::apiGet": 1.0,
+      "frontend/src/data/api.ts::apiPost": 1.0,
+      "frontend/src/types.ts::Counts": 1.0,
+      "frontend/src/types.ts::Dimension": 1.0,
+      "frontend/src/types.ts::FallbackData": 1.0,
+      "frontend/src/types.ts::PipelineStageStatus": 1.0,
+      "frontend/src/types.ts::Quality": 1.0,
+      "frontend/src/types.ts::QualityAssessment": 1.0,
+      "frontend/src/types.ts::ResearchSession": 1.0,
+      "frontend/src/types.ts::SourceCandidate": 1.0,
+      "frontend/src/types.ts::SourceFeed": 1.0,
+      "frontend/src/types.ts::StructuralFinding": 1.0
+    },
+    "neighborhoodHash_r1": "ebd9246f1f5b49526bfca335e8326f67add11397abd4ecda574a7627f9c8c225",
+    "neighborhoodHash_r2": "b5bc584928cc5278a77a8b358c024853910a83e35f43100768ac9f3ce14a890a"
+  },
+  "frontend/src/types.ts::ValidationStatus": {
+    "consumerProfile": [
+      0.02,
+      0.0,
+      1.0
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useCreateSource": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useDeleteSource": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useEnforcementSources": 1.0,
+      "frontend/src/data/usePipelineSelectors.ts::useUploadSourceDocument": 1.0,
+      "frontend/src/hooks.ts::useAsyncAction": 1.0,
+      "frontend/src/types.ts::EnforcementSource": 1.0
+    },
+    "neighborhoodHash_r1": "370e408ed3f2839649aa4fb6ddd69d496219558cd26f6b37a04ddddd1c4fe775",
+    "neighborhoodHash_r2": "370e408ed3f2839649aa4fb6ddd69d496219558cd26f6b37a04ddddd1c4fe775"
+  },
+  "frontend/src/utils.ts::formatDollars": {
+    "consumerProfile": [
+      0.06,
+      0.0,
+      0.3333333333333333
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/components/SharedUI.tsx::ErrorBanner": 0.3333333333333333,
+      "frontend/src/components/SharedUI.tsx::QualityTags": 0.6666666666666666,
+      "frontend/src/components/SharedUI.tsx::RiskBadge": 0.3333333333333333,
+      "frontend/src/components/SharedUI.tsx::ScoreBar": 0.3333333333333333,
+      "frontend/src/components/SharedUI.tsx::StageDot": 0.3333333333333333,
+      "frontend/src/data/pipelineStore.ts::usePipelineStore": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useApiAvailable": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useApproveStage": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useCases": 0.6666666666666666,
+      "frontend/src/data/usePipelineSelectors.ts::useEnforcementSources": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::usePipelineStatus": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useRefresh": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useRunId": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useRunPipeline": 0.3333333333333333,
+      "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline": 0.3333333333333333,
+      "frontend/src/hooks.ts::useAsyncAction": 0.3333333333333333,
+      "frontend/src/types.ts::Case": 1.0,
+      "frontend/src/types.ts::EnforcementSource": 0.3333333333333333,
+      "frontend/src/types.ts::Policy": 0.6666666666666666,
+      "frontend/src/types.ts::StageStatus": 0.3333333333333333
+    },
+    "neighborhoodHash_r1": "dd7d44766a8efa3e6a032c20b757c65f212c4d03789e5ee9768915134d492e7d",
+    "neighborhoodHash_r2": "dd7d44766a8efa3e6a032c20b757c65f212c4d03789e5ee9768915134d492e7d"
+  },
+  "frontend/src/utils.ts::scoreColor": {
+    "consumerProfile": [
+      0.16,
+      1.0,
+      0.125
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/data/usePipelineSelectors.ts::useCases": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::usePolicies": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useQuality": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useTaxonomy": 0.5,
+      "frontend/src/data/usePipelineSelectors.ts::useThreshold": 0.5,
+      "frontend/src/types.ts::Case": 0.5,
+      "frontend/src/types.ts::Policy": 0.5,
+      "frontend/src/types.ts::Quality": 0.5,
+      "frontend/src/types.ts::RiskLevel": 0.5,
+      "frontend/src/types.ts::StageStatus": 0.5,
+      "frontend/src/utils.ts::formatDollars": 0.5,
+      "frontend/src/utils.ts::scoreLevel": 0.5
+    },
+    "neighborhoodHash_r1": "2a2a5870407aeb917291b90d118e9a74df989c5c5036250f43d3737ccd25509c",
+    "neighborhoodHash_r2": "0a96f4b6ae087e30dc9ff47e15d54193b918c4cfa0cadda0907c489c56f681e1"
+  },
+  "frontend/src/utils.ts::scoreLevel": {
+    "consumerProfile": [
+      0.14,
+      0.0,
+      0.14285714285714285
+    ],
+    "cooccurrenceVector": {
+      "frontend/src/data/usePipelineSelectors.ts::useQuality": 1.0,
+      "frontend/src/types.ts::RiskLevel": 1.0,
+      "frontend/src/types.ts::StageStatus": 1.0,
+      "frontend/src/utils.ts::scoreColor": 1.0
+    },
+    "neighborhoodHash_r1": "ebbf5e7f871d601508133a5a3fc8c46b459949695279ff3cb1c8f2da31df4038",
+    "neighborhoodHash_r2": "11b60cc8d219f3d3455ed6bf386616c4f982fc1eccef170d68ef02e75f6a5bcc"
+  },
+  "frontend/src/views/CaseSourcing.tsx::default": {
+    "consumerProfile": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "cooccurrenceVector": {},
+    "neighborhoodHash_r1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "neighborhoodHash_r2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "frontend/src/views/ConvergenceMatrix.tsx::default": {
+    "consumerProfile": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "cooccurrenceVector": {},
+    "neighborhoodHash_r1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "neighborhoodHash_r2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "frontend/src/views/Dashboard.tsx::default": {
+    "consumerProfile": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "cooccurrenceVector": {},
+    "neighborhoodHash_r1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "neighborhoodHash_r2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "frontend/src/views/DetectionView.tsx::default": {
+    "consumerProfile": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "cooccurrenceVector": {},
+    "neighborhoodHash_r1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "neighborhoodHash_r2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "frontend/src/views/DimensionRegistryView.tsx::default": {
+    "consumerProfile": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "cooccurrenceVector": {},
+    "neighborhoodHash_r1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "neighborhoodHash_r2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "frontend/src/views/DiscoveryView.tsx::default": {
+    "consumerProfile": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "cooccurrenceVector": {},
+    "neighborhoodHash_r1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "neighborhoodHash_r2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "frontend/src/views/ManagementView.tsx::default": {
+    "consumerProfile": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "cooccurrenceVector": {},
+    "neighborhoodHash_r1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "neighborhoodHash_r2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "frontend/src/views/PolicyExplorer.tsx::default": {
+    "consumerProfile": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "cooccurrenceVector": {},
+    "neighborhoodHash_r1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "neighborhoodHash_r2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "frontend/src/views/PredictionView.tsx::default": {
+    "consumerProfile": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "cooccurrenceVector": {},
+    "neighborhoodHash_r1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "neighborhoodHash_r2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "frontend/src/views/ResearchView.tsx::default": {
+    "consumerProfile": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "cooccurrenceVector": {},
+    "neighborhoodHash_r1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "neighborhoodHash_r2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "frontend/src/views/SourcesView.tsx::default": {
+    "consumerProfile": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "cooccurrenceVector": {},
+    "neighborhoodHash_r1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "neighborhoodHash_r2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  },
+  "frontend/src/views/TaxonomyView.tsx::default": {
+    "consumerProfile": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "cooccurrenceVector": {},
+    "neighborhoodHash_r1": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "neighborhoodHash_r2": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+  }
+}

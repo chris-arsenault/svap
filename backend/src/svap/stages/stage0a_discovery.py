@@ -19,6 +19,7 @@ Output: source_candidates (discovered + scored entries),
 """
 
 import hashlib
+import logging
 import re
 import time
 from datetime import UTC, datetime
@@ -29,6 +30,8 @@ from svap.bedrock_client import BedrockClient
 from svap.rag import DocumentIngester
 from svap.stages.stage0_source_fetch import _extract_text, _fetch_url, _is_binary_content
 from svap.storage import SVAPStorage
+
+logger = logging.getLogger(__name__)
 
 LINK_EXTRACTION_SYSTEM = (
     "You are an analyst identifying enforcement case document links "
@@ -124,11 +127,11 @@ def _check_feed(
     listing_url = feed["listing_url"]
     max_per_feed = config.get("discovery", {}).get("max_candidates_per_feed", 50)
 
-    print(f"  Checking feed: {feed['name']}")
+    logger.info("Checking feed: %s", feed['name'])
     try:
         html = _fetch_url(listing_url)
     except Exception as e:
-        print(f"    Failed to fetch listing page: {e}")
+        logger.error("Failed to fetch listing page: %s", e)
         return []
 
     raw_links = _extract_links(html)
@@ -165,7 +168,7 @@ def _check_feed(
         storage.insert_candidate(candidate)
         new_candidates.append(candidate)
 
-    print(f"    Found {len(filtered)} links, {len(new_candidates)} new candidates")
+    logger.info("Found %d links, %d new candidates", len(filtered), len(new_candidates))
     return new_candidates
 
 
@@ -258,12 +261,12 @@ def run(storage: SVAPStorage, client: BedrockClient, config: dict) -> dict:
 
     Returns a summary dict of what was discovered/accepted/rejected.
     """
-    print("Case Discovery — Feed Monitoring")
+    logger.info("Case Discovery — Feed Monitoring")
 
     feeds = storage.get_source_feeds(enabled_only=True)
 
     if not feeds:
-        print("  No source feeds configured.")
+        logger.info("No source feeds configured.")
         return {"feeds_checked": 0}
 
     total_discovered = 0
@@ -281,17 +284,17 @@ def run(storage: SVAPStorage, client: BedrockClient, config: dict) -> dict:
                 html = _fetch_url(candidate["url"])
                 text = _extract_text(html)
             except Exception as e:
-                print(f"    Failed to fetch {candidate['url']}: {e}")
+                logger.error("Failed to fetch %s: %s", candidate['url'], e)
                 storage.update_candidate_status(candidate["candidate_id"], "error")
                 continue
 
             if len(text) < 200:
-                print(f"    Text too short ({len(text)} chars), skipping")
+                logger.info("Text too short (%d chars), skipping", len(text))
                 storage.update_candidate_status(candidate["candidate_id"], "error")
                 continue
 
             if _is_binary_content(text):
-                print("    Binary/non-readable content (PDF or image), skipping")
+                logger.info("Binary/non-readable content (PDF or image), skipping")
                 storage.update_candidate_status(candidate["candidate_id"], "error")
                 continue
 
@@ -309,9 +312,9 @@ def run(storage: SVAPStorage, client: BedrockClient, config: dict) -> dict:
 
             # Apply disposition
             disposition = _apply_disposition(eval_result, config)
-            print(
-                f"    {candidate['title'][:60]}: "
-                f"richness={eval_result['richness_score']:.2f} → {disposition}"
+            logger.info(
+                "%s: richness=%.2f -> %s",
+                candidate['title'][:60], eval_result['richness_score'], disposition,
             )
 
             if disposition == "accepted":
@@ -335,9 +338,8 @@ def run(storage: SVAPStorage, client: BedrockClient, config: dict) -> dict:
         "candidates_rejected": total_rejected,
         "candidates_pending_review": total_review,
     }
-    print(
-        f"  Discovery complete: {total_discovered} discovered, "
-        f"{total_accepted} accepted, {total_rejected} rejected, "
-        f"{total_review} pending review."
+    logger.info(
+        "Discovery complete: %d discovered, %d accepted, %d rejected, %d pending review.",
+        total_discovered, total_accepted, total_rejected, total_review,
     )
     return summary

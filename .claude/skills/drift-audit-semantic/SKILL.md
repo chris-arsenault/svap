@@ -30,87 +30,22 @@ genuine semantic duplication.
 
 ## Prerequisites
 
-1. Install drift: `curl -fsSL https://raw.githubusercontent.com/chris-arsenault/drift/main/install.sh | bash`
-   This sets `DRIFT_SEMANTIC=~/.drift-semantic` in your shell profile. Or set it manually
-   to wherever you cloned the repo. The tool auto-installs its own dependencies on first run.
-2. Install the skill to this project: `drift install-skill` (or it's already done if you're reading this)
-3. Check if `.drift-audit/drift-manifest.json` exists — append semantic findings to it
-4. Identify the shared component/utility library — this is where consolidated implementations
-   would eventually live
+The drift orchestrator runs the semantic pipeline before invoking this skill. The following
+artifacts must exist in `.drift-audit/semantic/` before proceeding:
 
-## Method A: Tool-Assisted (Preferred)
-
-Use this method when the drift CLI is available. It provides deterministic structural
-analysis that you then verify semantically.
-
-### Phase 0: Pipeline Health Check
-
-Before running the full pipeline, verify the environment can support it:
-
-```bash
-# Check that the CLI can find Python and create venvs
-drift version 2>&1 && echo "CLI OK"
-
-# Try a quick extract to verify the full toolchain works
-bash "$DRIFT_SEMANTIC/cli.sh" extract --project . 2>&1 | tail -5
-```
-
-If extraction succeeds, proceed with Phase 1. If it fails:
-- **Node.js not found:** Tell the user to install Node.js (required for ts-morph extraction)
-- **Python venv error:** The CLI auto-discovers Python via uv, pyenv, conda, and system
-  paths. If it still fails, tell the user to run `uv python install 3.12` or
-  `sudo apt install python3-venv`.
-- **Any other error:** Run individual stages to isolate the failure (see Phase 1 error recovery).
-
-### Phase 1: Run the CLI Tool
-
-```bash
-bash "$DRIFT_SEMANTIC/cli.sh" run --project .
-```
-
-This runs the full pipeline:
-1. **Extract** — ts-morph parses all exported code units (types, JSX, hooks, imports, call
-   graph, consumer graph, behavior markers)
-2. **ast-grep** — structural pattern matching for common code shapes
-3. **Fingerprint** — JSX hash, hook profile, import constellation, behavior flags
-4. **Type signatures** — normalized type hashes with identifiers stripped
-5. **Call graph vectors** — callee sets, call sequences, chain patterns
-6. **Dependency context** — consumer profiles, co-occurrence, neighborhood hashes
-7. **Embed** — TF-IDF embeddings of purpose statements (if available from Phase 3)
-8. **Score** — pairwise similarity across all units using 13 signals
-9. **Cluster** — graph-based community detection over similarity matrix
-10. **CSS extract** — parse `.css` files, fingerprint rules, link to components
-11. **CSS score** — pairwise CSS similarity and clustering
-12. **Report** — preliminary report with structural clusters and CSS findings
-
-**Error recovery:** If `drift run` fails partway through, run individual stages to isolate
-the problem and salvage partial results:
-
-```bash
-# Run stages individually — each one that succeeds produces usable artifacts
-bash "$DRIFT_SEMANTIC/cli.sh" extract --project .     # MUST succeed — everything depends on this
-bash "$DRIFT_SEMANTIC/cli.sh" ast-grep --project .     # Optional — skips gracefully if sg not found
-bash "$DRIFT_SEMANTIC/cli.sh" fingerprint              # Needs code-units.json
-bash "$DRIFT_SEMANTIC/cli.sh" typesig                  # Needs code-units.json
-bash "$DRIFT_SEMANTIC/cli.sh" callgraph                # Needs code-units.json
-bash "$DRIFT_SEMANTIC/cli.sh" depcontext               # Needs code-units.json
-bash "$DRIFT_SEMANTIC/cli.sh" score                    # Needs fingerprints
-bash "$DRIFT_SEMANTIC/cli.sh" cluster                  # Needs scores
-bash "$DRIFT_SEMANTIC/cli.sh" css-extract --project .  # CSS extraction (needs code-units.json)
-bash "$DRIFT_SEMANTIC/cli.sh" css-score                # CSS scoring + clustering
-bash "$DRIFT_SEMANTIC/cli.sh" report                   # Needs clusters
-```
-
-If only extraction succeeds, you still have `code-units.json` — proceed to Phase 3
-(Purpose Statements) which doesn't require the downstream stages and is the highest-value
-step you can do regardless of pipeline health.
-
-Output goes to `.drift-audit/semantic/`. Key artifacts:
 - `code-units.json` — all extracted units with full metadata
 - `clusters.json` — ranked clusters of structurally similar code
 - `semantic-drift-report.md` — preliminary report (pending your verification)
 
-### Phase 2: Verify Clusters
+If these files do not exist, the pipeline failed — return to the orchestrator's Step 1 to
+diagnose. Do not proceed with manual-only analysis.
+
+Also check:
+- `.drift-audit/drift-manifest.json` — append semantic findings to it if it exists
+- Identify the shared component/utility library — this is where consolidated implementations
+  would eventually live
+
+### Phase 1: Verify Clusters
 
 Read `clusters.json`. For each top-ranked cluster (start with top 10-20):
 
@@ -169,7 +104,7 @@ bash "$DRIFT_SEMANTIC/cli.sh" ingest-findings --file .drift-audit/semantic/findi
 bash "$DRIFT_SEMANTIC/cli.sh" report
 ```
 
-### Phase 3: Purpose Statements (CRITICAL — This Is Your Primary Contribution)
+### Phase 2: Purpose Statements (CRITICAL — This Is Your Primary Contribution)
 
 This is the most important phase of the semantic audit. The pipeline detects structural
 similarity — units that LOOK alike. Purpose statements detect semantic similarity — units
@@ -220,25 +155,13 @@ statements covering all components and hooks. Save as `purpose-statements.json`:
 ]
 ```
 
-#### Step 3: Ingest and re-run with semantic embeddings
+#### Step 3: Save purpose statements
 
-```bash
-bash "$DRIFT_SEMANTIC/cli.sh" ingest-purposes --file .drift-audit/semantic/purpose-statements.json
-bash "$DRIFT_SEMANTIC/cli.sh" embed       # Built-in TF-IDF, no external services
-bash "$DRIFT_SEMANTIC/cli.sh" score
-bash "$DRIFT_SEMANTIC/cli.sh" cluster
-bash "$DRIFT_SEMANTIC/cli.sh" report
-```
+Save the file to `.drift-audit/semantic/purpose-statements.json`. The orchestrator
+will ingest these and re-run the downstream pipeline stages (embed → score → cluster →
+report) to incorporate semantic embeddings into similarity scoring.
 
-The embed step uses built-in TF-IDF to compare purpose statements — no external
-services required. The re-scored clusters now include semantic similarity as a 13th signal,
-making clusters much more precise for catching functionally identical code with
-different names.
-
-If scoring/clustering fails, you still have the purpose statements. Use them in Phase 2
-(verification) — manually group units with similar purposes and assess them as clusters.
-
-### Phase 4: Targeted Exploration
+### Phase 3: Targeted Exploration
 
 Use inspection commands to explore specific units or clusters:
 
@@ -256,7 +179,7 @@ bash "$DRIFT_SEMANTIC/cli.sh" inspect callers "src/lib/EntityList.tsx::EntityLis
 bash "$DRIFT_SEMANTIC/cli.sh" inspect cluster cluster-003
 ```
 
-### Phase 5: Present and Output
+### Phase 4: Present and Output
 
 Read `semantic-drift-report.md` and present findings to the user. Each semantic finding
 must include concrete evidence — not just cluster IDs and scores.
@@ -286,63 +209,6 @@ Write findings to `.drift-audit/drift-manifest.json` as entries with `"type": "s
 Each entry must include `code_excerpts`, `implementation_details`, and `evidence_quality`
 fields (same schema as structural findings). The report command handles manifest integration
 automatically, but you must ensure the findings.json verdicts contain sufficient evidence.
-
----
-
-## Method B: Agent-Driven (Fallback)
-
-Use this method when the CLI tool is not available or for quick targeted investigations.
-
-### Phase 1: Role Discovery (Sampling)
-
-Read a diverse sample of 30-50 files across the codebase. For each file, identify its
-**functional role** — what purpose does it serve? What problem does it solve?
-
-Build a **role taxonomy** — a list of functional roles you observe organically.
-
-Common role categories you might find:
-
-**UI Roles:**
-- Action toolbar / button bar
-- Data list with filtering/sorting/selection
-- Detail view / inspector panel
-- Configuration form / settings panel
-- Status indicator / progress display
-- Navigation container (tabs, sidebar, breadcrumbs)
-- Empty state / placeholder
-- Modal workflow (multi-step process in a modal)
-
-**Data Roles:**
-- Entity/record loader (fetches data from persistence)
-- Schema/config consumer (reads configuration and applies it)
-- Worker dispatcher (sends tasks to background workers)
-- Queue/batch manager (processes items in order)
-- Persistence writer (saves data to IndexedDB/storage)
-
-**Behavioral Roles:**
-- Async operation lifecycle (loading -> success/error pattern)
-- Configuration provider (supplies settings to downstream code)
-- Event coordinator (connects triggers to handlers)
-
-### Phase 2: Systematic Search
-
-For each role with 2+ implementations, systematically search for ALL implementations.
-
-**Do NOT rely on naming patterns.** Instead:
-1. Formulate what the implementation DOES functionally
-2. Search for files using BROAD structural heuristics (JSX patterns, data access, lifecycle)
-3. Read candidates and determine if they serve the same role
-4. Group implementations by role
-
-### Phase 3: Divergence Analysis
-
-For each role cluster, compare across: interface divergence, behavior divergence,
-scope divergence, consolidation potential (HIGH/MEDIUM/LOW).
-
-### Phase 4: Generate Output
-
-Write findings to `.drift-audit/drift-manifest.json` with `"type": "semantic"`.
-Include `semantic_role`, `consolidation_assessment`, and `shared_interface_sketch` fields.
 
 ---
 

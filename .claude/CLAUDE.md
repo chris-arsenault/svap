@@ -1,5 +1,7 @@
 
 
+
+
 <!-- drift-semantic -->
 ## Drift
 
@@ -18,16 +20,16 @@ Drift skills (installed in `.claude/skills/`):
 - `drift-unify` — batch refactoring toward canonical patterns
 - `drift-guard` — generate ESLint rules, ADRs, pattern docs
 
-Centralized artifact library (online mode — auto-sync enabled):
+Centralized artifact library (online mode — auto-push/pull enabled):
 ```bash
 drift library init       # initialize ~/.drift/library
 drift library list       # show library contents
 drift library status     # compare library vs project
 ```
 
-**Auto-sync behavior:** Library sync is automatic. Before starting any drift
-audit phase, run `drift library sync` to pull the latest artifacts from the
-centralized library. After completing any drift-guard phase, run
-`drift library publish` to share new artifacts back to the library.
-Do not ask for confirmation — sync silently as part of the pipeline.
+**Auto-push/pull behavior:** Library operations are automatic. Before starting
+any drift audit phase, run `drift library pull` to pull the latest artifacts
+from the centralized library. After completing any drift-guard phase, run
+`drift library push` to share new artifacts back to the library.
+Do not ask for confirmation — run silently as part of the pipeline.
 <!-- /drift-semantic -->

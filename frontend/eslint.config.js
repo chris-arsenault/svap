@@ -12,6 +12,8 @@ import maxJsxProps from "./eslint-rules/max-jsx-props.js";
 import noInlineStyles from "./eslint-rules/no-inline-styles.js";
 import noDirectStoreImport from "./eslint-rules/no-direct-store-import.js";
 import noDirectFetch from "./eslint-rules/no-direct-fetch.js";
+import noEscapeHatches from "./eslint-rules/no-escape-hatches.js";
+import noManualAsyncState from "./eslint-rules/no-manual-async-state.js";
 
 export default tseslint.config(
   {
@@ -45,7 +47,7 @@ export default tseslint.config(
       "react-refresh": reactRefresh,
       "react-perf": reactPerf,
       "jsx-a11y": jsxA11y,
-      local: { rules: { "max-jsx-props": maxJsxProps, "no-inline-styles": noInlineStyles, "no-direct-store-import": noDirectStoreImport, "no-direct-fetch": noDirectFetch } },
+      local: { rules: { "max-jsx-props": maxJsxProps, "no-inline-styles": noInlineStyles, "no-direct-store-import": noDirectStoreImport, "no-direct-fetch": noDirectFetch, "no-escape-hatches": noEscapeHatches, "no-manual-async-state": noManualAsyncState } },
     },
     languageOptions: {
       globals: {
@@ -78,6 +80,8 @@ export default tseslint.config(
       "local/no-inline-styles": "warn",
       "local/no-direct-store-import": "warn",
       "local/no-direct-fetch": "warn",
+      "local/no-escape-hatches": "warn",
+      "local/no-manual-async-state": "warn",
     },
   },
 

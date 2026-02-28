@@ -13,12 +13,15 @@ Output: Detection patterns in the `detection_patterns` table
 """
 
 import hashlib
+import logging
 
 from svap import delta
 from svap.bedrock_client import BedrockClient
 from svap.parallel import run_parallel_llm
 from svap.rag import ContextAssembler
 from svap.storage import SVAPStorage
+
+logger = logging.getLogger(__name__)
 
 SYSTEM_PROMPT = """You are a fraud detection analyst designing monitoring rules. You translate
 predicted exploitation steps into specific, queryable anomaly signals. Every pattern
@@ -93,17 +96,17 @@ def _build_tree_summary(tree, steps):
 
 def _print_pattern_summary(all_patterns):
     """Print detection pattern summary grouped by priority."""
-    print("\n  Detection Pattern Summary:")
+    logger.info("Detection Pattern Summary:")
     by_priority = {"critical": [], "high": [], "medium": [], "low": []}
     for p in all_patterns:
         by_priority.get(p.get("priority", "medium"), by_priority["medium"]).append(p)
 
     for priority in ["critical", "high", "medium", "low"]:
         if by_priority[priority]:
-            print(f"\n    [{priority.upper()}]")
+            logger.info("[%s]", priority.upper())
             for p in by_priority[priority]:
-                print(f"      - {p['policy_name']}: {p['anomaly_signal'][:100]}")
-                print(f"        Data source: {p['data_source']}")
+                logger.info("- %s: %s", p['policy_name'], p['anomaly_signal'][:100])
+                logger.info("  Data source: %s", p['data_source'])
 
 
 def _get_data_sources_context(storage, config):
@@ -161,7 +164,7 @@ def _run_parallel_detection(storage, client, run_id, jobs, max_concurrency):
 
 def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
     """Execute Stage 6: Generate detection patterns for approved exploitation steps."""
-    print("Stage 6: Detection Pattern Generation")
+    logger.info("Stage 6: Detection Pattern Generation")
     storage.log_stage_start(run_id, 6)
 
     try:
@@ -182,14 +185,14 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
         # ── Delta detection ─────────────────────────────────────────
         to_detect = _detect_changed_steps(storage, all_steps)
         if not to_detect:
-            print(f"  All {len(all_steps)} steps unchanged — skipping.")
+            logger.info("All %d steps unchanged -- skipping.", len(all_steps))
             storage.log_stage_complete(run_id, 6, {
                 "patterns_generated": 0,
                 "skipped_unchanged": len(all_steps),
             })
             return
 
-        print(f"  {len(to_detect)}/{len(all_steps)} steps changed, generating patterns...")
+        logger.info("%d/%d steps changed, generating patterns...", len(to_detect), len(all_steps))
 
         # ── Delete stale patterns BEFORE LLM calls ──────────────────
         for step, _tree, _summary, _h in to_detect:
@@ -210,7 +213,7 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
         )
 
         all_patterns = storage.get_detection_patterns()
-        print(f"\n  Stage 6 complete: {total_patterns} detection patterns generated.")
+        logger.info("Stage 6 complete: %d detection patterns generated.", total_patterns)
         _print_pattern_summary(all_patterns)
 
         result_meta = {"patterns_generated": total_patterns}

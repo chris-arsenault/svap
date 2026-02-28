@@ -87,7 +87,7 @@ export function ErrorBanner({ error, onDismiss }: { error: string | null; onDism
       <div className="panel-body">
         {error}
         {onDismiss && (
-          <button className="btn btn-sm" onClick={onDismiss} style={{ marginLeft: "auto" }}>
+          <button className="btn btn-sm error-banner-dismiss" onClick={onDismiss}>
             Dismiss
           </button>
         )}

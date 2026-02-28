@@ -15,6 +15,7 @@ Output: structural_findings, research_sessions
 """
 
 import hashlib
+import logging
 import time
 
 from svap import delta
@@ -23,6 +24,8 @@ from svap.regulatory.ecfr_client import ECFRClient, parse_xml_sections
 from svap.regulatory.federal_register_client import FederalRegisterClient
 from svap.regulatory.source_router import get_sources_for_policy
 from svap.storage import SVAPStorage
+
+logger = logging.getLogger(__name__)
 
 RESEARCH_PLAN_SYSTEM = (
     "You are a regulatory research planner. You identify which specific sections "
@@ -70,7 +73,7 @@ def run(
     policy_ids: list[str] | None = None,
 ):
     """Execute Pass 2: Deep structural research for top-priority policies."""
-    print("Stage 4B: Deep Structural Research")
+    logger.info("Stage 4B: Deep Structural Research")
     storage.log_stage_start(run_id, 41)  # 41 = stage 4b
 
     try:
@@ -88,7 +91,7 @@ def run(
             policies_to_research = triage[:top_n]
 
         if not policies_to_research:
-            print("  No policies to research. Run triage first.")
+            logger.info("No policies to research. Run triage first.")
             storage.log_stage_complete(run_id, 41, {"policies_researched": 0})
             return
 
@@ -98,11 +101,11 @@ def run(
         )
 
         if not delta_entries:
-            print(f"  All {len(policies_to_research)} policies unchanged. Skipping research.")
+            logger.info("All %d policies unchanged. Skipping research.", len(policies_to_research))
             storage.log_stage_complete(run_id, 41, {"policies_researched": 0, "skipped": skipped})
             return
 
-        print(f"  Researching {len(delta_entries)} policies ({skipped} unchanged)...")
+        logger.info("Researching %d policies (%d unchanged)...", len(delta_entries), skipped)
 
         ecfr = ECFRClient()
         fr = FederalRegisterClient()
@@ -118,7 +121,7 @@ def run(
                     storage.record_processing(41, entry["policy_id"], h, run_id)
 
         storage.log_stage_complete(run_id, 41, {"policies_researched": researched, "skipped": skipped})
-        print(f"  Research complete: {researched} policies.")
+        logger.info("Research complete: %d policies.", researched)
 
     except Exception as e:
         storage.log_stage_failed(run_id, 41, str(e))
@@ -131,11 +134,11 @@ def _research_one_policy(storage, client, ecfr, fr, run_id, entry, dimensions):
     policies = storage.get_policies()
     policy = next((p for p in policies if p["policy_id"] == policy_id), None)
     if not policy:
-        print(f"  Policy {policy_id} not found, skipping")
+        logger.warning("Policy %s not found, skipping", policy_id)
         return False
 
     policy_name = policy["name"]
-    print(f"  Researching: {policy_name}")
+    logger.info("Researching: %s", policy_name)
 
     session_id = hashlib.sha256(f"{run_id}:{policy_id}".encode()).hexdigest()[:12]
     storage.create_research_session(run_id, policy_id, session_id)
@@ -175,11 +178,11 @@ def _research_one_policy(storage, client, ecfr, fr, run_id, entry, dimensions):
         storage.update_policy_lifecycle(policy_id, "structurally_characterized")
 
         findings_count = len(storage.get_structural_findings(policy_id))
-        print(f"    Complete: {findings_count} findings extracted")
+        logger.info("Complete: %d findings extracted", findings_count)
         return True
 
     except Exception as e:
-        print(f"    Research failed for {policy_name}: {e}")
+        logger.error("Research failed for %s: %s", policy_name, e)
         storage.update_research_session(session_id, "failed", error=str(e))
         return False
 
@@ -265,14 +268,14 @@ def _research_ecfr_source(
                 "full_text": xml_text,
             })
         except Exception as e:
-            print(f"    Failed to fetch eCFR title {title} part {part}: {e}")
+            logger.error("Failed to fetch eCFR title %s part %s: %s", title, part, e)
             return []
 
     sections = parse_xml_sections(xml_text)
     if not sections:
         return []
 
-    print(f"    Processing eCFR {title} CFR Part {part}: {len(sections)} sections")
+    logger.info("Processing eCFR %s CFR Part %s: %d sections", title, part, len(sections))
 
     dimensions_text = "\n".join(
         f"- {d['dimension_id']}: {d['name']} — {d['definition'][:100]}"
@@ -343,7 +346,7 @@ def _research_fr_source(
             per_page=3,
         )
     except Exception as e:
-        print(f"    Failed to search Federal Register for '{term}': {e}")
+        logger.error("Failed to search Federal Register for '%s': %s", term, e)
         return []
 
     documents = results.get("results", [])
@@ -383,7 +386,7 @@ def _research_fr_source(
                     },
                 })
             except Exception as e:
-                print(f"    Failed to fetch FR doc {doc_number}: {e}")
+                logger.error("Failed to fetch FR doc %s: %s", doc_number, e)
                 continue
 
         # Extract findings from the preamble (first 8000 chars)

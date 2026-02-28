@@ -104,6 +104,21 @@ export default function App() {
   return <AuthenticatedApp token={auth.token} username={auth.username} onSignOut={handleSignOut} />;
 }
 
+const ROUTE_ELEMENTS = {
+  dashboard: <Dashboard />,
+  sources: <SourcesView />,
+  cases: <CaseSourcing />,
+  policies: <PolicyExplorer />,
+  taxonomy: <TaxonomyView />,
+  matrix: <ConvergenceMatrix />,
+  predictions: <PredictionView />,
+  detection: <DetectionView />,
+  discovery: <DiscoveryView />,
+  research: <ResearchView />,
+  dimensions: <DimensionRegistryView />,
+  management: <ManagementView />,
+};
+
 function AuthenticatedApp({ token, username, onSignOut }: { token: string; username: string; onSignOut: () => void }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -130,18 +145,18 @@ function AuthenticatedApp({ token, username, onSignOut }: { token: string; usern
         </button>
         <ApiGate>
           <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/sources" element={<SourcesView />} />
-            <Route path="/cases" element={<CaseSourcing />} />
-            <Route path="/policies" element={<PolicyExplorer />} />
-            <Route path="/taxonomy" element={<TaxonomyView />} />
-            <Route path="/matrix" element={<ConvergenceMatrix />} />
-            <Route path="/predictions" element={<PredictionView />} />
-            <Route path="/detection" element={<DetectionView />} />
-            <Route path="/discovery" element={<DiscoveryView />} />
-            <Route path="/research" element={<ResearchView />} />
-            <Route path="/dimensions" element={<DimensionRegistryView />} />
-            <Route path="/management" element={<ManagementView />} />
+            <Route path="/" element={ROUTE_ELEMENTS.dashboard} />
+            <Route path="/sources" element={ROUTE_ELEMENTS.sources} />
+            <Route path="/cases" element={ROUTE_ELEMENTS.cases} />
+            <Route path="/policies" element={ROUTE_ELEMENTS.policies} />
+            <Route path="/taxonomy" element={ROUTE_ELEMENTS.taxonomy} />
+            <Route path="/matrix" element={ROUTE_ELEMENTS.matrix} />
+            <Route path="/predictions" element={ROUTE_ELEMENTS.predictions} />
+            <Route path="/detection" element={ROUTE_ELEMENTS.detection} />
+            <Route path="/discovery" element={ROUTE_ELEMENTS.discovery} />
+            <Route path="/research" element={ROUTE_ELEMENTS.research} />
+            <Route path="/dimensions" element={ROUTE_ELEMENTS.dimensions} />
+            <Route path="/management" element={ROUTE_ELEMENTS.management} />
           </Routes>
         </ApiGate>
       </main>

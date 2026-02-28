@@ -23,7 +23,7 @@ function QualityCard({
           onSelectId(quality.quality_id);
         }
       }}
-      // eslint-disable-next-line local/no-inline-styles
+       
       style={{ "--q-color": quality.color } as React.CSSProperties}
     >
       <div className="quality-card-header">
@@ -44,7 +44,7 @@ function QualityDetail({ quality, matchingCases }: { quality: Quality; matchingC
   return (
     <div
       className="panel quality-detail-panel"
-      // eslint-disable-next-line local/no-inline-styles
+       
       style={{ "--q-color": quality.color } as React.CSSProperties}
     >
       <div className="panel-header">
@@ -106,6 +106,9 @@ export default function TaxonomyView() {
             onSelectId={toggleQuality}
           />
         ))}
+        {taxonomy.length === 0 && (
+          <div className="empty-state">No taxonomy qualities found. Run stage 2 to extract qualities from cases.</div>
+        )}
       </div>
 
       {selectedData && <QualityDetail quality={selectedData} matchingCases={matchingCases} />}

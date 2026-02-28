@@ -10,10 +10,13 @@ Output: Structured cases in the `cases` table
 
 import hashlib
 import json
+import logging
 import re
 
 from svap.bedrock_client import BedrockClient
 from svap.storage import SVAPStorage
+
+logger = logging.getLogger(__name__)
 
 SYSTEM_PROMPT = """You are an analyst extracting structured information from enforcement
 documents. You extract the mechanical details of how schemes operated, not just legal
@@ -31,14 +34,14 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
     Incremental: documents that already have extracted cases in the database
     are skipped.
     """
-    print("Stage 1: Case Corpus Assembly")
+    logger.info("Stage 1: Case Corpus Assembly")
     storage.log_stage_start(run_id, 1)
 
     try:
         docs = storage.get_all_documents(doc_type="enforcement")
         if not docs:
-            print("  No enforcement documents found. Load documents first.")
-            print("  Use: orchestrator.py ingest --path /your/docs --type enforcement")
+            logger.info("No enforcement documents found. Load documents first.")
+            logger.info("Use: orchestrator.py ingest --path /your/docs --type enforcement")
             storage.log_stage_complete(run_id, 1, {"cases_extracted": 0, "note": "no documents"})
             return
 
@@ -47,14 +50,14 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
         skipped = 0
         for doc in docs:
             if storage.cases_exist_for_document(doc["doc_id"]):
-                print(f"  Skipping (cases exist): {doc['filename']}")
+                logger.info("Skipping (cases exist): %s", doc['filename'])
                 skipped += 1
             else:
                 new_docs.append(doc)
 
         total_cases = 0
         for doc in new_docs:
-            print(f"  Processing: {doc['filename']}")
+            logger.info("Processing: %s", doc['filename'])
             prompt = client.render_prompt(
                 "stage1_extract.txt",
                 document_text=_truncate(doc["full_text"], 12000),
@@ -83,16 +86,16 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
                 }
                 storage.insert_case(case)
                 total_cases += 1
-                print(f"    Extracted: {case['case_name']}")
+                logger.info("Extracted: %s", case['case_name'])
 
         storage.log_stage_complete(run_id, 1, {
             "cases_extracted": total_cases,
             "documents_processed": len(new_docs),
             "documents_skipped": skipped,
         })
-        print(
-            f"  Stage 1 complete: {total_cases} cases from {len(new_docs)} new documents "
-            f"({skipped} unchanged, skipped)."
+        logger.info(
+            "Stage 1 complete: %d cases from %d new documents (%d unchanged, skipped).",
+            total_cases, len(new_docs), skipped,
         )
 
     except Exception as e:
@@ -107,7 +110,7 @@ def load_seed_cases(storage: SVAPStorage, seed_path: str):
 
     for case_data in cases:
         storage.insert_case(case_data)
-    print(f"  Loaded {len(cases)} seed cases.")
+    logger.info("Loaded %d seed cases.", len(cases))
 
 
 def _truncate(text: str, max_chars: int) -> str:

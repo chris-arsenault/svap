@@ -10,9 +10,13 @@ Output: triage_results table (ranked policies with scores and rationale)
 """
 
 
+import logging
+
 from svap import delta
 from svap.bedrock_client import BedrockClient
 from svap.storage import SVAPStorage
+
+logger = logging.getLogger(__name__)
 
 TRIAGE_SYSTEM = (
     "You are an expert healthcare policy analyst assessing structural vulnerability "
@@ -24,7 +28,7 @@ TRIAGE_SYSTEM = (
 
 def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
     """Execute Pass 1: Triage all policies by vulnerability likelihood."""
-    print("Stage 4A: Policy Triage")
+    logger.info("Stage 4A: Policy Triage")
     storage.log_stage_start(run_id, 40)  # 40 = stage 4a in integer form
 
     try:
@@ -34,12 +38,12 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
         cases = storage.get_cases()
 
         if not policies:
-            print("  No policies found. Run Stage 4 or seed policies first.")
+            logger.info("No policies found. Run Stage 4 or seed policies first.")
             storage.log_stage_complete(run_id, 40, {"policies_triaged": 0})
             return
 
         if not taxonomy:
-            print("  No taxonomy found. Run Stage 2 first.")
+            logger.info("No taxonomy found. Run Stage 2 first.")
             storage.log_stage_complete(run_id, 40, {"policies_triaged": 0})
             return
 
@@ -51,7 +55,7 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
         )
         stored_hashes = storage.get_processing_hashes(40)
         if stored_hashes.get("triage_batch") == h:
-            print("  Triage inputs unchanged. Skipping.")
+            logger.info("Triage inputs unchanged. Skipping.")
             storage.log_stage_complete(run_id, 40, {"policies_triaged": 0, "skipped": True})
             return
 
@@ -70,7 +74,7 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
         for i, entry in enumerate(rankings):
             policy_id = _resolve_policy_id(entry.get("policy_name", ""), policies)
             if not policy_id:
-                print(f"  Warning: could not match policy '{entry.get('policy_name')}'")
+                logger.warning("Could not match policy '%s'", entry.get('policy_name'))
                 continue
 
             storage.insert_triage_result(run_id, {
@@ -82,14 +86,14 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
             })
             storage.update_policy_lifecycle(policy_id, "triaged")
             stored += 1
-            print(f"  #{i + 1}: {entry.get('policy_name', '?')} — score={entry.get('score', 0):.2f}")
+            logger.info("#%d: %s -- score=%.2f", i + 1, entry.get('policy_name', '?'), entry.get('score', 0))
 
         storage.record_processing(40, "triage_batch", h, run_id)
         storage.log_stage_complete(run_id, 40, {
             "policies_triaged": stored,
             "total_rankings": len(rankings),
         })
-        print(f"  Triage complete: {stored} policies ranked.")
+        logger.info("Triage complete: %d policies ranked.", stored)
 
     except Exception as e:
         storage.log_stage_failed(run_id, 40, str(e))

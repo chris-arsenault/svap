@@ -22,10 +22,13 @@ Output: Taxonomy of vulnerability qualities in the `taxonomy` table
 
 import hashlib
 import json
+import logging
 
 from svap.bedrock_client import BedrockClient
 from svap.rag import ContextAssembler
 from svap.storage import SVAPStorage
+
+logger = logging.getLogger(__name__)
 
 SYSTEM_PROMPT_CLUSTER = """You are a structural analyst. Your task is to find the abstract
 patterns that make policies exploitable. You think in terms of system design properties —
@@ -84,7 +87,7 @@ def _semantic_dedup(
 
 def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
     """Execute Stage 2: Extract taxonomy from case enabling conditions (delta)."""
-    print("Stage 2: Vulnerability Taxonomy Extraction")
+    logger.info("Stage 2: Vulnerability Taxonomy Extraction")
     storage.log_stage_start(run_id, 2)
 
     try:
@@ -98,9 +101,10 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
 
         if not new_cases:
             taxonomy = storage.get_taxonomy()
-            print(
-                f"  All {len(cases)} cases already processed for taxonomy. "
-                f"Nothing to extract. ({len(taxonomy)} qualities in taxonomy)"
+            logger.info(
+                "All %d cases already processed for taxonomy. "
+                "Nothing to extract. (%d qualities in taxonomy)",
+                len(cases), len(taxonomy),
             )
             storage.log_stage_complete(run_id, 2, {
                 "qualities_total": len(taxonomy),
@@ -109,15 +113,15 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
             })
             return
 
-        print(
-            f"  {len(new_cases)} new cases to process "
-            f"({len(cases) - len(new_cases)} already processed)"
+        logger.info(
+            "%d new cases to process (%d already processed)",
+            len(new_cases), len(cases) - len(new_cases),
         )
 
         ContextAssembler(storage, config)
 
         # 2. Pass 1: Cluster ONLY new cases' enabling conditions
-        print("  Pass 1: Clustering enabling conditions from new cases...")
+        logger.info("Pass 1: Clustering enabling conditions from new cases...")
         enabling_conditions = "\n\n".join(
             f"CASE: {c['case_name']}\nENABLING CONDITION: {c['enabling_condition']}"
             for c in new_cases
@@ -136,16 +140,16 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
             clusters if isinstance(clusters, list)
             else clusters.get("qualities", [])
         )
-        print(f"    Identified {len(qualities_draft)} draft qualities.")
+        logger.info("Identified %d draft qualities.", len(qualities_draft))
 
         # 3. Pass 2: Refine each draft quality
-        print("  Pass 2: Refining each quality...")
+        logger.info("Pass 2: Refining each quality...")
         all_quality_names = [q.get("name", "") for q in qualities_draft]
         refined_qualities = []
 
         for i, draft in enumerate(qualities_draft):
             name = draft.get("name", f"Quality {i + 1}")
-            print(f"    Refining: {name}")
+            logger.info("Refining: %s", name)
 
             other_qualities = [n for n in all_quality_names if n != draft.get("name")]
             refine_prompt = client.render_prompt(
@@ -177,7 +181,7 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
             })
 
         # 4. Pass 3: Semantic deduplication against existing taxonomy
-        print("  Pass 3: Semantic deduplication against existing taxonomy...")
+        logger.info("Pass 3: Semantic deduplication against existing taxonomy...")
         existing = storage.get_taxonomy()
         novel_qualities = []
         merged_count = 0
@@ -190,15 +194,15 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
                     (q["name"] for q in existing if q["quality_id"] == matched_id),
                     matched_id,
                 )
-                print(
-                    f"    MERGED: '{draft['name']}' -> existing '{matched_name}'"
+                logger.info(
+                    "MERGED: '%s' -> existing '%s'", draft['name'], matched_name,
                 )
                 storage.merge_quality_examples(
                     matched_id, draft.get("canonical_examples", []),
                 )
                 merged_count += 1
             else:
-                print(f"    NOVEL: '{draft['name']}' — adding as draft")
+                logger.info("NOVEL: '%s' -- adding as draft", draft['name'])
                 draft["review_status"] = "draft"
                 storage.insert_quality(draft)
                 novel_qualities.append(draft)
@@ -211,20 +215,20 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
 
         # 6. Report
         taxonomy = storage.get_taxonomy()
-        print("\n  Stage 2 results:")
-        print(f"    Cases processed:     {len(new_cases)}")
-        print(f"    Draft qualities:     {len(refined_qualities)}")
-        print(f"    Merged w/ existing:  {merged_count}")
-        print(f"    Novel (new drafts):  {len(novel_qualities)}")
-        print(f"    Total taxonomy:      {len(taxonomy)}")
+        logger.info("Stage 2 results:")
+        logger.info("Cases processed:     %d", len(new_cases))
+        logger.info("Draft qualities:     %d", len(refined_qualities))
+        logger.info("Merged w/ existing:  %d", merged_count)
+        logger.info("Novel (new drafts):  %d", len(novel_qualities))
+        logger.info("Total taxonomy:      %d", len(taxonomy))
 
         # 7. Human gate only if new draft qualities need review
         if novel_qualities:
             storage.log_stage_pending_review(run_id, 2)
-            print("\n  HUMAN REVIEW REQUIRED — new draft qualities need approval:")
+            logger.info("HUMAN REVIEW REQUIRED -- new draft qualities need approval:")
             for q in novel_qualities:
-                print(f"    {q['quality_id']}: {q['name']}")
-            print("    Approve with: python -m svap.orchestrator approve --stage 2")
+                logger.info("%s: %s", q['quality_id'], q['name'])
+            logger.info("Approve with: python -m svap.orchestrator approve --stage 2")
         else:
             storage.log_stage_complete(run_id, 2, {
                 "qualities_total": len(taxonomy),
@@ -232,7 +236,7 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
                 "merged": merged_count,
                 "novel": 0,
             })
-            print("\n  No new draft qualities — stage complete, no review needed.")
+            logger.info("No new draft qualities -- stage complete, no review needed.")
 
     except Exception as e:
         storage.log_stage_failed(run_id, 2, str(e))
@@ -246,4 +250,4 @@ def load_seed_taxonomy(storage: SVAPStorage, seed_path: str):
     for q in qualities:
         q.setdefault("review_status", "approved")
         storage.insert_quality(q)
-    print(f"  Loaded {len(qualities)} seed taxonomy qualities.")
+    logger.info("Loaded %d seed taxonomy qualities.", len(qualities))

@@ -1,3 +1,4 @@
+<!-- drift-generated -->
 # ADR 013: Unified Store Access via usePipelineSelectors
 
 ## Status

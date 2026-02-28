@@ -27,134 +27,130 @@ function StatusIcon({ status, hasDocument }: { status: ValidationStatus; hasDocu
   return <Clock size={14} className="text-muted" />;
 }
 
+function SourceExpandedDetail({ source, error, onDismiss }: {
+  source: EnforcementSource;
+  error: string | null;
+  onDismiss: () => void;
+}) {
+  return (
+    <tr>
+      <td colSpan={6} className="case-detail-cell">
+        <div className="detail-expand">
+          <ErrorBanner error={error} onDismiss={onDismiss} />
+          {source.summary && (
+            <>
+              <div className="detail-label">Summary</div>
+              <div className="detail-text">{source.summary}</div>
+            </>
+          )}
+          <div className="detail-label">Description</div>
+          <div className="detail-text">{source.description || "No description"}</div>
+          {source.url && (
+            <>
+              <div className="detail-label">URL</div>
+              <div className="detail-text">
+                <a href={source.url} target="_blank" rel="noreferrer">{source.url}</a>
+              </div>
+            </>
+          )}
+          {source.s3_key && (
+            <>
+              <div className="detail-label">S3 Key</div>
+              <div className="detail-text mono">{source.s3_key}</div>
+            </>
+          )}
+        </div>
+      </td>
+    </tr>
+  );
+}
+
+function uploadButtonLabel(busy: string | null, hasDocument: boolean): string {
+  if (busy === "upload") return "Uploading...";
+  return hasDocument ? "Replace" : "Upload";
+}
+
+function SourceRowActions({ source, busy, onUploadClick, onDelete, fileInputRef, onUpload }: {
+  source: EnforcementSource;
+  busy: string | null;
+  onUploadClick: (e: React.MouseEvent) => void;
+  onDelete: (e: React.MouseEvent) => void;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
+  onUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}) {
+  return (
+    <td>
+      <div className="source-actions">
+        <input ref={fileInputRef} type="file" accept=".html,.htm,.txt,.pdf" onChange={onUpload} hidden />
+        <button className="btn btn-sm" onClick={onUploadClick} disabled={!!busy}>
+          <Upload size={12} /> {uploadButtonLabel(busy, source.has_document)}
+        </button>
+        <button className="btn btn-sm btn-danger" onClick={onDelete} title="Remove source">
+          <Trash2 size={12} />
+        </button>
+      </div>
+    </td>
+  );
+}
+
 function SourceRow({ source }: { source: EnforcementSource }) {
   const uploadSourceDocument = useUploadSourceDocument();
   const deleteSource = useDeleteSource();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [uploading, setUploading] = useState(false);
+  const { busy, error, run, clearError } = useAsyncAction();
   const [expanded, setExpanded] = useState(false);
+  const toggleExpanded = useCallback(() => setExpanded((prev) => !prev), []);
 
-  const handleUpload = useCallback(
-    async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      setUploading(true);
-      try {
-        await uploadSourceDocument(source.source_id, file);
-      } catch (err) {
-        console.error("Upload failed:", err);
-      } finally {
-        setUploading(false);
-        if (fileInputRef.current) fileInputRef.current.value = "";
-      }
-    },
-    [source.source_id, uploadSourceDocument]
-  );
+  const handleUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    await run("upload", () => uploadSourceDocument(source.source_id, file));
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  }, [source.source_id, uploadSourceDocument, run]);
 
-  const handleDelete = useCallback(
-    async (e: React.MouseEvent) => {
-      e.stopPropagation();
-      if (!confirm(`Remove source "${source.name}"?`)) return;
-      try {
-        await deleteSource(source.source_id);
-      } catch (err) {
-        console.error("Delete failed:", err);
-      }
-    },
-    [source.source_id, source.name, deleteSource]
-  );
+  const handleDelete = useCallback(async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm(`Remove source "${source.name}"?`)) return;
+    await run("delete", () => deleteSource(source.source_id));
+  }, [source.source_id, source.name, deleteSource, run]);
+
+  const handleUploadClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    fileInputRef.current?.click();
+  }, []);
 
   return (
     <>
-      <tr className="detail-row" onClick={() => setExpanded(!expanded)}>
-        <td className="td-toggle">
-          {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-        </td>
+      <tr
+        className="detail-row"
+        onClick={toggleExpanded}
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleExpanded(); } }}
+      >
+        <td className="td-toggle">{expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}</td>
         <td>
           <div className="source-name-cell">
             <StatusIcon status={source.validation_status} hasDocument={source.has_document} />
             <span>{source.name}</span>
           </div>
         </td>
-        <td>
-          <span className="badge badge-neutral">{source.source_type.replace("_", " ")}</span>
-        </td>
-        <td>
-          <StatusBadge status={source.validation_status} hasDocument={source.has_document} />
-        </td>
+        <td><span className="badge badge-neutral">{source.source_type.replace("_", " ")}</span></td>
+        <td><StatusBadge status={source.validation_status} hasDocument={source.has_document} /></td>
         <td>
           {source.url && (
-            <a
-              href={source.url}
-              target="_blank"
-              rel="noreferrer"
-              className="source-card-link"
-              onClick={(e) => e.stopPropagation()}
-              title={source.url}
-            >
+            <a href={source.url} target="_blank" rel="noreferrer" className="source-card-link"
+              onClick={(e) => e.stopPropagation()} title={source.url}>
               <ExternalLink size={14} />
             </a>
           )}
         </td>
-        <td>
-          <div className="source-actions">
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".html,.htm,.txt,.pdf"
-              onChange={handleUpload}
-              hidden
-            />
-            <button
-              className="btn btn-sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                fileInputRef.current?.click();
-              }}
-              disabled={uploading}
-            >
-              <Upload size={12} />
-              {/* eslint-disable-next-line sonarjs/no-nested-conditional */}
-              {uploading ? "Uploading..." : source.has_document ? "Replace" : "Upload"}
-            </button>
-            <button className="btn btn-sm btn-danger" onClick={handleDelete} title="Remove source">
-              <Trash2 size={12} />
-            </button>
-          </div>
-        </td>
+        <SourceRowActions source={source} busy={busy} onUploadClick={handleUploadClick}
+          onDelete={handleDelete} fileInputRef={fileInputRef} onUpload={handleUpload} />
       </tr>
-      {expanded && (
-        <tr>
-          <td colSpan={6} className="case-detail-cell">
-            <div className="detail-expand">
-              {source.summary && (
-                <>
-                  <div className="detail-label">Summary</div>
-                  <div className="detail-text">{source.summary}</div>
-                </>
-              )}
-              <div className="detail-label">Description</div>
-              <div className="detail-text">{source.description || "No description"}</div>
-              {source.url && (
-                <>
-                  <div className="detail-label">URL</div>
-                  <div className="detail-text">
-                    <a href={source.url} target="_blank" rel="noreferrer">
-                      {source.url}
-                    </a>
-                  </div>
-                </>
-              )}
-              {source.s3_key && (
-                <>
-                  <div className="detail-label">S3 Key</div>
-                  <div className="detail-text mono">{source.s3_key}</div>
-                </>
-              )}
-            </div>
-          </td>
-        </tr>
+      {!expanded && error && (
+        <tr><td colSpan={6} className="case-detail-cell"><ErrorBanner error={error} onDismiss={clearError} /></td></tr>
       )}
+      {expanded && <SourceExpandedDetail source={source} error={error} onDismiss={clearError} />}
     </>
   );
 }
@@ -206,6 +202,7 @@ function AddSourceForm({ onClose }: { onClose: () => void }) {
 export default function SourcesView() {
   const enforcement_sources = useEnforcementSources();
   const [showAddForm, setShowAddForm] = useState(false);
+  const hideAddForm = useCallback(() => setShowAddForm(false), []);
 
   const withDoc = enforcement_sources.filter((s) => s.has_document).length;
   const validated = enforcement_sources.filter((s) => s.validation_status === "valid").length;
@@ -237,7 +234,7 @@ export default function SourcesView() {
         </div>
       </div>
 
-      {showAddForm && <AddSourceForm onClose={() => setShowAddForm(false)} />}
+      {showAddForm && <AddSourceForm onClose={hideAddForm} />}
 
       <div className="panel stagger-in">
         <div className="panel-header">
@@ -253,11 +250,11 @@ export default function SourcesView() {
           <table className="data-table">
             <thead>
               <tr>
-                <th style={{ width: 30 }}></th>
+                <th className="th-toggle"></th>
                 <th>Source</th>
                 <th>Type</th>
                 <th>Status</th>
-                <th style={{ width: 40 }}>Link</th>
+                <th className="th-icon">Link</th>
                 <th>Actions</th>
               </tr>
             </thead>

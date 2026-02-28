@@ -1,3 +1,4 @@
+<!-- drift-generated -->
 # ADR 015: Shared Async Error Handling (useAsyncAction + ErrorBanner)
 
 ## Status
@@ -37,3 +38,9 @@ const { busy, error, run, clearError } = useAsyncAction();
 - Users see feedback when operations fail (uploads, pipeline runs, approvals)
 - Consistent busy/error UX across all views
 - Error banner uses `.error-banner` CSS class (defined in index.css)
+
+## Enforcement
+- **ESLint rule:** `local/no-manual-async-state` (in `frontend/eslint-rules/no-manual-async-state.js`)
+  warns when views use `useState<boolean>` or `useState(false)` patterns for manual
+  busy/loading tracking instead of `useAsyncAction()`
+- **Pattern doc:** [async-error-handling](../patterns/async-error-handling.md)

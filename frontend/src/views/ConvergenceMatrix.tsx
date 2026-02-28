@@ -10,7 +10,7 @@ function MatrixCell({ present, color }: { present: boolean; color: string }) {
   return (
     <span
       className="matrix-cell-present"
-      // eslint-disable-next-line local/no-inline-styles
+       
       style={{ "--cell-color": color } as React.CSSProperties}
     >
       {"\u2713"}

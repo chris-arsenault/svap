@@ -1,0 +1,128 @@
+[
+  {
+    "avgSimilarity": 0.4005,
+    "consumerOverlap": 0.0,
+    "directorySpread": 1,
+    "id": "cluster-001",
+    "kindMix": {
+      "function": 7
+    },
+    "memberCount": 7,
+    "members": [
+      "frontend/src/App.tsx::default",
+      "frontend/src/views/DetectionView.tsx::default",
+      "frontend/src/views/DimensionRegistryView.tsx::default",
+      "frontend/src/views/DiscoveryView.tsx::default",
+      "frontend/src/views/ManagementView.tsx::default",
+      "frontend/src/views/ResearchView.tsx::default",
+      "frontend/src/views/TaxonomyView.tsx::default"
+    ],
+    "rankScore": 2.8035,
+    "sharedCallees": [
+      "useCallback",
+      "useEffect",
+      "useState"
+    ],
+    "signalBreakdown": {
+      "behavior": 0.8603,
+      "callSequence": 0.2241,
+      "calleeSet": 0.1009,
+      "coOccurrence": 0.0,
+      "consumerSet": 0.0,
+      "dataAccess": 0.0,
+      "imports": 0.5494,
+      "neighborhood": 1.0,
+      "typeSignature": 1.0
+    }
+  },
+  {
+    "avgSimilarity": 0.3966,
+    "consumerOverlap": 0.0,
+    "directorySpread": 1,
+    "id": "cluster-002",
+    "kindMix": {
+      "function": 6
+    },
+    "memberCount": 6,
+    "members": [
+      "frontend/src/views/CaseSourcing.tsx::default",
+      "frontend/src/views/ConvergenceMatrix.tsx::default",
+      "frontend/src/views/Dashboard.tsx::default",
+      "frontend/src/views/PolicyExplorer.tsx::default",
+      "frontend/src/views/PredictionView.tsx::default",
+      "frontend/src/views/SourcesView.tsx::default"
+    ],
+    "rankScore": 2.3796,
+    "sharedCallees": [
+      "useState"
+    ],
+    "signalBreakdown": {
+      "behavior": 0.8167,
+      "callSequence": 0.25,
+      "calleeSet": 0.0556,
+      "coOccurrence": 0.0,
+      "consumerSet": 0.0,
+      "dataAccess": 0.0,
+      "imports": 0.5549,
+      "neighborhood": 1.0,
+      "typeSignature": 1.0
+    }
+  },
+  {
+    "avgSimilarity": 0.4607,
+    "consumerOverlap": 1.0,
+    "directorySpread": 1,
+    "id": "cluster-003",
+    "kindMix": {
+      "function": 1,
+      "hook": 2
+    },
+    "memberCount": 3,
+    "members": [
+      "frontend/src/auth.ts::getSession",
+      "frontend/src/data/usePipelineSelectors.ts::useError",
+      "frontend/src/data/usePipelineSelectors.ts::useLoading"
+    ],
+    "rankScore": 1.6585,
+    "sharedCallees": [],
+    "signalBreakdown": {
+      "behavior": 0.9375,
+      "callSequence": 0.0,
+      "calleeSet": 0.0,
+      "coOccurrence": 0.8571,
+      "consumerSet": 1.0,
+      "dataAccess": 0.0,
+      "imports": 0.0,
+      "neighborhood": 1.0,
+      "typeSignature": 0.7
+    }
+  },
+  {
+    "avgSimilarity": 0.5424,
+    "consumerOverlap": 1.0,
+    "directorySpread": 1,
+    "id": "cluster-004",
+    "kindMix": {
+      "function": 1,
+      "hook": 1
+    },
+    "memberCount": 2,
+    "members": [
+      "frontend/src/auth.ts::signOut",
+      "frontend/src/data/useStatusSubscription.ts::useStatusSubscription"
+    ],
+    "rankScore": 1.3018,
+    "sharedCallees": [],
+    "signalBreakdown": {
+      "behavior": 0.75,
+      "callSequence": 0.15,
+      "calleeSet": 0.0,
+      "coOccurrence": 0.8571,
+      "consumerSet": 1.0,
+      "dataAccess": 0.0,
+      "imports": 0.0,
+      "neighborhood": 1.0,
+      "typeSignature": 1.0
+    }
+  }
+]

@@ -13,12 +13,15 @@ Output: Convergence matrix + calibration threshold in `convergence_scores` and `
 """
 
 import json
+import logging
 from collections import defaultdict
 
 from svap import delta
 from svap.bedrock_client import BedrockClient
 from svap.rag import ContextAssembler
 from svap.storage import SVAPStorage
+
+logger = logging.getLogger(__name__)
 
 SYSTEM_PROMPT = """You are scoring a policy against a structural vulnerability taxonomy.
 Apply each recognition test precisely. A quality is PRESENT only if the policy clearly
@@ -28,7 +31,7 @@ in the evidence field. Do not over-score."""
 
 def _score_case(storage, client, run_id, case, taxonomy_context):
     """Score a single case against the taxonomy and store results."""
-    print(f"    Scoring: {case['case_name']}")
+    logger.info("Scoring: %s", case['case_name'])
     prompt = client.render_prompt(
         "stage3_score.txt",
         case_name=case["case_name"],
@@ -107,7 +110,7 @@ Return JSON: {{"threshold": N, "correlation_notes": "..."}}"""
 
 def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
     """Execute Stage 3: Score all cases and calibrate."""
-    print("Stage 3: Convergence Scoring & Calibration")
+    logger.info("Stage 3: Convergence Scoring & Calibration")
     storage.log_stage_start(run_id, 3)
 
     try:
@@ -140,19 +143,19 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
                 cases_to_score.append((case, h))
 
         if not cases_to_score:
-            print(f"  All {len(cases)} cases unchanged. Skipping scoring.")
+            logger.info("All %d cases unchanged. Skipping scoring.", len(cases))
             storage.log_stage_complete(run_id, 3, {"cases_scored": 0, "skipped": skipped})
-            print("\n  Stage 3 complete (no changes).")
+            logger.info("Stage 3 complete (no changes).")
             return
 
         # ── Score each case ─────────────────────────────────────────
-        print(f"  Scoring {len(cases_to_score)} cases ({skipped} unchanged)...")
+        logger.info("Scoring %d cases (%d unchanged)...", len(cases_to_score), skipped)
         for case, h in cases_to_score:
             _score_case(storage, client, run_id, case, taxonomy_context)
             storage.record_processing(3, case["case_id"], h, run_id)
 
         # ── Calibration analysis ────────────────────────────────────
-        print("  Running calibration analysis...")
+        logger.info("Running calibration analysis...")
         matrix = storage.get_convergence_matrix()
         sorted_cases, quality_freq, quality_combos = _build_calibration_stats(matrix)
         cal_result = _run_calibration(client, sorted_cases)
@@ -166,16 +169,16 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
             combos=quality_combos,
         )
 
-        print("\n  Calibration Results:")
-        print(f"    Threshold: {threshold} (policies scoring >={threshold} are high-priority)")
-        print(f"    Quality frequency: {quality_freq}")
-        print("    Case scores:")
+        logger.info("Calibration Results:")
+        logger.info("Threshold: %d (policies scoring >=%d are high-priority)", threshold, threshold)
+        logger.info("Quality frequency: %s", quality_freq)
+        logger.info("Case scores:")
         for cs in sorted_cases:
             marker = "!" if cs["count"] >= threshold else " "
-            print(f"      {marker} {cs['name']}: score={cs['count']}, scale=${cs['scale']:,.0f}")
+            logger.info("%s %s: score=%d, scale=$%,.0f", marker, cs['name'], cs['count'], cs['scale'])
 
         storage.log_stage_complete(run_id, 3, {"cases_scored": len(cases), "threshold": threshold})
-        print("\n  Stage 3 complete.")
+        logger.info("Stage 3 complete.")
 
     except Exception as e:
         storage.log_stage_failed(run_id, 3, str(e))

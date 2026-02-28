@@ -1,3 +1,4 @@
+// drift-generated
 /**
  * ESLint rule: max-jsx-props
  *

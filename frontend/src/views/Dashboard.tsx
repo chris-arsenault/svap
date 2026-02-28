@@ -1,10 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { useShallow } from "zustand/shallow";
-import { usePipelineStore } from "../data/pipelineStore";
 import {
   usePipelineStatus, useRunId, useApiAvailable,
   useRunPipeline, useApproveStage, useSeedPipeline, useRefresh,
+  useCases, useTaxonomy, usePolicies, useDetectionPatterns, useThreshold,
 } from "../data/usePipelineSelectors";
 import { useAsyncAction } from "../hooks";
 import { ScoreBar, QualityTags, RiskBadge, StageDot, ErrorBanner } from "../components/SharedUI";
@@ -227,15 +226,11 @@ function PipelineControls() {
 }
 
 export default function Dashboard() {
-  const { cases, taxonomy, policies, detection_patterns, threshold } = usePipelineStore(
-    useShallow((s) => ({
-      cases: s.cases,
-      taxonomy: s.taxonomy,
-      policies: s.policies,
-      detection_patterns: s.detection_patterns,
-      threshold: s.threshold,
-    })),
-  );
+  const cases = useCases();
+  const taxonomy = useTaxonomy();
+  const policies = usePolicies();
+  const detection_patterns = useDetectionPatterns();
+  const threshold = useThreshold();
   const criticalPolicies = policies.filter((p) => p.risk_level === "critical").length;
   const totalFraudDollars = cases.reduce((sum, c) => sum + (c.scale_dollars || 0), 0);
   const criticalPatterns = detection_patterns.filter((p) => p.priority === "critical").length;

@@ -1,3 +1,4 @@
+<!-- drift-generated -->
 # ADR 016: Backend Shared Modules (defaults.py, parallel.py)
 
 ## Status
@@ -45,3 +46,11 @@ All path-parameterized routes use this instead of raw dict access.
 - Never define default config values in Lambda entry points
 - Never copy-paste parallel execution logic — parameterize `run_parallel_llm()`
 - Never access `event["pathParameters"]` directly — use `_path_param()`
+
+## Enforcement
+- **CI script:** `backend/scripts/check-no-print.sh` scans all Python files under
+  `backend/src/svap/` for `print(` calls and fails the build if any are found
+- **Logging standard:** All 11 stage files now use `logging.getLogger(__name__)` instead
+  of `print()` for output, consistent with the pattern established in `api.py` and
+  `stage_runner.py`. See [ADR-017](017-backend-structured-logging.md) for the full
+  structured logging decision.

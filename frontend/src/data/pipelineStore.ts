@@ -122,103 +122,190 @@ export interface PipelineStore {
   fetchAssessments: (policyId: string) => Promise<QualityAssessment[]>;
 }
 
+// ── Internal fetch functions ──────────────────────────────────────────
+
+const EMPTY_ARRAY: never[] = [];
+const EMPTY_OBJECT = {};
+
+function orArray<T>(v: T[] | undefined | null): T[] { return v ?? EMPTY_ARRAY as T[]; }
+function orObj<T extends object>(v: T | undefined | null): T { return v ?? EMPTY_OBJECT as T; }
+
+function buildIncomingData(apiData: FallbackData) {
+  const pipeline_status = deduplicatePipelineStatus(orArray(apiData.pipeline_status));
+  const taxonomy = orArray(apiData.taxonomy);
+  return {
+    run_id: apiData.run_id,
+    source: "api" as const,
+    pipeline_status,
+    counts: apiData.counts,
+    calibration: apiData.calibration,
+    cases: orArray(apiData.cases),
+    taxonomy,
+    policies: orArray(apiData.policies),
+    exploitation_trees: orArray(apiData.exploitation_trees),
+    detection_patterns: orArray(apiData.detection_patterns),
+    case_convergence: orArray(apiData.case_convergence),
+    policy_convergence: orArray(apiData.policy_convergence),
+    policy_catalog: orObj(apiData.policy_catalog),
+    enforcement_sources: orArray(apiData.enforcement_sources),
+    data_sources: orObj(apiData.data_sources),
+    scanned_programs: orArray(apiData.scanned_programs),
+    threshold: apiData.calibration?.threshold ?? 3,
+    qualityMap: buildQualityMap(taxonomy),
+  };
+}
+
+// ── Discovery & Research action factory ──────────────────────────────────
+
+type SetFn = (partial: Partial<PipelineStore>) => void;
+type GetFn = () => PipelineStore;
+
+function createDiscoveryActions(set: SetFn, get: GetFn) {
+  const fetchDiscovery = async () => {
+    const [feedsRes, candidatesRes] = await Promise.all([
+      apiGet("/discovery/feeds"),
+      apiGet("/discovery/candidates"),
+    ]);
+    if (feedsRes.ok && candidatesRes.ok) {
+      set({ source_feeds: await feedsRes.json(), source_candidates: await candidatesRes.json() });
+    }
+  };
+
+  return {
+    fetchDiscovery,
+    runDiscoveryFeeds: async () => {
+      const result = await apiPost("/discovery/run-feeds", {});
+      await fetchDiscovery();
+      return result;
+    },
+    reviewCandidate: async (candidateId: string, action: "accept" | "reject") => {
+      const result = await apiPost("/discovery/candidates/review", { candidate_id: candidateId, action });
+      await fetchDiscovery();
+      return result;
+    },
+    fetchDimensions: async () => {
+      const res = await apiGet("/dimensions");
+      if (res.ok) set({ dimensions: await res.json() });
+    },
+    fetchTriageResults: async () => {
+      const res = await apiGet("/research/triage");
+      if (res.ok) set({ triage_results: await res.json() });
+    },
+    runTriage: async () => {
+      const result = await apiPost("/research/triage", {});
+      await get().fetchTriageResults();
+      return result;
+    },
+    runDeepResearch: async (policyIds?: string[]) => {
+      const body = policyIds ? { policy_ids: policyIds } : {};
+      const result = await apiPost("/research/deep", body);
+      await get().fetchResearchSessions();
+      return result;
+    },
+    fetchResearchSessions: async () => {
+      const res = await apiGet("/research/sessions");
+      if (res.ok) set({ research_sessions: await res.json() });
+    },
+    fetchFindings: async (policyId: string) => {
+      const res = await apiGet(`/research/findings/${policyId}`);
+      if (!res.ok) return [];
+      return (await res.json()).findings || [];
+    },
+    fetchAssessments: async (policyId: string) => {
+      const res = await apiGet(`/research/assessments/${policyId}`);
+      if (!res.ok) return [];
+      return (await res.json()).assessments || [];
+    },
+  };
+}
+
+// ── Initial state ────────────────────────────────────────────────────────
+
+const INITIAL_STATE = {
+  run_id: "",
+  source: "api" as const,
+  pipeline_status: [] as PipelineStageStatus[],
+  counts: { cases: 0, taxonomy_qualities: 0, policies: 0, exploitation_trees: 0, detection_patterns: 0 },
+  calibration: { threshold: 3 },
+  cases: [] as FallbackData["cases"],
+  taxonomy: [] as FallbackData["taxonomy"],
+  policies: [] as FallbackData["policies"],
+  exploitation_trees: [] as FallbackData["exploitation_trees"],
+  detection_patterns: [] as FallbackData["detection_patterns"],
+  case_convergence: [] as unknown[],
+  policy_convergence: [] as unknown[],
+  policy_catalog: {} as Record<string, unknown>,
+  enforcement_sources: [] as FallbackData["enforcement_sources"],
+  data_sources: {} as Record<string, unknown>,
+  scanned_programs: [] as string[],
+  source_feeds: [] as SourceFeed[],
+  source_candidates: [] as SourceCandidate[],
+  dimensions: [] as Dimension[],
+  triage_results: [] as TriageResult[],
+  research_sessions: [] as ResearchSession[],
+  threshold: 3,
+  qualityMap: {} as Record<string, Quality>,
+  loading: true,
+  error: null as string | null,
+  apiAvailable: false,
+  _token: "",
+};
+
+// ── Source CRUD action factory ───────────────────────────────────────────
+
+function createSourceActions(set: SetFn, get: GetFn, refreshSources: () => Promise<void>) {
+  return {
+    uploadSourceDocument: async (sourceId: string, file: File) => {
+      if (!get().apiAvailable) throw new Error("API not available");
+      const buffer = await file.arrayBuffer();
+      const bytes = new Uint8Array(buffer);
+      let binary = "";
+      for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+      const result = await apiPost("/enforcement-sources/upload", { source_id: sourceId, filename: file.name, content: btoa(binary) });
+      await refreshSources();
+      return result;
+    },
+    createSource: async (source: { name: string; url?: string; description?: string }) => {
+      if (!get().apiAvailable) throw new Error("API not available");
+      const result = await apiPost("/enforcement-sources", source);
+      await refreshSources();
+      return result;
+    },
+    deleteSource: async (sourceId: string) => {
+      if (!get().apiAvailable) throw new Error("API not available");
+      const result = await apiPost("/enforcement-sources/delete", { source_id: sourceId });
+      await refreshSources();
+      return result;
+    },
+  };
+}
+
 // ── Store ────────────────────────────────────────────────────────────────
 
 export const usePipelineStore = create<PipelineStore>((set, get) => {
-  // ── Internal fetch functions ─────────────────────────────────────────
-
   const fetchDashboard = async () => {
     set({ loading: true, error: null });
     try {
       const res = await apiGet("/dashboard", { signal: AbortSignal.timeout(10000) });
       if (!res.ok) throw new Error(`API returned ${res.status}`);
-      const apiData: FallbackData = await res.json();
-      const pipeline_status = deduplicatePipelineStatus(apiData.pipeline_status || []);
-      const taxonomy = apiData.taxonomy || [];
-
-      // Build incoming data, then only set slices that actually changed
-      const incoming = {
-        run_id: apiData.run_id,
-        source: "api" as const,
-        pipeline_status,
-        counts: apiData.counts,
-        calibration: apiData.calibration,
-        cases: apiData.cases || [],
-        taxonomy,
-        policies: apiData.policies || [],
-        exploitation_trees: apiData.exploitation_trees || [],
-        detection_patterns: apiData.detection_patterns || [],
-        case_convergence: apiData.case_convergence || [],
-        policy_convergence: apiData.policy_convergence || [],
-        policy_catalog: apiData.policy_catalog || {},
-        enforcement_sources: apiData.enforcement_sources || [],
-        data_sources: apiData.data_sources || {},
-        scanned_programs: apiData.scanned_programs || [],
-        threshold: apiData.calibration?.threshold ?? 3,
-        qualityMap: buildQualityMap(taxonomy),
-      };
+      const incoming = buildIncomingData(await res.json());
       const diff = changedSlices(get(), incoming);
-      // Always set status flags; only set data slices if something changed
       set({ apiAvailable: true, loading: false, ...(diff || {}) });
     } catch (err) {
       const message = (err as Error).message || "Unknown error";
       console.error("SVAP API unreachable:", message);
-      set({
-        error: `Unable to reach the SVAP API. ${message}`,
-        apiAvailable: false,
-        loading: false,
-      });
+      set({ error: `Unable to reach the SVAP API. ${message}`, apiAvailable: false, loading: false });
     }
   };
 
   const refreshSources = async () => {
     const res = await apiGet("/enforcement-sources");
-    if (!res.ok) return;
-    const sources = await res.json();
-    set({ enforcement_sources: sources });
+    if (res.ok) set({ enforcement_sources: await res.json() });
   };
 
-  // ── Public store ─────────────────────────────────────────────────────
-
   return {
-    // Data — empty defaults
-    run_id: "",
-    source: "api",
-    pipeline_status: [],
-    counts: { cases: 0, taxonomy_qualities: 0, policies: 0, exploitation_trees: 0, detection_patterns: 0 },
-    calibration: { threshold: 3 },
-    cases: [],
-    taxonomy: [],
-    policies: [],
-    exploitation_trees: [],
-    detection_patterns: [],
-    case_convergence: [],
-    policy_convergence: [],
-    policy_catalog: {},
-    enforcement_sources: [],
-    data_sources: {},
-    scanned_programs: [],
+    ...INITIAL_STATE,
 
-    // Discovery & research — empty defaults
-    source_feeds: [],
-    source_candidates: [],
-    dimensions: [],
-    triage_results: [],
-    research_sessions: [],
-
-    // Derived
-    threshold: 3,
-    qualityMap: {},
-
-    // Status
-    loading: true,
-    error: null,
-    apiAvailable: false,
-
-    // Internal
-    _token: "",
-
-    // Actions
     _setToken: (token: string) => {
       set({ _token: token });
       fetchDashboard();
@@ -256,106 +343,7 @@ export const usePipelineStore = create<PipelineStore>((set, get) => {
       return result;
     },
 
-    uploadSourceDocument: async (sourceId: string, file: File) => {
-      if (!get().apiAvailable) throw new Error("API not available");
-      const buffer = await file.arrayBuffer();
-      const bytes = new Uint8Array(buffer);
-      let binary = "";
-      for (let i = 0; i < bytes.byteLength; i++) {
-        binary += String.fromCharCode(bytes[i]);
-      }
-      const result = await apiPost(
-        "/enforcement-sources/upload",
-        { source_id: sourceId, filename: file.name, content: btoa(binary) },
-      );
-      await refreshSources();
-      return result;
-    },
-
-    createSource: async (source: { name: string; url?: string; description?: string }) => {
-      if (!get().apiAvailable) throw new Error("API not available");
-      const result = await apiPost("/enforcement-sources", source);
-      await refreshSources();
-      return result;
-    },
-
-    deleteSource: async (sourceId: string) => {
-      if (!get().apiAvailable) throw new Error("API not available");
-      const result = await apiPost("/enforcement-sources/delete", { source_id: sourceId });
-      await refreshSources();
-      return result;
-    },
-
-    // ── Discovery & Research actions ────────────────────────────────────
-
-    fetchDiscovery: async () => {
-      const [feedsRes, candidatesRes] = await Promise.all([
-        apiGet("/discovery/feeds"),
-        apiGet("/discovery/candidates"),
-      ]);
-      if (feedsRes.ok && candidatesRes.ok) {
-        set({
-          source_feeds: await feedsRes.json(),
-          source_candidates: await candidatesRes.json(),
-        });
-      }
-    },
-
-    runDiscoveryFeeds: async () => {
-      const result = await apiPost("/discovery/run-feeds", {});
-      await get().fetchDiscovery();
-      return result;
-    },
-
-    reviewCandidate: async (candidateId: string, action: "accept" | "reject") => {
-      const result = await apiPost(
-        "/discovery/candidates/review",
-        { candidate_id: candidateId, action },
-      );
-      await get().fetchDiscovery();
-      return result;
-    },
-
-    fetchDimensions: async () => {
-      const res = await apiGet("/dimensions");
-      if (res.ok) set({ dimensions: await res.json() });
-    },
-
-    fetchTriageResults: async () => {
-      const res = await apiGet("/research/triage");
-      if (res.ok) set({ triage_results: await res.json() });
-    },
-
-    runTriage: async () => {
-      const result = await apiPost("/research/triage", {});
-      await get().fetchTriageResults();
-      return result;
-    },
-
-    runDeepResearch: async (policyIds?: string[]) => {
-      const body = policyIds ? { policy_ids: policyIds } : {};
-      const result = await apiPost("/research/deep", body);
-      await get().fetchResearchSessions();
-      return result;
-    },
-
-    fetchResearchSessions: async () => {
-      const res = await apiGet("/research/sessions");
-      if (res.ok) set({ research_sessions: await res.json() });
-    },
-
-    fetchFindings: async (policyId: string) => {
-      const res = await apiGet(`/research/findings/${policyId}`);
-      if (!res.ok) return [];
-      const data = await res.json();
-      return data.findings || [];
-    },
-
-    fetchAssessments: async (policyId: string) => {
-      const res = await apiGet(`/research/assessments/${policyId}`);
-      if (!res.ok) return [];
-      const data = await res.json();
-      return data.assessments || [];
-    },
+    ...createSourceActions(set, get, refreshSources),
+    ...createDiscoveryActions(set, get),
   };
 });

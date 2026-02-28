@@ -1,0 +1,3257 @@
+{
+  "frontend/src/App.tsx::default": {
+    "behaviorFlags": [
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore.getState": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./auth": 4.574710978503383,
+      "./components/Sidebar": 4.574710978503383,
+      "./data/pipelineStore": 4.574710978503383,
+      "./data/usePipelineSelectors": 4.574710978503383,
+      "./data/useStatusSubscription": 4.574710978503383,
+      "./views/CaseSourcing": 4.574710978503383,
+      "./views/ConvergenceMatrix": 4.574710978503383,
+      "./views/Dashboard": 4.574710978503383,
+      "./views/DetectionView": 4.574710978503383,
+      "./views/DimensionRegistryView": 4.574710978503383,
+      "./views/DiscoveryView": 4.574710978503383,
+      "./views/ManagementView": 4.574710978503383,
+      "./views/PolicyExplorer": 4.574710978503383,
+      "./views/PredictionView": 4.574710978503383,
+      "./views/ResearchView": 4.574710978503383,
+      "./views/SourcesView": 4.574710978503383,
+      "./views/TaxonomyView": 4.574710978503383,
+      "react": 1.483668525145067,
+      "react-router-dom": 3.4760986898352733
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/auth.ts::getSession": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./config": 3.188416617383492,
+      "amazon-cognito-identity-js": 3.188416617383492
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/auth.ts::getToken": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./config": 3.188416617383492,
+      "amazon-cognito-identity-js": 3.188416617383492
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/auth.ts::signIn": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./config": 3.188416617383492,
+      "amazon-cognito-identity-js": 3.188416617383492
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/auth.ts::signOut": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./config": 3.188416617383492,
+      "amazon-cognito-identity-js": 3.188416617383492
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/components/SharedUI.tsx::Badge": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "../data/usePipelineSelectors": 1.5789787049493917,
+      "../types": 1.5301885407799598,
+      "../utils": 2.272125885509337,
+      "react": 1.483668525145067
+    },
+    "jsxHash": {
+      "exact": "aa89a148af7f940ae074ddcc9cd5e0eb9416c3b848d61a1a9d58dca8afbe02fb",
+      "fuzzy": "e74909300963ed251f5126f23ba8ce8b44477e50a4cd80b220e6167cff59cb56"
+    }
+  },
+  "frontend/src/components/SharedUI.tsx::ErrorBanner": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "../data/usePipelineSelectors": 1.5789787049493917,
+      "../types": 1.5301885407799598,
+      "../utils": 2.272125885509337,
+      "react": 1.483668525145067
+    },
+    "jsxHash": {
+      "exact": "5c23b14336bf2f8a0f7dce817aa704c51b5cbbf4e7e88be50724239b0649b9df",
+      "fuzzy": "29e47f58feacd8e7f9163036701c6a2518f4625c8673cdea2c5f52c2a30f789f"
+    }
+  },
+  "frontend/src/components/SharedUI.tsx::QualityTag": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "../data/usePipelineSelectors": 1.5789787049493917,
+      "../types": 1.5301885407799598,
+      "../utils": 2.272125885509337,
+      "react": 1.483668525145067
+    },
+    "jsxHash": {
+      "exact": "aa89a148af7f940ae074ddcc9cd5e0eb9416c3b848d61a1a9d58dca8afbe02fb",
+      "fuzzy": "e74909300963ed251f5126f23ba8ce8b44477e50a4cd80b220e6167cff59cb56"
+    }
+  },
+  "frontend/src/components/SharedUI.tsx::QualityTags": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "../data/usePipelineSelectors": 1.5789787049493917,
+      "../types": 1.5301885407799598,
+      "../utils": 2.272125885509337,
+      "react": 1.483668525145067
+    },
+    "jsxHash": {
+      "exact": "12ceca41b850b49ab07a8abcc4e8198a7402151c75e3ba6a3edf1093511a9012",
+      "fuzzy": "ea6d5b449b85c6080563c2fabea2760dccdcb77ca8f38cb847de14919cadd96b"
+    }
+  },
+  "frontend/src/components/SharedUI.tsx::RiskBadge": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "../data/usePipelineSelectors": 1.5789787049493917,
+      "../types": 1.5301885407799598,
+      "../utils": 2.272125885509337,
+      "react": 1.483668525145067
+    },
+    "jsxHash": {
+      "exact": "b73d68b7d4fb2289bfb7486cb8e0b3385cd3cc3d1948cc014ace3d6d5348b058",
+      "fuzzy": "80af5db87affe3ab438b9c0248646e881649864c25ef3ce10c6d14387f0c6242"
+    }
+  },
+  "frontend/src/components/SharedUI.tsx::ScoreBar": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "../data/usePipelineSelectors": 1.5789787049493917,
+      "../types": 1.5301885407799598,
+      "../utils": 2.272125885509337,
+      "react": 1.483668525145067
+    },
+    "jsxHash": {
+      "exact": "ec81145f305a2b52c1effac6376d13ee74bcc48e42e2851d6e495c5a9f27d284",
+      "fuzzy": "66b3d8fbbcb839168073583740b53495028637f2647558001fac182c9dde2a5f"
+    }
+  },
+  "frontend/src/components/SharedUI.tsx::StageDot": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "../data/usePipelineSelectors": 1.5789787049493917,
+      "../types": 1.5301885407799598,
+      "../utils": 2.272125885509337,
+      "react": 1.483668525145067
+    },
+    "jsxHash": {
+      "exact": "aa89a148af7f940ae074ddcc9cd5e0eb9416c3b848d61a1a9d58dca8afbe02fb",
+      "fuzzy": "e74909300963ed251f5126f23ba8ce8b44477e50a4cd80b220e6167cff59cb56"
+    }
+  },
+  "frontend/src/components/Sidebar.tsx::default": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "../data/usePipelineSelectors": 1.5789787049493917,
+      "../types": 1.5301885407799598,
+      "./SharedUI": 4.574710978503383,
+      "lucide-react": 2.495269436823547,
+      "react-router-dom": 3.4760986898352733
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/config.ts::config": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {},
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/api.ts::API_BASE": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "ds:fetch": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "../auth": 3.4760986898352733,
+      "../config": 3.4760986898352733
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/api.ts::apiGet": {
+    "behaviorFlags": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "ds:fetch": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "../auth": 3.4760986898352733,
+      "../config": 3.4760986898352733
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/api.ts::apiPost": {
+    "behaviorFlags": [
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "ds:fetch": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "../auth": 3.4760986898352733,
+      "../config": 3.4760986898352733
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/fallback.ts::FALLBACK_DATA": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "../types": 1.5301885407799598
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/pipelineStore.ts::PipelineStore": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "../types": 1.5301885407799598,
+      "./api": 3.4760986898352733,
+      "zustand": 3.8815637979434374
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/pipelineStore.ts::usePipelineStore": {
+    "behaviorFlags": [
+      0,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "../types": 1.5301885407799598,
+      "./api": 3.4760986898352733,
+      "zustand": 3.8815637979434374
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useApiAvailable": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useApproveStage": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useCases": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useCounts": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useCreateSource": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useDataSources": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useDeleteSource": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useDetectionPatterns": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useDimensions": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useEnforcementSources": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useError": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useExploitationTrees": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useFetchAssessments": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useFetchDimensions": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useFetchDiscovery": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useFetchFindings": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useFetchResearchSessions": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useFetchTriageResults": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useLoading": {
+    "behaviorFlags": [
+      0,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::usePipelineStatus": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::usePolicies": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::usePolicyCatalog": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useQuality": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useRefresh": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useResearchSessions": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useReviewCandidate": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useRunDeepResearch": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useRunDiscoveryFeeds": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useRunId": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useRunPipeline": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useRunTriage": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useScannedPrograms": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useSourceCandidates": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useSourceFeeds": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useTaxonomy": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useThreshold": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useTriageResults": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useUpdatePipelineStatus": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useUploadSourceDocument": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "./pipelineStore": 0.861138911799075
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/data/useStatusSubscription.ts::useStatusSubscription": {
+    "behaviorFlags": [
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore.getState": 1.0
+    },
+    "hookProfile": [
+      0,
+      1,
+      0,
+      0,
+      3,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "../types": 1.5301885407799598,
+      "./api": 3.4760986898352733,
+      "./pipelineStore": 0.861138911799075,
+      "react": 1.483668525145067
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/hooks.ts::useAsyncAction": {
+    "behaviorFlags": [
+      0,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      2,
+      0,
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "react": 1.483668525145067
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/types.ts::Case": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {},
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/types.ts::Counts": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {},
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/types.ts::DetectionPattern": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {},
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/types.ts::Dimension": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {},
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/types.ts::EnforcementSource": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {},
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/types.ts::ExploitationStep": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {},
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/types.ts::ExploitationTree": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {},
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/types.ts::FallbackData": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {},
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/types.ts::PipelineStageStatus": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {},
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/types.ts::Policy": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {},
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/types.ts::Quality": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {},
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/types.ts::QualityAssessment": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {},
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/types.ts::ResearchSession": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {},
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/types.ts::RiskLevel": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {},
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/types.ts::SourceCandidate": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {},
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/types.ts::SourceFeed": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {},
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/types.ts::StageStatus": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {},
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/types.ts::StructuralFinding": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {},
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/types.ts::TriageResult": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {},
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/types.ts::ValidationStatus": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {},
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/utils.ts::formatDollars": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {},
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/utils.ts::scoreColor": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {},
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/utils.ts::scoreLevel": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {},
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/views/CaseSourcing.tsx::default": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "../components/SharedUI": 2.272125885509337,
+      "../data/usePipelineSelectors": 1.5789787049493917,
+      "../types": 1.5301885407799598,
+      "../utils": 2.272125885509337,
+      "lucide-react": 2.495269436823547,
+      "react": 1.483668525145067
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/views/ConvergenceMatrix.tsx::default": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "../data/usePipelineSelectors": 1.5789787049493917,
+      "../types": 1.5301885407799598,
+      "../utils": 2.272125885509337,
+      "react": 1.483668525145067
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/views/Dashboard.tsx::default": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dataAccessPattern": {
+      "store:usePipelineStore": 1.0
+    },
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "../components/SharedUI": 2.272125885509337,
+      "../data/pipelineStore": 4.574710978503383,
+      "../data/usePipelineSelectors": 1.5789787049493917,
+      "../hooks": 2.9652730660692823,
+      "../types": 1.5301885407799598,
+      "../utils": 2.272125885509337,
+      "react": 1.483668525145067,
+      "react-router-dom": 3.4760986898352733,
+      "zustand/shallow": 4.574710978503383
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/views/DetectionView.tsx::default": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "../components/SharedUI": 2.272125885509337,
+      "../data/usePipelineSelectors": 1.5789787049493917,
+      "../types": 1.5301885407799598,
+      "lucide-react": 2.495269436823547,
+      "react": 1.483668525145067
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/views/DimensionRegistryView.tsx::default": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      1
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "../components/SharedUI": 2.272125885509337,
+      "../data/usePipelineSelectors": 1.5789787049493917,
+      "lucide-react": 2.495269436823547,
+      "react": 1.483668525145067
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/views/DiscoveryView.tsx::default": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      1
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "../components/SharedUI": 4.544251771018674,
+      "../data/usePipelineSelectors": 1.5789787049493917,
+      "../hooks": 2.9652730660692823,
+      "../types": 1.5301885407799598,
+      "lucide-react": 2.495269436823547,
+      "react": 1.483668525145067
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/views/ManagementView.tsx::default": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      1
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "../components/SharedUI": 2.272125885509337,
+      "../data/api": 4.574710978503383,
+      "../data/usePipelineSelectors": 1.5789787049493917,
+      "../hooks": 2.9652730660692823,
+      "react": 1.483668525145067
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/views/PolicyExplorer.tsx::default": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "../components/SharedUI": 2.272125885509337,
+      "../data/usePipelineSelectors": 1.5789787049493917,
+      "react": 1.483668525145067
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/views/PredictionView.tsx::default": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      0,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "../components/SharedUI": 2.272125885509337,
+      "../data/usePipelineSelectors": 1.5789787049493917,
+      "../types": 1.5301885407799598,
+      "lucide-react": 2.495269436823547,
+      "react": 1.483668525145067
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/views/ResearchView.tsx::default": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      1
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "../components/SharedUI": 4.544251771018674,
+      "../data/usePipelineSelectors": 1.5789787049493917,
+      "../hooks": 2.9652730660692823,
+      "../types": 1.5301885407799598,
+      "lucide-react": 2.495269436823547,
+      "react": 1.483668525145067
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/views/SourcesView.tsx::default": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "../components/SharedUI": 2.272125885509337,
+      "../data/usePipelineSelectors": 1.5789787049493917,
+      "../hooks": 2.9652730660692823,
+      "../types": 1.5301885407799598,
+      "lucide-react": 2.495269436823547,
+      "react": 1.483668525145067
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  },
+  "frontend/src/views/TaxonomyView.tsx::default": {
+    "behaviorFlags": [
+      0,
+      0,
+      0,
+      1,
+      0,
+      1,
+      1,
+      0
+    ],
+    "dataAccessPattern": {},
+    "hookProfile": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "importConstellation": {
+      "../data/usePipelineSelectors": 1.5789787049493917,
+      "../types": 1.5301885407799598,
+      "react": 1.483668525145067
+    },
+    "jsxHash": {
+      "exact": null,
+      "fuzzy": null
+    }
+  }
+}

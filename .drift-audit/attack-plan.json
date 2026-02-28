@@ -1,10 +1,43 @@
 {
   "created": "2026-02-27T17:20:00Z",
-  "updated": "2026-02-28T01:00:00Z",
+  "updated": "2026-02-28T09:19:24.432230+00:00",
+  "merges": [
+    {
+      "primary": "frontend-error-loading-handling",
+      "absorbed": "frontend-store-access-patterns",
+      "reason": "Jaccard file overlap: 0.85"
+    },
+    {
+      "primary": "frontend-error-loading-handling",
+      "absorbed": "frontend-inline-styles",
+      "reason": "Jaccard file overlap: 0.62"
+    },
+    {
+      "primary": "backend-logging-inconsistency",
+      "absorbed": "backend-llm-config-hardcoding",
+      "reason": "Jaccard file overlap: 0.79"
+    },
+    {
+      "primary": "frontend-empty-state-handling",
+      "absorbed": "frontend-expandable-accessibility",
+      "reason": "Jaccard file overlap: 0.56"
+    }
+  ],
   "plan": [
     {
-      "area_id": "dead-prototype-codebase",
+      "area_id": "dead-pipeline-prototype",
       "rank": 1,
+      "depends_on": [],
+      "phase": "completed",
+      "canonical_variant": "active-backend",
+      "unify_summary": "Deleted svap_pipeline/ entirely (30 files)",
+      "guard_artifacts": [
+        "docs/adr/017-backend-structured-logging.md"
+      ]
+    },
+    {
+      "area_id": "dead-prototype-codebase",
+      "rank": 2,
       "depends_on": [],
       "phase": "completed",
       "canonical_variant": "active-typescript-frontend",
@@ -12,44 +45,21 @@
       "guard_artifacts": []
     },
     {
-      "area_id": "frontend-store-access-patterns",
-      "rank": 2,
-      "depends_on": [],
-      "phase": "completed",
-      "canonical_variant": "selector-hooks",
-      "unify_summary": "All views migrated to usePipelineSelectors — actions via individual hooks, data via individual data selectors",
-      "guard_artifacts": [
-        "docs/adr/013-unified-store-access.md",
-        "docs/patterns/store-access.md",
-        "frontend/eslint-rules/no-direct-store-import.js"
-      ]
-    },
-    {
-      "area_id": "frontend-error-loading-handling",
+      "area_id": "eslint-rules-duplication",
       "rank": 3,
       "depends_on": [],
       "phase": "completed",
-      "canonical_variant": "useAsyncAction-ErrorBanner",
-      "unify_summary": "Created useAsyncAction() hook and ErrorBanner component, adopted in Dashboard, SourcesView, ManagementView, DiscoveryView, ResearchView",
+      "canonical_variant": "frontend-active",
+      "unify_summary": "Consolidated to frontend/eslint-rules/, upgraded no-inline-styles with CSS custom property allowance, added no-escape-hatches, deleted root eslint-rules/, updated drift config sync path",
       "guard_artifacts": [
-        "docs/adr/015-async-error-handling.md",
-        "docs/patterns/async-error-handling.md"
-      ]
-    },
-    {
-      "area_id": "backend-config-duplication",
-      "rank": 4,
-      "depends_on": [],
-      "phase": "completed",
-      "canonical_variant": "factory-function",
-      "unify_summary": "Extracted to svap/defaults.py, both api.py and stage_runner.py import from it",
-      "guard_artifacts": [
-        "docs/adr/016-backend-shared-modules.md"
+        "docs/adr/018-eslint-rule-canonical-location.md",
+        "frontend/eslint-rules/no-escape-hatches.js",
+        "frontend/eslint-rules/no-inline-styles.js"
       ]
     },
     {
       "area_id": "parallel-execution-duplication",
-      "rank": 5,
+      "rank": 4,
       "depends_on": [],
       "phase": "completed",
       "canonical_variant": "run-parallel-llm",
@@ -59,20 +69,71 @@
       ]
     },
     {
-      "area_id": "frontend-inline-styles",
+      "area_id": "frontend-error-loading-handling",
+      "rank": 5,
+      "depends_on": [
+        "dead-prototype-codebase"
+      ],
+      "phase": "completed",
+      "canonical_variant": "useAsyncAction-ErrorBanner",
+      "unify_summary": "All views with async operations now use useAsyncAction + ErrorBanner. SourcesView.SourceRow migrated (upload/delete). ManagementView fully migrated (5 async ops).",
+      "guard_artifacts": [
+        "docs/adr/015-async-error-handling.md",
+        "docs/patterns/async-error-handling.md",
+        "frontend/eslint-rules/no-manual-async-state.js"
+      ]
+    },
+    {
+      "area_id": "backend-config-duplication",
       "rank": 6,
       "depends_on": [],
       "phase": "completed",
-      "canonical_variant": "css-classes",
-      "unify_summary": "Added utility CSS classes (flex-row, mb-2, ml-auto, etc.), reduced inline styles from 27 to 13 (remaining are CSS variable injection and dynamic values)",
+      "canonical_variant": "factory-function",
+      "unify_summary": "Extracted to svap/defaults.py, both api.py and stage_runner.py import from it",
       "guard_artifacts": [
-        "docs/patterns/css-architecture.md",
-        "frontend/eslint-rules/no-inline-styles.js"
+        "docs/adr/016-backend-shared-modules.md"
+      ]
+    },
+    {
+      "area_id": "backend-logging-inconsistency",
+      "rank": 7,
+      "depends_on": [],
+      "phase": "completed",
+      "canonical_variant": "logging-module",
+      "unify_summary": "Replaced 129 print() calls with logging module across all 11 stage files. All use logger = logging.getLogger(__name__).",
+      "guard_artifacts": [
+        "docs/adr/017-backend-structured-logging.md",
+        "docs/patterns/backend-logging.md",
+        "backend/scripts/check-no-print.sh"
+      ]
+    },
+    {
+      "area_id": "frontend-empty-state-handling",
+      "rank": 8,
+      "depends_on": [],
+      "phase": "completed",
+      "canonical_variant": "div-empty-state",
+      "unify_summary": "Added empty states to CaseSourcing (cases table + source registry) and TaxonomyView. Added keyboard accessibility (tabIndex + onKeyDown) to 3 table row expanders in CaseSourcing, SourcesView, DiscoveryView.",
+      "guard_artifacts": [
+        "docs/patterns/empty-state-handling.md"
+      ]
+    },
+    {
+      "area_id": "frontend-auth-token-access",
+      "rank": 9,
+      "depends_on": [],
+      "phase": "completed",
+      "canonical_variant": "shared-api-utility",
+      "unify_summary": "useStatusSubscription.ts migrated from raw fetch+getToken to apiGet from data/api.ts. Zero files now bypass the shared API utility.",
+      "guard_artifacts": [
+        "docs/adr/014-shared-api-utility.md",
+        "docs/patterns/api-access.md",
+        "frontend/eslint-rules/no-direct-fetch.js"
       ]
     },
     {
       "area_id": "backend-route-error-handling",
-      "rank": 7,
+      "rank": 10,
       "depends_on": [],
       "phase": "completed",
       "canonical_variant": "path-param-helper",
@@ -80,19 +141,7 @@
       "guard_artifacts": [
         "docs/adr/016-backend-shared-modules.md"
       ]
-    },
-    {
-      "area_id": "frontend-auth-token-access",
-      "rank": 8,
-      "depends_on": ["frontend-store-access-patterns"],
-      "phase": "completed",
-      "canonical_variant": "shared-api-utility",
-      "unify_summary": "Extracted apiGet/apiPost to data/api.ts, ManagementView uses shared utility instead of local authHeaders()",
-      "guard_artifacts": [
-        "docs/adr/014-shared-api-utility.md",
-        "docs/patterns/api-access.md",
-        "frontend/eslint-rules/no-direct-fetch.js"
-      ]
     }
-  ]
+  ],
+  "regressions": []
 }

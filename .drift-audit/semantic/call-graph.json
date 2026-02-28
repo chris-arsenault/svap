@@ -1,0 +1,1279 @@
+{
+  "frontend/src/App.tsx::default": {
+    "calleeSetVector": {
+      "loadSession": 4.574710978503383,
+      "setAuth": 4.574710978503383,
+      "signOut": 4.574710978503383,
+      "useCallback": 2.272125885509337,
+      "useEffect": 2.782951509275328,
+      "useState": 4.179608657430765
+    },
+    "chainPatternHashes": [],
+    "depthProfile": [
+      6,
+      0,
+      0
+    ],
+    "sequenceHashes": {
+      "effect": "abb1c5e58df1c39bb712d8dac4848770343d3800ca1d915ed283f42fbce4d166",
+      "handler": "abfb2f01ff6bbea97e07f9ef24930ff2602532a1c6dcfefcb9cd9b499b8bb8e7",
+      "init": "3dd4e3cbaa2da843f7485bd2103ffc4a9c8ec058f1c34410b0aad10e6048175d"
+    }
+  },
+  "frontend/src/auth.ts::getSession": {
+    "calleeSetVector": {
+      "Promise.resolve": 4.574710978503383,
+      "getCurrentUser": 3.8815637979434374,
+      "resolve": 9.149421957006766
+    },
+    "chainPatternHashes": [],
+    "depthProfile": [
+      3,
+      0,
+      0
+    ],
+    "sequenceHashes": {
+      "conditional": "cc6830c1b9e1acbb5852c14a625e18042318043f6be23aa0d828613b86cb645e",
+      "init": "6552e2cff0ff5bd8069d922258c2e85f5eccea4a6aa0050e429aa1bd3490372f"
+    }
+  },
+  "frontend/src/auth.ts::getToken": {
+    "calleeSetVector": {
+      "getSession": 4.574710978503383,
+      "session.getIdToken": 4.574710978503383,
+      "session.getIdToken().getJwtToken": 4.574710978503383
+    },
+    "chainPatternHashes": [],
+    "depthProfile": [
+      3,
+      0,
+      0
+    ],
+    "sequenceHashes": {
+      "init": "1228c62c4012358b3825a473811986d7e39eca5349b044c97baf4997c2b85fbe"
+    }
+  },
+  "frontend/src/auth.ts::signIn": {
+    "calleeSetVector": {
+      "getUserPool": 4.574710978503383
+    },
+    "chainPatternHashes": [],
+    "depthProfile": [
+      1,
+      0,
+      0
+    ],
+    "sequenceHashes": {
+      "init": "a5c2e8c171453c89d1fb7fc90f31268f833103297cfbeb0b75487cced56dc0e7"
+    }
+  },
+  "frontend/src/auth.ts::signOut": {
+    "calleeSetVector": {
+      "getCurrentUser": 3.8815637979434374,
+      "user.signOut": 4.574710978503383
+    },
+    "chainPatternHashes": [],
+    "depthProfile": [
+      2,
+      0,
+      0
+    ],
+    "sequenceHashes": {
+      "init": "05934533805bedbe801468af19ce55ace0c5fc1209bc53643c2436e8828508b0"
+    }
+  },
+  "frontend/src/components/SharedUI.tsx::Badge": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/components/SharedUI.tsx::ErrorBanner": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/components/SharedUI.tsx::QualityTag": {
+    "calleeSetVector": {
+      "useQuality": 4.574710978503383
+    },
+    "chainPatternHashes": [],
+    "depthProfile": [
+      1,
+      0,
+      0
+    ],
+    "sequenceHashes": {
+      "init": "96b46abbe00e2b0314bb898aacfc066f63a67bf7411627b12056c0f97f0821fa"
+    }
+  },
+  "frontend/src/components/SharedUI.tsx::QualityTags": {
+    "calleeSetVector": {
+      "ids.map": 4.574710978503383
+    },
+    "chainPatternHashes": [],
+    "depthProfile": [
+      1,
+      0,
+      0
+    ],
+    "sequenceHashes": {
+      "render": "10bc2b747e860c5a812de7406f603eb2e64e027e7c39ce2eca9514ddbbb6ddbb"
+    }
+  },
+  "frontend/src/components/SharedUI.tsx::RiskBadge": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/components/SharedUI.tsx::ScoreBar": {
+    "calleeSetVector": {
+      "Array.from": 4.574710978503383,
+      "pipClass": 4.574710978503383,
+      "scoreColor": 4.574710978503383,
+      "scoreLevel": 4.574710978503383
+    },
+    "chainPatternHashes": [],
+    "depthProfile": [
+      4,
+      0,
+      0
+    ],
+    "sequenceHashes": {
+      "init": "df2f26eb9cb0a25f1b49fe1524ebed841087c8b7cca6ecbb07656f983a21ec32",
+      "render": "219cfa61d0cfe98d5da25d0c9312e86b4a539d910dafead5efe55e69d40afc8c"
+    }
+  },
+  "frontend/src/components/SharedUI.tsx::StageDot": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/components/Sidebar.tsx::default": {
+    "calleeSetVector": {
+      "<expr>.map": 4.574710978503383,
+      "NAV_ITEMS.map": 4.574710978503383,
+      "isSection": 4.574710978503383,
+      "useCounts": 4.574710978503383,
+      "usePipelineStatus": 4.574710978503383
+    },
+    "chainPatternHashes": [],
+    "depthProfile": [
+      5,
+      0,
+      0
+    ],
+    "sequenceHashes": {
+      "conditional": "db85f413275aa809c3a29b4b1eb7e2c48c4b66fa211a43ae70aee9a61c1266fc",
+      "init": "ce6bf4dce3d891612db38f5c53936ef4b63c120d2b575ac0503f1da2bacc5caf",
+      "render": "e78a65f384d6df631ff28355b8e2b55a525ebf992c4062aa1c3556bc645a2790"
+    }
+  },
+  "frontend/src/config.ts::config": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/api.ts::API_BASE": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/api.ts::apiGet": {
+    "calleeSetVector": {
+      "fetch": 3.8815637979434374,
+      "getToken": 3.8815637979434374
+    },
+    "chainPatternHashes": [],
+    "depthProfile": [
+      2,
+      0,
+      0
+    ],
+    "sequenceHashes": {
+      "init": "218a40c6931ab59d541ce0a59e437b2d17bff1a0d18fbe2f1c267dc51a438739"
+    }
+  },
+  "frontend/src/data/api.ts::apiPost": {
+    "calleeSetVector": {
+      "JSON.parse": 4.574710978503383,
+      "JSON.stringify": 4.574710978503383,
+      "fetch": 3.8815637979434374,
+      "getToken": 3.8815637979434374,
+      "res.text": 4.574710978503383
+    },
+    "chainPatternHashes": [],
+    "depthProfile": [
+      5,
+      0,
+      0
+    ],
+    "sequenceHashes": {
+      "conditional": "79f5f543aa7318ab31a04d53a5a442051f27310b3fd9291fbf60b515d788dcdd",
+      "init": "3c26ae9471795fb5f33f0246c3f66a68ff0b7dfa83e49fd40da0e7130e542832"
+    }
+  },
+  "frontend/src/data/fallback.ts::FALLBACK_DATA": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/pipelineStore.ts::PipelineStore": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/pipelineStore.ts::usePipelineStore": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useApiAvailable": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useApproveStage": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useCases": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useCounts": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useCreateSource": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useDataSources": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useDeleteSource": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useDetectionPatterns": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useDimensions": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useEnforcementSources": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useError": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useExploitationTrees": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useFetchAssessments": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useFetchDimensions": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useFetchDiscovery": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useFetchFindings": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useFetchResearchSessions": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useFetchTriageResults": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useLoading": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::usePipelineStatus": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::usePolicies": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::usePolicyCatalog": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useQuality": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useRefresh": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useResearchSessions": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useReviewCandidate": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useRunDeepResearch": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useRunDiscoveryFeeds": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useRunId": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useRunPipeline": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useRunTriage": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useScannedPrograms": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useSourceCandidates": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useSourceFeeds": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useTaxonomy": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useThreshold": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useTriageResults": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useUpdatePipelineStatus": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/usePipelineSelectors.ts::useUploadSourceDocument": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/data/useStatusSubscription.ts::useStatusSubscription": {
+    "calleeSetVector": {
+      "poll": 4.574710978503383,
+      "useEffect": 2.782951509275328,
+      "useRef": 13.724132935510148
+    },
+    "chainPatternHashes": [],
+    "depthProfile": [
+      3,
+      0,
+      0
+    ],
+    "sequenceHashes": {
+      "effect": "4abf7a52c06e3d6c6219e514f0b9bac26e79e4649dc2a0a66a66e42b36d642b6",
+      "init": "8dea3809f63ee71d4d3b7e2a79b5ce5bc1e3cc71551bd611c6408aef3ac46771"
+    }
+  },
+  "frontend/src/hooks.ts::useAsyncAction": {
+    "calleeSetVector": {
+      "String": 4.574710978503383,
+      "fn": 4.574710978503383,
+      "setBusy": 9.149421957006766,
+      "setError": 13.724132935510148,
+      "useCallback": 4.544251771018674,
+      "useState": 4.179608657430765
+    },
+    "chainPatternHashes": [],
+    "depthProfile": [
+      6,
+      0,
+      0
+    ],
+    "sequenceHashes": {
+      "conditional": "0b885a316c8c1df7a437ebed1e319d7d73f508660882d4982789c268e3bb687d",
+      "init": "94f695d297405fe646532ada55053bd1581382831ca2f8843806c5e4e6af32ae"
+    }
+  },
+  "frontend/src/types.ts::Case": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/types.ts::Counts": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/types.ts::DetectionPattern": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/types.ts::Dimension": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/types.ts::EnforcementSource": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/types.ts::ExploitationStep": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/types.ts::ExploitationTree": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/types.ts::FallbackData": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/types.ts::PipelineStageStatus": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/types.ts::Policy": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/types.ts::Quality": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/types.ts::QualityAssessment": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/types.ts::ResearchSession": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/types.ts::RiskLevel": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/types.ts::SourceCandidate": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/types.ts::SourceFeed": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/types.ts::StageStatus": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/types.ts::StructuralFinding": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/types.ts::TriageResult": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/types.ts::ValidationStatus": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/utils.ts::formatDollars": {
+    "calleeSetVector": {
+      "<expr>.toFixed": 13.724132935510148
+    },
+    "chainPatternHashes": [],
+    "depthProfile": [
+      1,
+      0,
+      0
+    ],
+    "sequenceHashes": {
+      "conditional": "f7a3dcdb6ad5f7bad974f7bee1c3d90fb072b42820b722fb0c2b40eb29be3484"
+    }
+  },
+  "frontend/src/utils.ts::scoreColor": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/utils.ts::scoreLevel": {
+    "calleeSetVector": {},
+    "chainPatternHashes": [],
+    "depthProfile": [
+      0,
+      0,
+      0
+    ],
+    "sequenceHashes": {}
+  },
+  "frontend/src/views/CaseSourcing.tsx::default": {
+    "calleeSetVector": {
+      "cases.map": 4.574710978503383,
+      "setExpandedCase": 4.574710978503383,
+      "useCallback": 2.272125885509337,
+      "useCases": 3.4760986898352733,
+      "useEnforcementSources": 3.8815637979434374,
+      "useState": 2.0898043287153825
+    },
+    "chainPatternHashes": [],
+    "depthProfile": [
+      6,
+      0,
+      0
+    ],
+    "sequenceHashes": {
+      "init": "a5ec59cfeed4f864d23b96dea0de8c15e26d2135b92af93f213d425247e13b80",
+      "render": "153917dc5cfe66b18157c8a123abc35ee0a8cab5da1a4888bd9d7b0056e83307"
+    }
+  },
+  "frontend/src/views/ConvergenceMatrix.tsx::default": {
+    "calleeSetVector": {
+      "<expr>.sort": 4.574710978503383,
+      "qualities.map": 4.574710978503383,
+      "sorted.map": 4.574710978503383,
+      "useCases": 3.4760986898352733,
+      "usePolicies": 3.4760986898352733,
+      "useState": 2.0898043287153825,
+      "useTaxonomy": 3.8815637979434374,
+      "useThreshold": 3.8815637979434374
+    },
+    "chainPatternHashes": [],
+    "depthProfile": [
+      8,
+      0,
+      0
+    ],
+    "sequenceHashes": {
+      "init": "bbb080fde1e0fc59b2b6accbf2f759c2ee9164c0becd23cd8ac729a21b3db045",
+      "render": "93ed1eadc0c8bc5fbd44ba16f745a8d327899c8f47780893e149f25510274468"
+    }
+  },
+  "frontend/src/views/Dashboard.tsx::default": {
+    "calleeSetVector": {
+      "cases.reduce": 4.574710978503383,
+      "detection_patterns.filter": 3.8815637979434374,
+      "policies.filter": 4.574710978503383,
+      "usePipelineStore": 4.574710978503383,
+      "useShallow": 4.574710978503383
+    },
+    "chainPatternHashes": [],
+    "depthProfile": [
+      5,
+      0,
+      0
+    ],
+    "sequenceHashes": {
+      "init": "5ebd2f1a7018ad925580055269a65364b258fb52ad92940b9379c173377b1b7a"
+    }
+  },
+  "frontend/src/views/DetectionView.tsx::default": {
+    "calleeSetVector": {
+      "PRIORITY_ORDER.map": 4.574710978503383,
+      "buildTreeGroups": 4.574710978503383,
+      "detection_patterns.filter": 3.8815637979434374,
+      "detection_patterns.forEach": 4.574710978503383,
+      "expandedTrees.has": 4.574710978503383,
+      "g.steps.map": 4.574710978503383,
+      "setExpandedPatterns": 9.149421957006766,
+      "setExpandedSteps": 13.724132935510148,
+      "setExpandedTrees": 13.724132935510148,
+      "toggleSet": 13.724132935510148,
+      "treeGroups.flatMap": 4.574710978503383,
+      "treeGroups.map": 9.149421957006766,
+      "useCallback": 11.360629427546684,
+      "useDetectionPatterns": 4.574710978503383,
+      "useMemo": 4.574710978503383,
+      "useState": 8.35921731486153
+    },
+    "chainPatternHashes": [],
+    "depthProfile": [
+      16,
+      0,
+      0
+    ],
+    "sequenceHashes": {
+      "conditional": "68e2fa676076788c965a6fd68f491fd0b966b4cb293396d6c88e81e4ac200603",
+      "init": "0abad395cd7358f39233dcb1e7868668e008f4d0d8b189b9b31c86c49e8bd0af",
+      "render": "70de48e2628e3c1064129913f43847d17e678830da9b388687e4ec98b629c7ba"
+    }
+  },
+  "frontend/src/views/DimensionRegistryView.tsx::default": {
+    "calleeSetVector": {
+      "dim.probing_questions.map": 4.574710978503383,
+      "dimensions.filter": 9.149421957006766,
+      "dimensions.map": 4.574710978503383,
+      "fetchDimensions": 4.574710978503383,
+      "originBadge": 4.574710978503383,
+      "setExpandedId": 4.574710978503383,
+      "useCallback": 2.272125885509337,
+      "useDimensions": 4.574710978503383,
+      "useEffect": 2.782951509275328,
+      "useFetchDimensions": 4.574710978503383,
+      "useState": 2.0898043287153825
+    },
+    "chainPatternHashes": [],
+    "depthProfile": [
+      11,
+      0,
+      0
+    ],
+    "sequenceHashes": {
+      "conditional": "455a4894d4e3e0c73fa607f8fc3de04652d8587a46c0f84d9a4125740ba95c55",
+      "effect": "6738e2b31180a42a3d3c0ec303f07fbe7223822460a653e04eae3bb5c1fd6757",
+      "init": "303db15dbb1da059c8753b8f0091d135ab64e2ffc1aed63fc77a177952fa4268",
+      "render": "18c4eb379cede8e5fe1367f5dbe9dd0d4ea20edffcc1c905506c24ee64c6e9d5"
+    }
+  },
+  "frontend/src/views/DiscoveryView.tsx::default": {
+    "calleeSetVector": {
+      "<expr>.toLocaleDateString": 4.574710978503383,
+      "fetchDiscovery": 4.574710978503383,
+      "filtered.map": 4.574710978503383,
+      "reviewCandidate": 4.574710978503383,
+      "run": 6.9521973796705465,
+      "source_candidates.filter": 13.724132935510148,
+      "source_feeds.map": 4.574710978503383,
+      "useAsyncAction": 3.4760986898352733,
+      "useCallback": 4.544251771018674,
+      "useEffect": 2.782951509275328,
+      "useFetchDiscovery": 4.574710978503383,
+      "useReviewCandidate": 4.574710978503383,
+      "useRunDiscoveryFeeds": 4.574710978503383,
+      "useSourceCandidates": 4.574710978503383,
+      "useSourceFeeds": 4.574710978503383,
+      "useState": 4.179608657430765
+    },
+    "chainPatternHashes": [],
+    "depthProfile": [
+      16,
+      0,
+      0
+    ],
+    "sequenceHashes": {
+      "conditional": "5296aaf5fc2af422ef6618c11e8c30cd246e4f760f4a6c4d518771724acc96bb",
+      "effect": "a388237b72f6755b1ada5939486930006a416b5704c8a7cfac71f116a699d44a",
+      "handler": "3fef2123402b5c116f02ba37a81d5f5224f2ded0c42c8d70f9e9f0d36bd472a9",
+      "init": "7edd740daa5b0c8c8a4577fae376bf221cc2e1d5feb5a105ddca08fe6129b347",
+      "render": "dfd9e7aae623d9edf67037974e649828d9c8322cb5ab0164d2904202be2913b6"
+    }
+  },
+  "frontend/src/views/ManagementView.tsx::default": {
+    "calleeSetVector": {
+      "<expr>.getTime": 9.149421957006766,
+      "Math.round": 4.574710978503383,
+      "Promise.all": 19.407818989717185,
+      "STAGE_ORDER.map": 4.574710978503383,
+      "apiGet": 9.149421957006766,
+      "apiPost": 9.149421957006766,
+      "executionStatusLevel": 4.574710978503383,
+      "executions.filter": 4.574710978503383,
+      "executions.map": 4.574710978503383,
+      "fetchExecutions": 22.873554892516914,
+      "fetchRuns": 22.873554892516914,
+      "r.stages.map": 4.574710978503383,
+      "refresh": 4.574710978503383,
+      "refreshAll": 4.574710978503383,
+      "res.json": 9.149421957006766,
+      "run": 3.4760986898352733,
+      "runPipeline": 4.574710978503383,
+      "runs.map": 4.574710978503383,
+      "seedPipeline": 4.574710978503383,
+      "setExecutions": 4.574710978503383,
+      "setRuns": 4.574710978503383,
+      "stageMap.get": 4.574710978503383,
+      "stageStatusClass": 4.574710978503383,
+      "timeAgo": 9.149421957006766,
+      "useAsyncAction": 3.4760986898352733,
+      "useCallback": 6.816377656528011,
+      "useEffect": 2.782951509275328,
+      "useRefresh": 4.574710978503383,
+      "useRunPipeline": 4.574710978503383,
+      "useSeedPipeline": 4.574710978503383,
+      "useState": 4.179608657430765
+    },
+    "chainPatternHashes": [],
+    "depthProfile": [
+      31,
+      0,
+      0
+    ],
+    "sequenceHashes": {
+      "conditional": "fb8af07048fa6342510559871a9e7264717cb941a4d05e70c969cd381b586662",
+      "effect": "1edcf5bd6894a61cc768860de8a2f58b2791955ef752d07fb9e4d45e24b91394",
+      "handler": "ed837e58d7c44ba2ac98d96cd39a9b8df1548f434b859c64d513cc38adf96375",
+      "init": "ea7a6ef19103cf4a417a210b523835c9c009e2d64f199480274b3fe3beba8f6d",
+      "render": "6a5f86f5205617851ff780b47036c9d157b99b23cf9a2ab47e2b93fdfbe3ccef"
+    }
+  },
+  "frontend/src/views/PolicyExplorer.tsx::default": {
+    "calleeSetVector": {
+      "Object.entries": 4.574710978503383,
+      "Object.entries().map": 4.574710978503383,
+      "useDataSources": 4.574710978503383,
+      "usePolicies": 3.4760986898352733,
+      "usePolicyCatalog": 4.574710978503383,
+      "useScannedPrograms": 4.574710978503383,
+      "useThreshold": 3.8815637979434374
+    },
+    "chainPatternHashes": [],
+    "depthProfile": [
+      7,
+      0,
+      0
+    ],
+    "sequenceHashes": {
+      "init": "e488d572171de040d03d62eb6403b0312545e83c3bceea1944c428ff77de1640",
+      "render": "7d40d7a82cda395c971654e48a1fd81a61c61da645e638138cb64cdb587f8613"
+    }
+  },
+  "frontend/src/views/PredictionView.tsx::default": {
+    "calleeSetVector": {
+      "setExpandedTree": 4.574710978503383,
+      "trees.map": 4.574710978503383,
+      "useCallback": 2.272125885509337,
+      "useExploitationTrees": 4.574710978503383,
+      "useState": 2.0898043287153825
+    },
+    "chainPatternHashes": [],
+    "depthProfile": [
+      5,
+      0,
+      0
+    ],
+    "sequenceHashes": {
+      "init": "f95fd9572f525080186656b0dbdc08d4b461030742459fd703031fe2f6b4418e",
+      "render": "265d56e08f65a354c89330c026fde1edc3396841fbc5c288a624d84d03798ac6"
+    }
+  },
+  "frontend/src/views/ResearchView.tsx::default": {
+    "calleeSetVector": {
+      "Promise.all": 3.8815637979434374,
+      "a.rationale.slice": 4.574710978503383,
+      "assessments.map": 4.574710978503383,
+      "confidenceBadge": 9.149421957006766,
+      "f.observation.slice": 4.574710978503383,
+      "fetchAssessments": 4.574710978503383,
+      "fetchFindings": 4.574710978503383,
+      "fetchResearchSessions": 4.574710978503383,
+      "fetchTriageResults": 4.574710978503383,
+      "findings.map": 4.574710978503383,
+      "policies.find": 4.574710978503383,
+      "policyName": 9.149421957006766,
+      "presentBadge": 4.574710978503383,
+      "research_sessions.filter": 9.149421957006766,
+      "research_sessions.map": 4.574710978503383,
+      "run": 6.9521973796705465,
+      "setAssessments": 4.574710978503383,
+      "setExpandedPolicy": 9.149421957006766,
+      "setFindings": 4.574710978503383,
+      "t.rationale.slice": 4.574710978503383,
+      "t.triage_score.toFixed": 4.574710978503383,
+      "triage_results.map": 4.574710978503383,
+      "useAsyncAction": 3.4760986898352733,
+      "useCallback": 9.088503542037348,
+      "useEffect": 2.782951509275328,
+      "useFetchAssessments": 4.574710978503383,
+      "useFetchFindings": 4.574710978503383,
+      "useFetchResearchSessions": 4.574710978503383,
+      "useFetchTriageResults": 4.574710978503383,
+      "usePolicies": 3.4760986898352733,
+      "useResearchSessions": 4.574710978503383,
+      "useRunDeepResearch": 4.574710978503383,
+      "useRunTriage": 4.574710978503383,
+      "useState": 6.269412986146147,
+      "useTriageResults": 4.574710978503383
+    },
+    "chainPatternHashes": [],
+    "depthProfile": [
+      35,
+      0,
+      0
+    ],
+    "sequenceHashes": {
+      "conditional": "4bd948d1b48e4a4b20f7f01b5c1628a5500d046902debdd789e98f9ec15a792d",
+      "effect": "91b92337b9f85b78e0cbc8c4abc8b1a277fa16aed37ae0d8dee59d26690e4d16",
+      "handler": "522efa9849e5b75ea55585518aaf9fff4df087998947380d8c3b27d4cda42c2d",
+      "init": "27b11201f11d225f89f7ac7375c679a78167880c9acccf92011661b521c9049e",
+      "render": "bcf6552768e63e8f4f2b097fdc0f2eda31d2e1ac66c4f99b6241381261e78ace"
+    }
+  },
+  "frontend/src/views/SourcesView.tsx::default": {
+    "calleeSetVector": {
+      "enforcement_sources.filter": 9.149421957006766,
+      "enforcement_sources.map": 4.574710978503383,
+      "useEnforcementSources": 3.8815637979434374,
+      "useState": 2.0898043287153825
+    },
+    "chainPatternHashes": [],
+    "depthProfile": [
+      4,
+      0,
+      0
+    ],
+    "sequenceHashes": {
+      "init": "238dfc0e7e2cf54663d1d6a241691a6163e663acc8a582fe619f2467c4df238b",
+      "render": "e648027c567b4fae1baa58340379a9c517b777226ce9138b1f041774c3cf8b75"
+    }
+  },
+  "frontend/src/views/TaxonomyView.tsx::default": {
+    "calleeSetVector": {
+      "c.qualities.includes": 4.574710978503383,
+      "cases.filter": 4.574710978503383,
+      "setSelectedQuality": 4.574710978503383,
+      "taxonomy.find": 4.574710978503383,
+      "taxonomy.map": 4.574710978503383,
+      "useCallback": 2.272125885509337,
+      "useCases": 3.4760986898352733,
+      "useState": 2.0898043287153825,
+      "useTaxonomy": 3.8815637979434374
+    },
+    "chainPatternHashes": [],
+    "depthProfile": [
+      9,
+      0,
+      0
+    ],
+    "sequenceHashes": {
+      "conditional": "baddb87fe73dec1665867ef60ef11675164e7c1bb4b62cb218c86570c530dce6",
+      "init": "923c59c83ce13276e1ac9695dd1bf57cbc0ebd1f5d7f0a0a7d82447b7e886c4e",
+      "render": "d1c4bd520bbcec028bca46cdaad9d9022f9d32cf50e99dcf4359ddf1a4761d26"
+    }
+  }
+}

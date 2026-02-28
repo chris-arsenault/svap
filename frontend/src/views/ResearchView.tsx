@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   useTriageResults, useResearchSessions, usePolicies,
   useFetchTriageResults, useFetchResearchSessions,
@@ -8,56 +8,219 @@ import { useAsyncAction } from "../hooks";
 import { ErrorBanner } from "../components/SharedUI";
 import { Badge, QualityTag, QualityTags } from "../components/SharedUI";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import type { StructuralFinding, QualityAssessment } from "../types";
+import type { RiskLevel, TriageResult, ResearchSession, StructuralFinding, QualityAssessment } from "../types";
+
+const CONFIDENCE_LEVELS: Record<string, RiskLevel> = {
+  high: "low",
+  medium: "medium",
+};
 
 function confidenceBadge(confidence: string) {
-  const level = confidence === "high" ? "low" : confidence === "medium" ? "medium" : "high";
+  const level: RiskLevel = CONFIDENCE_LEVELS[confidence] ?? "high";
   return <Badge level={level}>{confidence}</Badge>;
 }
 
+const PRESENT_LEVELS: Record<string, RiskLevel> = {
+  yes: "critical",
+  no: "low",
+};
+
 function presentBadge(present: string) {
-  const level = present === "yes" ? "critical" : present === "no" ? "low" : "medium";
+  const level: RiskLevel = PRESENT_LEVELS[present] ?? "medium";
   return <Badge level={level}>{present}</Badge>;
 }
 
-export default function ResearchView() {
-  const triage_results = useTriageResults();
-  const research_sessions = useResearchSessions();
-  const policies = usePolicies();
-  const fetchTriageResults = useFetchTriageResults();
-  const fetchResearchSessions = useFetchResearchSessions();
-  const runTriage = useRunTriage();
-  const runDeepResearch = useRunDeepResearch();
+function triageScoreColor(score: number): string | undefined {
+  if (score >= 0.7) return "var(--critical)";
+  if (score >= 0.4) return "var(--high)";
+  return undefined;
+}
+
+const SESSION_STATUS_LEVELS: Record<string, RiskLevel> = {
+  assessment_complete: "low",
+  failed: "critical",
+};
+
+function sessionStatusLevel(status: string): RiskLevel {
+  return SESSION_STATUS_LEVELS[status] ?? "medium";
+}
+
+function TriageTable({
+  results,
+  policyName,
+}: {
+  results: TriageResult[];
+  policyName: (id: string) => string;
+}) {
+  if (results.length === 0) {
+    return <div className="empty-state">No triage results yet. Run triage to rank policies by vulnerability.</div>;
+  }
+  return (
+    <table className="data-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Policy</th>
+          <th>Score</th>
+          <th className="hide-on-mobile">Rationale</th>
+          <th>Uncertainty</th>
+        </tr>
+      </thead>
+      <tbody>
+        {results.map((t) => (
+          <tr key={t.policy_id}>
+            <td>{t.priority_rank}</td>
+            <td className="td-name">{policyName(t.policy_id)}</td>
+            <td>
+              <span className="score-highlight" style={{ '--score-color': triageScoreColor(t.triage_score) } as React.CSSProperties}>
+                {t.triage_score.toFixed(2)}
+              </span>
+            </td>
+            <td className="hide-on-mobile">{t.rationale.slice(0, 120)}{t.rationale.length > 120 ? "..." : ""}</td>
+            <td>{t.uncertainty || "—"}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+function SessionDetail({
+  findings,
+  assessments,
+}: {
+  findings: StructuralFinding[];
+  assessments: QualityAssessment[];
+}) {
+  return (
+    <div className="panel-body panel-body-bordered">
+      <h4 className="mb-2">Structural Findings ({findings.length})</h4>
+      {findings.length === 0 ? (
+        <div className="empty-state">No findings yet.</div>
+      ) : (
+        <table className="data-table mb-3">
+          <thead>
+            <tr>
+              <th>Dimension</th>
+              <th>Observation</th>
+              <th>Source</th>
+              <th>Confidence</th>
+            </tr>
+          </thead>
+          <tbody>
+            {findings.map((f) => (
+              <tr key={f.finding_id}>
+                <td>{f.dimension_id}</td>
+                <td>{f.observation.slice(0, 150)}{f.observation.length > 150 ? "..." : ""}</td>
+                <td className="text-sm">{f.source_citation || f.source_type}</td>
+                <td>{confidenceBadge(f.confidence)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+
+      <h4 className="mb-2">Quality Assessments ({assessments.length})</h4>
+      {assessments.length === 0 ? (
+        <div className="empty-state">No assessments yet.</div>
+      ) : (
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Quality</th>
+              <th>Present</th>
+              <th>Confidence</th>
+              <th className="hide-on-mobile">Rationale</th>
+              <th>Evidence</th>
+            </tr>
+          </thead>
+          <tbody>
+            {assessments.map((a) => (
+              <tr key={a.assessment_id}>
+                <td><QualityTag id={a.quality_id} /></td>
+                <td>{presentBadge(a.present)}</td>
+                <td>{confidenceBadge(a.confidence)}</td>
+                <td className="hide-on-mobile">
+                  {a.rationale.slice(0, 100)}{a.rationale.length > 100 ? "..." : ""}
+                </td>
+                <td>
+                  <QualityTags ids={a.evidence_finding_ids} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+}
+
+function ResearchMetrics({ triageCount, completedCount, inProgressCount }: {
+  triageCount: number; completedCount: number; inProgressCount: number;
+}) {
+  return (
+    <div className="metrics-row">
+      <div className="metric-card stagger-in">
+        <div className="metric-label">Triaged</div>
+        <div className="metric-value">{triageCount}</div>
+        <div className="metric-sub">policies ranked</div>
+      </div>
+      <div className="metric-card stagger-in">
+        <div className="metric-label">Researched</div>
+        <div className="metric-value">{completedCount}</div>
+        <div className="metric-sub">deep research</div>
+      </div>
+      <div className="metric-card stagger-in">
+        <div className="metric-label">In Progress</div>
+        <div className="metric-value">{inProgressCount}</div>
+        <div className="metric-sub">sessions</div>
+      </div>
+    </div>
+  );
+}
+
+function SessionCard({ session, isExpanded, policyName, findings, assessments, onExpand }: {
+  session: ResearchSession;
+  isExpanded: boolean;
+  policyName: string;
+  findings: StructuralFinding[];
+  assessments: QualityAssessment[];
+  onExpand: (policyId: string) => void;
+}) {
+  const handleClick = useCallback(() => onExpand(session.policy_id), [onExpand, session.policy_id]);
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onExpand(session.policy_id); }
+  }, [onExpand, session.policy_id]);
+
+  return (
+    <div className="panel mb-2">
+      <div
+        className="panel-header clickable"
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
+        role="button"
+        tabIndex={0}
+      >
+        {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+        <span className="font-semibold ml-2">{policyName}</span>
+        <span className="ml-auto">
+          <Badge level={sessionStatusLevel(session.status)}>{session.status}</Badge>
+        </span>
+      </div>
+      {isExpanded && <SessionDetail findings={findings} assessments={assessments} />}
+    </div>
+  );
+}
+
+function SessionsPanel({ sessions, policyName }: {
+  sessions: ResearchSession[];
+  policyName: (id: string) => string;
+}) {
   const fetchFindings = useFetchFindings();
   const fetchAssessments = useFetchAssessments();
-
-  const { busy, error, run, clearError } = useAsyncAction();
   const [expandedPolicy, setExpandedPolicy] = useState<string | null>(null);
   const [findings, setFindings] = useState<StructuralFinding[]>([]);
   const [assessments, setAssessments] = useState<QualityAssessment[]>([]);
-
-  useEffect(() => {
-    fetchTriageResults();
-    fetchResearchSessions();
-  }, [fetchTriageResults, fetchResearchSessions]);
-
-  const policyName = useCallback(
-    (policyId: string) => {
-      const p = policies.find((p) => p.policy_id === policyId);
-      return p?.name || policyId;
-    },
-    [policies],
-  );
-
-  const handleRunTriage = useCallback(
-    () => run("triage", runTriage),
-    [run, runTriage],
-  );
-
-  const handleRunResearch = useCallback(
-    () => run("research", runDeepResearch),
-    [run, runDeepResearch],
-  );
 
   const handleExpand = useCallback(
     async (policyId: string) => {
@@ -73,9 +236,61 @@ export default function ResearchView() {
     [expandedPolicy, fetchFindings, fetchAssessments],
   );
 
-  const completedSessions = research_sessions.filter(
-    (s) => s.status === "findings_complete" || s.status === "assessment_complete",
+  return (
+    <div className="panel stagger-in">
+      <div className="panel-header"><h3>Research Sessions</h3></div>
+      <div className="panel-body">
+        {sessions.length === 0 ? (
+          <div className="empty-state">No research sessions. Run deep research after triage.</div>
+        ) : (
+          sessions.map((session) => (
+            <SessionCard
+              key={session.session_id}
+              session={session}
+              isExpanded={expandedPolicy === session.policy_id}
+              policyName={policyName(session.policy_id)}
+              findings={findings}
+              assessments={assessments}
+              onExpand={handleExpand}
+            />
+          ))
+        )}
+      </div>
+    </div>
   );
+}
+
+export default function ResearchView() {
+  const triage_results = useTriageResults();
+  const research_sessions = useResearchSessions();
+  const policies = usePolicies();
+  const fetchTriageResults = useFetchTriageResults();
+  const fetchResearchSessions = useFetchResearchSessions();
+  const runTriage = useRunTriage();
+  const runDeepResearch = useRunDeepResearch();
+
+  const { busy, error, run, clearError } = useAsyncAction();
+
+  useEffect(() => {
+    fetchTriageResults();
+    fetchResearchSessions();
+  }, [fetchTriageResults, fetchResearchSessions]);
+
+  const policyName = useCallback(
+    (policyId: string) => {
+      const p = policies.find((p) => p.policy_id === policyId);
+      return p?.name || policyId;
+    },
+    [policies],
+  );
+
+  const handleRunTriage = useCallback(() => run("triage", runTriage), [run, runTriage]);
+  const handleRunResearch = useCallback(() => run("research", runDeepResearch), [run, runDeepResearch]);
+
+  const completedCount = research_sessions.filter(
+    (s) => s.status === "findings_complete" || s.status === "assessment_complete",
+  ).length;
+  const inProgressCount = research_sessions.filter((s) => s.status === "researching").length;
 
   return (
     <div>
@@ -86,28 +301,7 @@ export default function ResearchView() {
           Three-pass structural vulnerability analysis: triage, deep regulatory research, and quality assessment.
         </div>
       </div>
-
-      <div className="metrics-row">
-        <div className="metric-card stagger-in">
-          <div className="metric-label">Triaged</div>
-          <div className="metric-value">{triage_results.length}</div>
-          <div className="metric-sub">policies ranked</div>
-        </div>
-        <div className="metric-card stagger-in">
-          <div className="metric-label">Researched</div>
-          <div className="metric-value">{completedSessions.length}</div>
-          <div className="metric-sub">deep research</div>
-        </div>
-        <div className="metric-card stagger-in">
-          <div className="metric-label">In Progress</div>
-          <div className="metric-value">
-            {research_sessions.filter((s) => s.status === "researching").length}
-          </div>
-          <div className="metric-sub">sessions</div>
-        </div>
-      </div>
-
-      {/* Actions bar */}
+      <ResearchMetrics triageCount={triage_results.length} completedCount={completedCount} inProgressCount={inProgressCount} />
       <div className="filter-bar filter-bar-mb stagger-in">
         <button className="btn btn-accent" onClick={handleRunTriage} disabled={!!busy}>
           {busy === "triage" ? "Running Triage..." : "Run Triage"}
@@ -116,169 +310,13 @@ export default function ResearchView() {
           {busy === "research" ? "Researching..." : "Run Deep Research"}
         </button>
       </div>
-
-      {/* Triage rankings */}
       <div className="panel stagger-in">
-        <div className="panel-header">
-          <h3>Triage Rankings</h3>
-        </div>
+        <div className="panel-header"><h3>Triage Rankings</h3></div>
         <div className="panel-body dense">
-          {triage_results.length === 0 ? (
-            <div className="empty-state">No triage results yet. Run triage to rank policies by vulnerability.</div>
-          ) : (
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Policy</th>
-                  <th>Score</th>
-                  <th className="hide-on-mobile">Rationale</th>
-                  <th>Uncertainty</th>
-                </tr>
-              </thead>
-              <tbody>
-                {triage_results.map((t) => (
-                  <tr key={t.policy_id}>
-                    <td>{t.priority_rank}</td>
-                    <td className="td-name">{policyName(t.policy_id)}</td>
-                    <td>
-                      <span
-                        style={{
-                          color: t.triage_score >= 0.7 ? "var(--critical)" : t.triage_score >= 0.4 ? "var(--high)" : undefined,
-                          fontWeight: 600,
-                        }}
-                      >
-                        {t.triage_score.toFixed(2)}
-                      </span>
-                    </td>
-                    <td className="hide-on-mobile">{t.rationale.slice(0, 120)}{t.rationale.length > 120 ? "..." : ""}</td>
-                    <td>{t.uncertainty || "—"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+          <TriageTable results={triage_results} policyName={policyName} />
         </div>
       </div>
-
-      {/* Research sessions — expandable */}
-      <div className="panel stagger-in">
-        <div className="panel-header">
-          <h3>Research Sessions</h3>
-        </div>
-        <div className="panel-body">
-          {research_sessions.length === 0 ? (
-            <div className="empty-state">No research sessions. Run deep research after triage.</div>
-          ) : (
-            research_sessions.map((session) => (
-              <div key={session.session_id} className="panel mb-2">
-                <div
-                  className="panel-header clickable"
-                  onClick={() => handleExpand(session.policy_id)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      handleExpand(session.policy_id);
-                    }
-                  }}
-                  role="button"
-                  tabIndex={0}
-                >
-                  {expandedPolicy === session.policy_id ? (
-                    <ChevronDown size={16} />
-                  ) : (
-                    <ChevronRight size={16} />
-                  )}
-                  <span className="font-semibold" style={{ marginLeft: "0.5rem" }}>
-                    {policyName(session.policy_id)}
-                  </span>
-                  <span className="ml-auto">
-                    <Badge
-                      level={
-                        session.status === "assessment_complete"
-                          ? "low"
-                          : session.status === "failed"
-                            ? "critical"
-                            : "medium"
-                      }
-                    >
-                      {session.status}
-                    </Badge>
-                  </span>
-                </div>
-
-                {expandedPolicy === session.policy_id && (
-                  <div className="panel-body panel-body-bordered">
-                    {/* Findings */}
-                    <h4 className="mb-2">
-                      Structural Findings ({findings.length})
-                    </h4>
-                    {findings.length === 0 ? (
-                      <div className="empty-state">No findings yet.</div>
-                    ) : (
-                      <table className="data-table mb-3">
-                        <thead>
-                          <tr>
-                            <th>Dimension</th>
-                            <th>Observation</th>
-                            <th>Source</th>
-                            <th>Confidence</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {findings.map((f) => (
-                            <tr key={f.finding_id}>
-                              <td>{f.dimension_id}</td>
-                              <td>{f.observation.slice(0, 150)}{f.observation.length > 150 ? "..." : ""}</td>
-                              <td className="text-sm">{f.source_citation || f.source_type}</td>
-                              <td>{confidenceBadge(f.confidence)}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    )}
-
-                    {/* Assessments */}
-                    <h4 className="mb-2">
-                      Quality Assessments ({assessments.length})
-                    </h4>
-                    {assessments.length === 0 ? (
-                      <div className="empty-state">No assessments yet.</div>
-                    ) : (
-                      <table className="data-table">
-                        <thead>
-                          <tr>
-                            <th>Quality</th>
-                            <th>Present</th>
-                            <th>Confidence</th>
-                            <th className="hide-on-mobile">Rationale</th>
-                            <th>Evidence</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {assessments.map((a) => (
-                            <tr key={a.assessment_id}>
-                              <td><QualityTag id={a.quality_id} /></td>
-                              <td>{presentBadge(a.present)}</td>
-                              <td>{confidenceBadge(a.confidence)}</td>
-                              <td className="hide-on-mobile">
-                                {a.rationale.slice(0, 100)}{a.rationale.length > 100 ? "..." : ""}
-                              </td>
-                              <td>
-                                <QualityTags ids={a.evidence_finding_ids} />
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))
-          )}
-        </div>
-      </div>
+      <SessionsPanel sessions={research_sessions} policyName={policyName} />
     </div>
   );
 }

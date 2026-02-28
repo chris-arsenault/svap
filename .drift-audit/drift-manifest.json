@@ -3,18 +3,18 @@
   "project_root": "/home/tsonu/src/svap",
   "project_name": "svap",
   "summary": {
-    "total_drift_areas": 8,
-    "total_files_affected": 38,
-    "high_impact": 3,
-    "medium_impact": 3,
+    "total_drift_areas": 12,
+    "total_files_affected": 48,
+    "high_impact": 4,
+    "medium_impact": 6,
     "low_impact": 2,
     "by_type": {
-      "structural": 5,
-      "behavioral": 2,
+      "structural": 7,
+      "behavioral": 4,
       "semantic": 1
     },
     "evidence_coverage": {
-      "high": 8,
+      "high": 12,
       "medium": 0,
       "low": 0
     }
@@ -30,7 +30,7 @@
       "variants": [
         {
           "name": "active-typescript-frontend",
-          "description": "frontend/ — React 18 + TypeScript + Vite + Zustand + react-router-dom + Cognito auth. 12 views, path-based routing, granular store subscriptions.",
+          "description": "frontend/ \u2014 React 18 + TypeScript + Vite + Zustand + react-router-dom + Cognito auth. 12 views, path-based routing, granular store subscriptions.",
           "file_count": 25,
           "files": [
             "frontend/src/App.tsx",
@@ -52,7 +52,7 @@
         },
         {
           "name": "dead-jsx-prototype",
-          "description": "svap-ui-project/svap-ui/ — React + plain JavaScript + Context API + state-based routing. 7 views, no auth, static seed data only.",
+          "description": "svap-ui-project/svap-ui/ \u2014 React + plain JavaScript + Context API + state-based routing. 7 views, no auth, static seed data only.",
           "file_count": 11,
           "files": [
             "svap-ui-project/svap-ui/src/App.jsx",
@@ -74,108 +74,7 @@
         }
       ],
       "analysis": "svap-ui-project/ was committed once (2026-02-25) and never updated. frontend/ was committed in the same initial commit and received 10+ subsequent updates. There are zero cross-references between them. The prototype's SharedUI components have diverged from frontend/'s versions (QualityTag uses static seeds vs store subscription, formatDollars relocated to utils.ts). Its continued presence inflates tooling output and creates confusion about canonical source.",
-      "recommendation": "Delete svap-ui-project/ entirely: rm -rf svap-ui-project/. There is no code in it that isn't already present (and improved) in frontend/.",
-      "evidence_quality": "high",
-      "status": "completed"
-    },
-    {
-      "id": "frontend-store-access-patterns",
-      "name": "Frontend Store Access Patterns",
-      "type": "structural",
-      "description": "Views use 4 different patterns to access the Zustand store: useShallow for data, direct inline selectors, pre-defined selector hooks (usePipelineSelectors.ts), and mixed data+actions in useShallow. Only 1 of 12 views uses the selector hooks despite 14 being defined.",
-      "impact": "HIGH",
-      "total_files": 10,
-      "variants": [
-        {
-          "name": "useShallow-data-destructure",
-          "description": "usePipelineStore(useShallow((s) => ({ field1: s.field1, ... }))) — extracts multiple data slices with shallow equality",
-          "file_count": 6,
-          "files": [
-            "frontend/src/views/Dashboard.tsx:237-245",
-            "frontend/src/views/CaseSourcing.tsx",
-            "frontend/src/views/ConvergenceMatrix.tsx",
-            "frontend/src/views/PolicyExplorer.tsx",
-            "frontend/src/views/TaxonomyView.tsx",
-            "frontend/src/views/SourcesView.tsx:210"
-          ],
-          "sample_file": "frontend/src/views/Dashboard.tsx",
-          "code_excerpts": [
-            {
-              "file": "frontend/src/views/Dashboard.tsx",
-              "start_line": 237,
-              "end_line": 245,
-              "snippet": "const { cases, taxonomy, policies, detection_patterns, threshold } = usePipelineStore(\n  useShallow((s) => ({\n    cases: s.cases,\n    taxonomy: s.taxonomy,\n    policies: s.policies,\n    detection_patterns: s.detection_patterns,\n    threshold: s.threshold,\n  })),\n);"
-            }
-          ],
-          "implementation_details": "Most common pattern (6 views). Uses Zustand's useShallow to prevent unnecessary re-renders when unrelated store slices change. Correct for multi-field data access."
-        },
-        {
-          "name": "direct-inline-selector",
-          "description": "usePipelineStore((s) => s.field) — single-field inline selectors without useShallow",
-          "file_count": 3,
-          "files": [
-            "frontend/src/views/DetectionView.tsx:83",
-            "frontend/src/views/PredictionView.tsx:82",
-            "frontend/src/views/ManagementView.tsx:81-83"
-          ],
-          "sample_file": "frontend/src/views/DetectionView.tsx",
-          "code_excerpts": [
-            {
-              "file": "frontend/src/views/DetectionView.tsx",
-              "start_line": 83,
-              "end_line": 83,
-              "snippet": "const detection_patterns = usePipelineStore((s) => s.detection_patterns);"
-            },
-            {
-              "file": "frontend/src/views/ManagementView.tsx",
-              "start_line": 81,
-              "end_line": 83,
-              "snippet": "const runPipeline = usePipelineStore((s) => s.runPipeline);\nconst seedPipeline = usePipelineStore((s) => s.seedPipeline);\nconst refresh = usePipelineStore((s) => s.refresh);"
-            }
-          ],
-          "implementation_details": "Used for single-field access (fine) but also for multiple action functions in ManagementView (wasteful — actions are stable references and don't need individual selectors)."
-        },
-        {
-          "name": "selector-hooks",
-          "description": "Pre-defined hooks from usePipelineSelectors.ts — useUploadSourceDocument(), useDeleteSource(), etc.",
-          "file_count": 1,
-          "files": [
-            "frontend/src/views/SourcesView.tsx:4,30-31",
-            "frontend/src/data/usePipelineSelectors.ts:1-29"
-          ],
-          "sample_file": "frontend/src/views/SourcesView.tsx",
-          "code_excerpts": [
-            {
-              "file": "frontend/src/views/SourcesView.tsx",
-              "start_line": 4,
-              "end_line": 4,
-              "snippet": "import { useUploadSourceDocument, useDeleteSource, useCreateSource } from \"../data/usePipelineSelectors\";"
-            }
-          ],
-          "implementation_details": "14 selector hooks are defined in usePipelineSelectors.ts but only 1 of 12 views uses them. These represent the intended canonical pattern that was built but never adopted."
-        },
-        {
-          "name": "mixed-data-actions-useShallow",
-          "description": "Extracts both data slices AND action functions in one useShallow call",
-          "file_count": 2,
-          "files": [
-            "frontend/src/views/ResearchView.tsx:29-40",
-            "frontend/src/views/DiscoveryView.tsx:28-36"
-          ],
-          "sample_file": "frontend/src/views/ResearchView.tsx",
-          "code_excerpts": [
-            {
-              "file": "frontend/src/views/ResearchView.tsx",
-              "start_line": 29,
-              "end_line": 40,
-              "snippet": "const { triage_results, research_sessions, policies,\n  fetchTriageResults, fetchResearchSessions, runTriage,\n  runDeepResearch, fetchFindings, fetchAssessments,\n} = usePipelineStore(useShallow((s) => ({ ... })));"
-            }
-          ],
-          "implementation_details": "Actions are already stable Zustand references — wrapping them in useShallow adds shallow-comparison overhead with no render benefit. This pattern likely emerged because it's visually convenient to destructure everything in one call."
-        }
-      ],
-      "analysis": "The project built usePipelineSelectors.ts as the canonical store access layer (14 hooks), but adoption stalled at 1 of 12 views. The remaining 11 views developed 3 ad-hoc patterns organically. The useShallow pattern for data is correct; the issue is mixing data+actions in useShallow (unnecessary overhead) and having multiple access patterns without a clear convention. New views have no template to follow.",
-      "recommendation": "Converge on: (1) useShallow for multi-field data access, (2) selector hooks for individual actions. Add grouped data selectors to usePipelineSelectors.ts (e.g., useDashboardData() wrapping useShallow internally). Target: every view imports from usePipelineSelectors, never directly from usePipelineStore.",
+      "recommendation": "Delete svap-ui-project/ entirely (rm -rf svap-ui-project/). All 11 files are duplicated and improved in frontend/. Remove references from .gitignore if any exist. Verify no CI/CD pipelines reference the path.",
       "evidence_quality": "high",
       "status": "completed"
     },
@@ -189,7 +88,7 @@
       "variants": [
         {
           "name": "no-error-ui",
-          "description": "Async operations catch errors but only log to console.error() — user gets no feedback",
+          "description": "Async operations catch errors but only log to console.error() \u2014 user gets no feedback",
           "file_count": 10,
           "files": [
             "frontend/src/views/Dashboard.tsx",
@@ -252,27 +151,80 @@
         }
       ],
       "behavior_matrix": {
-        "Dashboard": {"local_busy": "useState<string|null>", "error_display": "none", "error_handling": "swallowed"},
-        "SourcesView": {"local_busy": "useState(false)", "error_display": "none", "error_handling": "console.error"},
-        "ManagementView": {"local_busy": "useState<string|null>", "error_display": "inline panel", "error_handling": "try/catch per action"},
-        "DiscoveryView": {"local_busy": "useState(false)", "error_display": "none", "error_handling": "catch swallowed"},
-        "ResearchView": {"local_busy": "useState(false)", "error_display": "none", "error_handling": "catch swallowed"},
-        "DimensionRegistryView": {"local_busy": "useState(false)", "error_display": "none", "error_handling": "none"},
-        "CaseSourcing": {"local_busy": "none", "error_display": "none", "error_handling": "none"},
-        "TaxonomyView": {"local_busy": "none", "error_display": "none", "error_handling": "none"},
-        "ConvergenceMatrix": {"local_busy": "none", "error_display": "none", "error_handling": "none"},
-        "PolicyExplorer": {"local_busy": "none", "error_display": "none", "error_handling": "none"},
-        "PredictionView": {"local_busy": "none", "error_display": "none", "error_handling": "none"},
-        "DetectionView": {"local_busy": "none", "error_display": "none", "error_handling": "none"}
+        "Dashboard": {
+          "local_busy": "useState<string|null>",
+          "error_display": "none",
+          "error_handling": "swallowed"
+        },
+        "SourcesView": {
+          "local_busy": "useState(false)",
+          "error_display": "none",
+          "error_handling": "console.error"
+        },
+        "ManagementView": {
+          "local_busy": "useState<string|null>",
+          "error_display": "inline panel",
+          "error_handling": "try/catch per action"
+        },
+        "DiscoveryView": {
+          "local_busy": "useState(false)",
+          "error_display": "none",
+          "error_handling": "catch swallowed"
+        },
+        "ResearchView": {
+          "local_busy": "useState(false)",
+          "error_display": "none",
+          "error_handling": "catch swallowed"
+        },
+        "DimensionRegistryView": {
+          "local_busy": "useState(false)",
+          "error_display": "none",
+          "error_handling": "none"
+        },
+        "CaseSourcing": {
+          "local_busy": "none",
+          "error_display": "none",
+          "error_handling": "none"
+        },
+        "TaxonomyView": {
+          "local_busy": "none",
+          "error_display": "none",
+          "error_handling": "none"
+        },
+        "ConvergenceMatrix": {
+          "local_busy": "none",
+          "error_display": "none",
+          "error_handling": "none"
+        },
+        "PolicyExplorer": {
+          "local_busy": "none",
+          "error_display": "none",
+          "error_handling": "none"
+        },
+        "PredictionView": {
+          "local_busy": "none",
+          "error_display": "none",
+          "error_handling": "none"
+        },
+        "DetectionView": {
+          "local_busy": "none",
+          "error_display": "none",
+          "error_handling": "none"
+        }
       },
       "missing_behavior_complexity": {
-        "error_display": "moderate — need shared ErrorBanner component + useAsyncAction hook",
-        "consistent_busy_tracking": "trivial — standardize on string|null pattern for named actions"
+        "error_display": "moderate \u2014 need shared ErrorBanner component + useAsyncAction hook",
+        "consistent_busy_tracking": "trivial \u2014 standardize on string|null pattern for named actions"
       },
-      "analysis": "This is genuine drift. The store exports useLoading() and useError() selectors but only ApiGate uses them. Views independently create local busy state with different types. The user-visible impact is significant: failed uploads, pipeline runs, and approvals produce no feedback. ManagementView is the only view that displays errors, using an ad-hoc inline-styled panel.",
-      "recommendation": "Create shared useAsyncAction() hook returning { busy, error, run, clearError } and an ErrorBanner component. Target: every view that performs async operations uses useAsyncAction() and renders <ErrorBanner /> at the top of its content area.",
+      "analysis": "This is genuine drift. The store exports useLoading() and useError() selectors but only ApiGate uses them. Views independently create local busy state with different types. The user-visible impact is significant: failed uploads, pipeline runs, and approvals produce no feedback. ManagementView is the only view that displays errors, using an ad-hoc inline-styled panel.\n\nAlso noted by structural audit: The project built usePipelineSelectors.ts as the canonical store access layer (14 hooks), but adoption stalled at 1 of 12 views. The remaining 11 views developed 3 ad-hoc patterns organically. The useShallow pattern for data is correct; the issue is mixing data+actions in useShallow (unnecessary overhead) and having multiple access patterns without a clear convention. New views have no template to follow.\n\nAlso noted by structural audit: The project has a well-structured CSS system with custom properties and utility classes, but 7 views bypass it with inline styles. Most are for common layout patterns (flex row with gap, flex wrap) that appear repeatedly across views. Creating new objects on every render is a minor perf concern but mainly it's a consistency issue \u2014 some views are pure CSS classes, others mix in inline styles. CSS variable injection via inline style is the correct React pattern for dynamic theming and should not change.",
+      "recommendation": "Migrate SourcesView.SourceRow to useAsyncAction for upload/delete operations. Migrate ManagementView to useAsyncAction, replacing its 5 manual busy/error/try/catch patterns.",
       "evidence_quality": "high",
-      "status": "completed"
+      "status": "completed",
+      "merged_from": [
+        "frontend-store-access-patterns",
+        "frontend-inline-styles"
+      ],
+      "reaudit_note": "2026-02-28: Core infrastructure (useAsyncAction + ErrorBanner) is in place. Dashboard, DiscoveryView, ResearchView fully adopted. SourcesView.SourceRow (upload/delete) and ManagementView (5 async ops) still use console.error instead of the shared pattern."
     },
     {
       "id": "backend-config-duplication",
@@ -284,9 +236,11 @@
       "variants": [
         {
           "name": "module-level-dict",
-          "description": "_DEFAULT_CONFIG as module-level dict in api.py — shared mutable reference",
+          "description": "_DEFAULT_CONFIG as module-level dict in api.py \u2014 shared mutable reference",
           "file_count": 1,
-          "files": ["backend/src/svap/api.py:52-72"],
+          "files": [
+            "backend/src/svap/api.py:52-72"
+          ],
           "sample_file": "backend/src/svap/api.py",
           "code_excerpts": [
             {
@@ -296,13 +250,15 @@
               "snippet": "_DEFAULT_CONFIG = {\n    \"bedrock\": {\n        \"region\": \"us-east-1\",\n        \"model_id\": \"us.anthropic.claude-sonnet-4-6\",\n        \"max_tokens\": 4096,\n        \"temperature\": 0.2,\n        \"retry_attempts\": 3,\n        \"retry_delay_seconds\": 5,\n    },\n    \"rag\": { ... },\n    \"pipeline\": { ... },\n}"
             }
           ],
-          "implementation_details": "Module-level dict. Used as dict(_DEFAULT_CONFIG) when needed (shallow copy). Mutable — could be accidentally modified at runtime."
+          "implementation_details": "Module-level dict. Used as dict(_DEFAULT_CONFIG) when needed (shallow copy). Mutable \u2014 could be accidentally modified at runtime."
         },
         {
           "name": "factory-function",
-          "description": "_default_config() factory function in stage_runner.py — returns fresh dict each call",
+          "description": "_default_config() factory function in stage_runner.py \u2014 returns fresh dict each call",
           "file_count": 1,
-          "files": ["backend/src/svap/stage_runner.py:134-156"],
+          "files": [
+            "backend/src/svap/stage_runner.py:134-156"
+          ],
           "sample_file": "backend/src/svap/stage_runner.py",
           "code_excerpts": [
             {
@@ -315,7 +271,7 @@
           "implementation_details": "Factory function returning fresh dict. Safer pattern (no shared mutable state) but duplicates all values from api.py."
         }
       ],
-      "analysis": "Both files contain identical configuration values today. They diverged in form (dict vs function) but not content. The risk is future desynchronization — if the model ID or retry parameters change, both must be updated independently. The factory function pattern in stage_runner.py is safer (returns fresh dict), but having two sources of truth for defaults is unnecessary given they're in the same Python package.",
+      "analysis": "Both files contain identical configuration values today. They diverged in form (dict vs function) but not content. The risk is future desynchronization \u2014 if the model ID or retry parameters change, both must be updated independently. The factory function pattern in stage_runner.py is safer (returns fresh dict), but having two sources of truth for defaults is unnecessary given they're in the same Python package.",
       "recommendation": "Extract to svap/defaults.py: def default_config() -> dict. Both api.py and stage_runner.py import from this single source. Use the factory function pattern (fresh dict per call).",
       "evidence_quality": "high",
       "status": "completed"
@@ -330,9 +286,11 @@
       "variants": [
         {
           "name": "run-parallel-predictions",
-          "description": "_run_parallel_predictions() in stage5 — submits prediction LLM calls, stores via _store_predictions",
+          "description": "_run_parallel_predictions() in stage5 \u2014 submits prediction LLM calls, stores via _store_predictions",
           "file_count": 1,
-          "files": ["backend/src/svap/stages/stage5_prediction.py:104-131"],
+          "files": [
+            "backend/src/svap/stages/stage5_prediction.py:104-131"
+          ],
           "sample_file": "backend/src/svap/stages/stage5_prediction.py",
           "code_excerpts": [
             {
@@ -346,9 +304,11 @@
         },
         {
           "name": "run-parallel-detection",
-          "description": "_run_parallel_detection() in stage6 — submits detection LLM calls, stores via _store_patterns",
+          "description": "_run_parallel_detection() in stage6 \u2014 submits detection LLM calls, stores via _store_patterns",
           "file_count": 1,
-          "files": ["backend/src/svap/stages/stage6_detection.py:98-125"],
+          "files": [
+            "backend/src/svap/stages/stage6_detection.py:98-125"
+          ],
           "sample_file": "backend/src/svap/stages/stage6_detection.py",
           "code_excerpts": [
             {
@@ -361,72 +321,8 @@
           "implementation_details": "Jobs are (pred, hash, prompt) tuples. Result stored via _store_patterns(). Failures tracked by prediction_id. Returns (total_patterns, failed_predictions)."
         }
       ],
-      "analysis": "This is textbook semantic duplication — the same functional concept ('execute LLM calls in parallel, store results, track failures') implemented twice with different variable names. The functions share identical control flow: ThreadPoolExecutor creation, future submission via _invoke_llm, as_completed iteration, try/except per future, success counting, failure tracking, and tuple return. The only meaningful differences are the job tuple shape and the store callback. This likely arose from copy-paste when stage6 was built from stage5.",
+      "analysis": "This is textbook semantic duplication \u2014 the same functional concept ('execute LLM calls in parallel, store results, track failures') implemented twice with different variable names. The functions share identical control flow: ThreadPoolExecutor creation, future submission via _invoke_llm, as_completed iteration, try/except per future, success counting, failure tracking, and tuple return. The only meaningful differences are the job tuple shape and the store callback. This likely arose from copy-paste when stage6 was built from stage5.",
       "recommendation": "Extract a generic run_parallel_llm() utility to svap/parallel.py parameterized by (client, jobs, store_fn, max_concurrency). Interface: run_parallel_llm(client: BedrockClient, jobs: list[tuple], store_fn: Callable, max_concurrency: int, label: str) -> tuple[int, list[str]]. Both stages call this with their specific store function.",
-      "evidence_quality": "high",
-      "status": "completed"
-    },
-    {
-      "id": "frontend-inline-styles",
-      "name": "Frontend Inline Styles",
-      "type": "structural",
-      "description": "27 inline style={{}} usages across 7 views, while the project has a well-structured index.css with CSS custom properties and utility classes. Most inline styles are for layout (flex/gap) and spacing (margins/padding) that could be CSS classes.",
-      "impact": "MEDIUM",
-      "total_files": 7,
-      "variants": [
-        {
-          "name": "css-classes",
-          "description": "Views use CSS classes from index.css — className='panel', className='view-section', etc.",
-          "file_count": 12,
-          "files": [
-            "frontend/src/views/Dashboard.tsx",
-            "frontend/src/views/CaseSourcing.tsx",
-            "frontend/src/views/TaxonomyView.tsx"
-          ],
-          "sample_file": "frontend/src/views/Dashboard.tsx",
-          "code_excerpts": [
-            {
-              "file": "frontend/src/views/Dashboard.tsx",
-              "start_line": 1,
-              "end_line": 5,
-              "snippet": "<section className=\"view-section\">\n  <div className=\"panel stagger-in\">\n    <div className=\"panel-header\"><h2>Pipeline</h2></div>\n    <div className=\"panel-body\">"
-            }
-          ],
-          "implementation_details": "Canonical pattern. CSS custom properties (--critical, --border, etc.) and structural classes (panel, panel-header, view-section) provide consistent styling."
-        },
-        {
-          "name": "inline-style-objects",
-          "description": "Ad-hoc style={{}} props for layout, spacing, and conditional colors",
-          "file_count": 7,
-          "files": [
-            "frontend/src/views/ResearchView.tsx",
-            "frontend/src/views/DimensionRegistryView.tsx",
-            "frontend/src/views/ConvergenceMatrix.tsx",
-            "frontend/src/views/ManagementView.tsx",
-            "frontend/src/views/TaxonomyView.tsx",
-            "frontend/src/views/DiscoveryView.tsx",
-            "frontend/src/views/SourcesView.tsx"
-          ],
-          "sample_file": "frontend/src/views/ResearchView.tsx",
-          "code_excerpts": [
-            {
-              "file": "frontend/src/views/ResearchView.tsx",
-              "start_line": 162,
-              "end_line": 168,
-              "snippet": "<span style={{\n  color: t.triage_score >= 0.7 ? \"var(--critical)\" : t.triage_score >= 0.4 ? \"var(--high)\" : undefined,\n  fontWeight: 600,\n}}>"
-            },
-            {
-              "file": "frontend/src/views/DimensionRegistryView.tsx",
-              "start_line": 83,
-              "end_line": 86,
-              "snippet": "<div style={{ display: \"flex\", alignItems: \"center\", gap: \"0.5rem\" }}>"
-            }
-          ],
-          "implementation_details": "27 instances. Breakdown: layout flex/gap (12), spacing margins/padding (6), conditional colors (5), CSS variable injection (4). The CSS variable injection pattern (style={{ '--q-color': quality.color }}) is legitimate for dynamic theming; the rest should be CSS classes."
-        }
-      ],
-      "analysis": "The project has a well-structured CSS system with custom properties and utility classes, but 7 views bypass it with inline styles. Most are for common layout patterns (flex row with gap, flex wrap) that appear repeatedly across views. Creating new objects on every render is a minor perf concern but mainly it's a consistency issue — some views are pure CSS classes, others mix in inline styles. CSS variable injection via inline style is the correct React pattern for dynamic theming and should not change.",
-      "recommendation": "Add utility classes to index.css for repeated patterns: .flex-row (display:flex; align-items:center; gap:0.5rem), .flex-wrap (display:flex; flex-wrap:wrap; gap:0.25rem), .score-critical (color:var(--critical); font-weight:600), .score-high (color:var(--high); font-weight:600). Keep CSS variable injection inline. This eliminates ~20 of 27 inline styles.",
       "evidence_quality": "high",
       "status": "completed"
     },
@@ -442,7 +338,9 @@
           "name": "strict-404",
           "description": "Routes call get_active_run_id() which raises ApiError(404) if no active run exists",
           "file_count": 1,
-          "files": ["backend/src/svap/api.py"],
+          "files": [
+            "backend/src/svap/api.py"
+          ],
           "sample_file": "backend/src/svap/api.py",
           "code_excerpts": [
             {
@@ -456,9 +354,11 @@
         },
         {
           "name": "graceful-fallback",
-          "description": "Routes use get_latest_run() or empty string — returns empty/default data instead of 404",
+          "description": "Routes use get_latest_run() or empty string \u2014 returns empty/default data instead of 404",
           "file_count": 1,
-          "files": ["backend/src/svap/api.py"],
+          "files": [
+            "backend/src/svap/api.py"
+          ],
           "sample_file": "backend/src/svap/api.py",
           "code_excerpts": [
             {
@@ -474,7 +374,9 @@
           "name": "unguarded-path-params",
           "description": "Direct event['pathParameters']['param'] access without .get() fallback",
           "file_count": 1,
-          "files": ["backend/src/svap/api.py"],
+          "files": [
+            "backend/src/svap/api.py"
+          ],
           "sample_file": "backend/src/svap/api.py",
           "code_excerpts": [
             {
@@ -488,11 +390,20 @@
         }
       ],
       "behavior_matrix": {
-        "_status": {"missing_run": "ApiError(404)", "path_params": "n/a"},
-        "_dashboard": {"missing_run": "empty data", "path_params": "n/a"},
-        "_get_case": {"missing_run": "n/a", "path_params": "direct dict access (KeyError risk)"}
+        "_status": {
+          "missing_run": "ApiError(404)",
+          "path_params": "n/a"
+        },
+        "_dashboard": {
+          "missing_run": "empty data",
+          "path_params": "n/a"
+        },
+        "_get_case": {
+          "missing_run": "n/a",
+          "path_params": "direct dict access (KeyError risk)"
+        }
       },
-      "analysis": "The strict-404 vs graceful-fallback distinction is intentional and correct — the dashboard should work without runs, but /api/status should not. The actual bug is the unguarded path parameter access which could produce a raw 500 error instead of a proper 400. This is LOW impact because API Gateway validates path parameters before the Lambda runs, so the KeyError would only occur with a malformed test event.",
+      "analysis": "The strict-404 vs graceful-fallback distinction is intentional and correct \u2014 the dashboard should work without runs, but /api/status should not. The actual bug is the unguarded path parameter access which could produce a raw 500 error instead of a proper 400. This is LOW impact because API Gateway validates path parameters before the Lambda runs, so the KeyError would only occur with a malformed test event.",
       "recommendation": "Add a _path_param(event, name) helper that extracts with .get() and raises ApiError(400) on missing. Use it in all path-parameterized routes.",
       "evidence_quality": "high",
       "status": "completed"
@@ -509,7 +420,9 @@
           "name": "store-centralized-auth",
           "description": "API calls go through pipelineStore's apiGet()/apiPost() which handle Authorization header",
           "file_count": 11,
-          "files": ["frontend/src/data/pipelineStore.ts:38-49"],
+          "files": [
+            "frontend/src/data/pipelineStore.ts:38-49"
+          ],
           "sample_file": "frontend/src/data/pipelineStore.ts",
           "code_excerpts": [
             {
@@ -525,7 +438,9 @@
           "name": "direct-fetch-with-local-auth",
           "description": "ManagementView creates its own authHeaders() helper and calls fetch() directly",
           "file_count": 1,
-          "files": ["frontend/src/views/ManagementView.tsx:90-93"],
+          "files": [
+            "frontend/src/views/ManagementView.tsx:90-93"
+          ],
           "sample_file": "frontend/src/views/ManagementView.tsx",
           "code_excerpts": [
             {
@@ -541,7 +456,297 @@
       "analysis": "ManagementView accesses admin endpoints that don't fit the pipeline store's data model (executions, run management). Rather than adding these to the store, it built its own fetch+auth layer. This is pragmatic but creates a second auth code path. If token refresh logic changes in pipelineStore, ManagementView's authHeaders() would need a parallel update.",
       "recommendation": "Extract apiGet/apiPost from pipelineStore.ts into a standalone api.ts utility module. Both the store and ManagementView import from this shared module. Interface: export async function apiGet(path: string): Promise<unknown>; export async function apiPost(path: string, body?: unknown): Promise<unknown>;",
       "evidence_quality": "high",
+      "status": "completed",
+      "reaudit_note": "2026-02-28: api.ts extracted and ManagementView migrated. One residual: useStatusSubscription.ts (lines 49-52) still manually constructs auth headers and calls fetch() directly, bypassing api.ts. Migration is feasible \u2014 apiGet supports signal option for AbortSignal.timeout."
+    },
+    {
+      "id": "dead-pipeline-prototype",
+      "name": "Dead Pipeline Prototype",
+      "type": "structural",
+      "description": "svap_pipeline/ is a SQLite-based CLI prototype of the backend, committed once in the initial commit (2026-02-25) and never updated. It duplicates the entire pipeline (stages 1-6, orchestrator, storage) but uses SQLite instead of PostgreSQL, has no Lambda/Step Functions support, and lacks stages 0, 0A, 4A, 4B, 4C that were added later. Zero cross-references from the active codebase.",
+      "impact": "HIGH",
+      "total_files": 30,
+      "variants": [
+        {
+          "name": "active-backend",
+          "description": "backend/src/svap/ \u2014 PostgreSQL + Lambda + Step Functions. 11 stages, delta processing, parallel execution, Cognito auth.",
+          "file_count": 20,
+          "files": [
+            "backend/src/svap/api.py",
+            "backend/src/svap/stage_runner.py",
+            "backend/src/svap/orchestrator.py",
+            "backend/src/svap/storage.py",
+            "backend/src/svap/defaults.py"
+          ],
+          "sample_file": "backend/src/svap/storage.py",
+          "code_excerpts": [
+            {
+              "file": "backend/src/svap/storage.py",
+              "start_line": 1,
+              "end_line": 5,
+              "snippet": "# PostgreSQL storage with 2221 lines, full CRUD,\n# schema auto-migration, connection pooling"
+            }
+          ],
+          "implementation_details": "Production backend with PostgreSQL, Lambda handlers, Step Functions integration, delta processing, and 11 stage implementations."
+        },
+        {
+          "name": "dead-sqlite-prototype",
+          "description": "svap_pipeline/svap/ \u2014 SQLite + CLI-only. 6 stages (1-6), no auth, no cloud deployment.",
+          "file_count": 30,
+          "files": [
+            "svap_pipeline/svap/svap/storage.py",
+            "svap_pipeline/svap/svap/orchestrator.py",
+            "svap_pipeline/svap/config.yaml",
+            "svap_pipeline/svap/svap/bedrock_client.py"
+          ],
+          "sample_file": "svap_pipeline/svap/config.yaml",
+          "code_excerpts": [
+            {
+              "file": "svap_pipeline/svap/config.yaml",
+              "start_line": 1,
+              "end_line": 3,
+              "snippet": "storage:\n  db_path: ./svap_data.db  # SQLite database file"
+            }
+          ],
+          "implementation_details": "Initial proof-of-concept with SQLite, CLI orchestrator, 6 stages. 518-line storage.py vs 2221-line production version. No Lambda, no Step Functions, no auth."
+        }
+      ],
+      "analysis": "Identical pattern to the previously-deleted svap-ui-project/: a prototype committed in the initial commit that was immediately superseded by the production architecture. Contains 30 tracked files that inflate tooling output. The prototype's storage.py (518 lines, SQLite) has completely diverged from the production storage.py (2221 lines, PostgreSQL). Zero imports or references from anywhere in the active codebase.",
+      "recommendation": "Delete svap_pipeline/ entirely (rm -rf svap_pipeline/). All 30 files \u2014 stages, orchestrator, storage, config \u2014 exist and are vastly improved in backend/src/svap/. Verify no scripts or documentation reference svap_pipeline/ paths before deleting.",
+      "evidence_quality": "high",
       "status": "completed"
+    },
+    {
+      "id": "eslint-rules-duplication",
+      "name": "ESLint Rules Directory Duplication",
+      "type": "structural",
+      "description": "ESLint rule files exist in two directories: eslint-rules/ (project root, drift-generated) and frontend/eslint-rules/ (actively used). The root rules are orphaned \u2014 nothing imports them. Two overlapping rules (max-jsx-props, no-inline-styles) have diverged: the root no-inline-styles has a smarter CSS custom property allowance that the frontend version lacks.",
+      "impact": "HIGH",
+      "total_files": 7,
+      "variants": [
+        {
+          "name": "root-drift-generated",
+          "description": "eslint-rules/ at project root \u2014 3 rules marked // drift-generated, NOT imported anywhere",
+          "file_count": 3,
+          "files": [
+            "eslint-rules/max-jsx-props.js",
+            "eslint-rules/no-escape-hatches.js",
+            "eslint-rules/no-inline-styles.js"
+          ],
+          "sample_file": "eslint-rules/no-inline-styles.js",
+          "code_excerpts": [
+            {
+              "file": "eslint-rules/no-inline-styles.js",
+              "start_line": 59,
+              "end_line": 80,
+              "snippet": "function isCustomPropertiesOnly(node) {\n  // Allows style={{ '--q-color': quality.color }}\n  // which is the correct React pattern for CSS custom properties\n  ...\n}"
+            }
+          ],
+          "implementation_details": "Has smarter no-inline-styles with CSS custom property allowance (81 lines). Also has no-escape-hatches rule (86 lines) that frontend doesn't have. Drift config sync points here but nothing uses these."
+        },
+        {
+          "name": "frontend-active",
+          "description": "frontend/eslint-rules/ \u2014 4 rules imported by frontend/eslint.config.js",
+          "file_count": 4,
+          "files": [
+            "frontend/eslint-rules/max-jsx-props.js",
+            "frontend/eslint-rules/no-inline-styles.js",
+            "frontend/eslint-rules/no-direct-fetch.js",
+            "frontend/eslint-rules/no-direct-store-import.js"
+          ],
+          "sample_file": "frontend/eslint-rules/no-inline-styles.js",
+          "code_excerpts": [
+            {
+              "file": "frontend/eslint-rules/no-inline-styles.js",
+              "start_line": 1,
+              "end_line": 5,
+              "snippet": "// Blanket bans ALL inline styles without exception\n// 39 lines \u2014 missing CSS custom property allowance from root version"
+            }
+          ],
+          "implementation_details": "Simpler no-inline-styles (39 lines, blanket ban). Has no-direct-fetch and no-direct-store-import (unique to frontend). Missing no-escape-hatches entirely. These are the actually-wired rules."
+        }
+      ],
+      "analysis": "The drift-guard phase of the previous cycle generated rules to eslint-rules/ (matching the drift config's sync path), but the frontend's ESLint config imports from frontend/eslint-rules/. This disconnect means the drift-generated rules were never actually enforced. Worse, the frontend's no-inline-styles is a degraded version that flags legitimate CSS custom property usage (var(--q-color) patterns), producing false positives that views must suppress with eslint-disable comments.",
+      "recommendation": "1. Consolidate to frontend/eslint-rules/ as the single canonical location. 2. Upgrade frontend no-inline-styles.js with the root version's custom property allowance. 3. Copy no-escape-hatches.js to frontend/eslint-rules/ and wire it. 4. Delete eslint-rules/ at root. 5. Update .drift-audit/config.json sync path to frontend/eslint-rules/.",
+      "evidence_quality": "high",
+      "status": "completed"
+    },
+    {
+      "id": "backend-logging-inconsistency",
+      "name": "Backend Logging Inconsistency",
+      "type": "structural",
+      "description": "All 11 stage files use print() for output (129 calls total) while api.py and stage_runner.py use Python's logging module. In Lambda, print() goes to stdout without timestamps or severity levels; logging integrates with CloudWatch structured logs.",
+      "impact": "MEDIUM",
+      "total_files": 13,
+      "variants": [
+        {
+          "name": "logging-module",
+          "description": "api.py and stage_runner.py use logging.getLogger(__name__) with logger.info/warning/error",
+          "file_count": 2,
+          "files": [
+            "backend/src/svap/api.py",
+            "backend/src/svap/stage_runner.py"
+          ],
+          "sample_file": "backend/src/svap/api.py",
+          "code_excerpts": [
+            {
+              "file": "backend/src/svap/api.py",
+              "start_line": 1,
+              "end_line": 3,
+              "snippet": "logger = logging.getLogger(__name__)\nlogger.info(\"Gate registered for run_id=%s stage=%s\", run_id, stage)"
+            }
+          ],
+          "implementation_details": "Structured logging with severity levels, module context, and format strings. Integrates with CloudWatch Logs when running in Lambda."
+        },
+        {
+          "name": "print-statements",
+          "description": "All stage files (stage0 through stage6, plus stage0a, stage4a-c) use print() exclusively",
+          "file_count": 11,
+          "files": [
+            "backend/src/svap/stages/stage0_source_fetch.py",
+            "backend/src/svap/stages/stage0a_discovery.py",
+            "backend/src/svap/stages/stage1_case_assembly.py",
+            "backend/src/svap/stages/stage2_taxonomy.py",
+            "backend/src/svap/stages/stage3_scoring.py",
+            "backend/src/svap/stages/stage4_scanning.py",
+            "backend/src/svap/stages/stage4a_triage.py",
+            "backend/src/svap/stages/stage4b_research.py",
+            "backend/src/svap/stages/stage4c_assessment.py",
+            "backend/src/svap/stages/stage5_prediction.py",
+            "backend/src/svap/stages/stage6_detection.py"
+          ],
+          "sample_file": "backend/src/svap/stages/stage1_case_assembly.py",
+          "code_excerpts": [
+            {
+              "file": "backend/src/svap/stages/stage1_case_assembly.py",
+              "start_line": 1,
+              "end_line": 3,
+              "snippet": "print(\"Stage 1: Case Corpus Assembly\")\nprint(f\"  Skipping (cases exist): {doc['filename']}\")\nprint(f\"  ERROR for {doc['filename']}: {exc}\")"
+            }
+          ],
+          "implementation_details": "129 print() calls across 11 files. No timestamps, no severity levels, no module context. Errors printed with print(f'  ERROR...') rather than logger.error(). Makes production debugging in CloudWatch significantly harder."
+        }
+      ],
+      "analysis": "This drift likely arose because the stages were originally developed as CLI scripts (see svap_pipeline/ prototype) where print() was natural. When they were integrated into the Lambda architecture, the Lambda handlers (api.py, stage_runner.py) adopted logging but the stage implementations were never migrated. The impact is real: CloudWatch Logs from stage execution lack structured severity, timestamps, and module context that aid production debugging.\n\nAlso noted by structural audit: The per-call parameter values likely reflect prompt engineering requirements \u2014 stage0's 500 tokens for simple validation vs stage4a's 8192 for detailed triage. These are intentional but unmanageable: changing a stage's token budget requires a code edit, and there's no visibility into the current parameter landscape without reading all 11 files. Stage 5's unique temperature=0.3 is undocumented. Additionally, stages 0A and 4B read config sections ('discovery', 'research') not defined in defaults.py, making them invisible to developers.",
+      "recommendation": "Add `logger = logging.getLogger(__name__)` to each stage file. Replace print() with logger.info(), print('  ERROR...') with logger.error(). This is mechanical \u2014 a regex replacement with minor manual review for severity levels.",
+      "evidence_quality": "high",
+      "status": "completed",
+      "merged_from": [
+        "backend-llm-config-hardcoding"
+      ]
+    },
+    {
+      "id": "frontend-empty-state-handling",
+      "name": "Frontend Empty State Handling",
+      "type": "behavioral",
+      "description": "Empty state handling is inconsistent across views: CaseSourcing and TaxonomyView render blank space when data is empty (no empty state message). Other views use 'empty-state' class but vary in placement (td-in-tbody vs div-replacing-table) and text style (periods vs no periods, actionable vs passive).",
+      "impact": "MEDIUM",
+      "total_files": 8,
+      "variants": [
+        {
+          "name": "no-empty-state",
+          "description": "Views that render nothing when data arrays are empty",
+          "file_count": 2,
+          "files": [
+            "frontend/src/views/CaseSourcing.tsx:112-120",
+            "frontend/src/views/TaxonomyView.tsx:101-109"
+          ],
+          "sample_file": "frontend/src/views/CaseSourcing.tsx",
+          "code_excerpts": [
+            {
+              "file": "frontend/src/views/CaseSourcing.tsx",
+              "start_line": 112,
+              "end_line": 115,
+              "snippet": "<tbody>\n  {cases.map((c) => (\n    <CaseRow key={c.case_id} ... />\n  ))}\n</tbody>\n// No empty state fallback \u2014 renders empty <tbody>"
+            }
+          ],
+          "implementation_details": "cases.map() and taxonomy.map() produce no output when arrays are empty. User sees an empty table body or empty quality grid with no explanation."
+        },
+        {
+          "name": "td-empty-state",
+          "description": "Empty state as <td colSpan> inside <tbody> \u2014 keeps table structure intact",
+          "file_count": 1,
+          "files": [
+            "frontend/src/views/SourcesView.tsx:267-271"
+          ],
+          "sample_file": "frontend/src/views/SourcesView.tsx",
+          "code_excerpts": [
+            {
+              "file": "frontend/src/views/SourcesView.tsx",
+              "start_line": 267,
+              "end_line": 271,
+              "snippet": "<td colSpan={6} className=\"empty-state\">No enforcement sources configured. Add a source to get started.</td>"
+            }
+          ],
+          "implementation_details": "Keeps the table header visible, shows message inside table body. Actionable text with period."
+        },
+        {
+          "name": "div-empty-state",
+          "description": "Empty state as <div> replacing the table entirely",
+          "file_count": 5,
+          "files": [
+            "frontend/src/views/DiscoveryView.tsx:108-110",
+            "frontend/src/views/DiscoveryView.tsx:164-166",
+            "frontend/src/views/ResearchView.tsx:126-128",
+            "frontend/src/views/ResearchView.tsx:170-172",
+            "frontend/src/views/DimensionRegistryView.tsx:58-61"
+          ],
+          "sample_file": "frontend/src/views/DiscoveryView.tsx",
+          "code_excerpts": [
+            {
+              "file": "frontend/src/views/DiscoveryView.tsx",
+              "start_line": 108,
+              "end_line": 110,
+              "snippet": "<div className=\"empty-state\">No feeds configured.</div>"
+            }
+          ],
+          "implementation_details": "Replaces the entire table/list with a div. Text style varies: 'No feeds configured.' (period) vs 'No executions found' (no period). Some include actionable guidance, some don't."
+        }
+      ],
+      "behavior_matrix": {
+        "CaseSourcing": {
+          "empty_state": "none",
+          "placement": "n/a",
+          "text_style": "n/a"
+        },
+        "TaxonomyView": {
+          "empty_state": "none",
+          "placement": "n/a",
+          "text_style": "n/a"
+        },
+        "SourcesView": {
+          "empty_state": "present",
+          "placement": "td-in-tbody",
+          "text_style": "actionable, period"
+        },
+        "DiscoveryView": {
+          "empty_state": "present",
+          "placement": "div-replacing",
+          "text_style": "mixed"
+        },
+        "ResearchView": {
+          "empty_state": "present",
+          "placement": "div-replacing",
+          "text_style": "actionable, period"
+        },
+        "DimensionRegistryView": {
+          "empty_state": "present",
+          "placement": "div-in-grid",
+          "text_style": "actionable, period"
+        },
+        "ManagementView": {
+          "empty_state": "present",
+          "placement": "div-in-panel",
+          "text_style": "passive, no period"
+        }
+      },
+      "analysis": "The missing empty states in CaseSourcing and TaxonomyView are the most visible issue \u2014 users see an empty table or grid with column headers but no indication that data is expected. The placement variance (td vs div) is less critical but creates visual inconsistency. Text style variance suggests no shared empty state component or convention.\n\nAlso noted by behavioral audit: The split is clean: all div-based expandables have accessibility, all tr-based expandables don't. This suggests the accessibility pattern was established for the newer div-based components but was never backported to the table-row pattern. The fix is straightforward: add tabIndex={0} and onKeyDown to the three <tr> elements.",
+      "recommendation": "1. Add empty state messages to CaseSourcing and TaxonomyView. 2. Standardize on the div-replacing pattern (which is most common). 3. Standardize text to be actionable with period: 'No X found. Run Y to get started.' 4. Consider an EmptyState component in SharedUI.tsx.",
+      "evidence_quality": "high",
+      "status": "completed",
+      "merged_from": [
+        "frontend-expandable-accessibility"
+      ]
     }
   ]
 }

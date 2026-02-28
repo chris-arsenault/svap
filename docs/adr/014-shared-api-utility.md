@@ -1,3 +1,4 @@
+<!-- drift-generated -->
 # ADR 014: Shared API Utility (data/api.ts)
 
 ## Status

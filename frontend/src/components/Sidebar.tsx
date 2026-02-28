@@ -74,6 +74,9 @@ interface SidebarProps {
   username: string;
 }
 
+const navLinkClass = ({ isActive }: { isActive: boolean }) =>
+  `nav-item ${isActive ? "active" : ""}`;
+
 export default function Sidebar({ onSignOut, username }: SidebarProps) {
   const pipeline_status = usePipelineStatus();
   const counts = useCounts();
@@ -99,7 +102,7 @@ export default function Sidebar({ onSignOut, username }: SidebarProps) {
               key={item.path}
               to={item.path}
               end={item.path === "/"}
-              className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}
+              className={navLinkClass}
             >
               <Icon />
               <span>{item.label}</span>

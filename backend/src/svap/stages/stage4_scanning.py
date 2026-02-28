@@ -12,11 +12,14 @@ Output: Scored and ranked policy list in `policies` and `policy_scores` tables
 
 import hashlib
 import json
+import logging
 
 from svap import delta
 from svap.bedrock_client import BedrockClient
 from svap.rag import ContextAssembler
 from svap.storage import SVAPStorage
+
+logger = logging.getLogger(__name__)
 
 SYSTEM_PROMPT_CHARACTERIZE = """You are a structural analyst characterizing how a government
 policy or program works. Focus on the mechanical structure: how money flows, who reports what,
@@ -32,10 +35,10 @@ Be conservative — false negatives are better than false positives at this stag
 def _characterize_policy(storage, client, ctx, run_id, policy):
     """Run structural characterization for a single policy."""
     if policy.get("structural_characterization"):
-        print(f"    Already characterized: {policy['name']}")
+        logger.info("Already characterized: %s", policy['name'])
         return
 
-    print(f"    Characterizing: {policy['name']}")
+    logger.info("Characterizing: %s", policy['name'])
     rag_context = ctx.retrieve(
         policy["name"] + " " + (policy.get("description", "") or ""), doc_type="policy"
     )
@@ -54,7 +57,7 @@ def _characterize_policy(storage, client, ctx, run_id, policy):
 
 def _score_policy(storage, client, run_id, policy, taxonomy_context):
     """Score a single policy against the taxonomy and return the result."""
-    print(f"    Scoring: {policy['name']}")
+    logger.info("Scoring: %s", policy['name'])
     prompt = client.render_prompt(
         "stage4_score.txt",
         policy_name=policy["name"],
@@ -103,7 +106,7 @@ def _filter_changed_policies(storage, policies, taxonomy):
 
 def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
     """Execute Stage 4: Characterize and score all policies."""
-    print("Stage 4: Policy Corpus Scanning")
+    logger.info("Stage 4: Policy Corpus Scanning")
     storage.log_stage_start(run_id, 4)
 
     try:
@@ -118,16 +121,16 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
 
         policies = storage.get_policies()
         if not policies:
-            print("  No policies pre-loaded. Extracting from policy documents...")
+            logger.info("No policies pre-loaded. Extracting from policy documents...")
             policies = _extract_policies_from_docs(storage, client, config)
 
         if not policies:
-            print("  No policies found. Load policies first.")
+            logger.info("No policies found. Load policies first.")
             storage.log_stage_complete(run_id, 4, {"policies_scored": 0})
             return
 
         # ── 4a: Structural Characterization ─────────────────────────
-        print(f"  Characterizing {len(policies)} policies...")
+        logger.info("Characterizing %d policies...", len(policies))
         for policy in policies:
             _characterize_policy(storage, client, ctx, run_id, policy)
 
@@ -139,7 +142,7 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
         for policy in policies:
             existing = storage.get_quality_assessments(policy["policy_id"])
             if existing:
-                print(f"    Skipping {policy['name']} — already assessed via deep research")
+                logger.info("Skipping %s -- already assessed via deep research", policy['name'])
             else:
                 policies_to_score.append(policy)
 
@@ -147,15 +150,15 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
         delta_policies, skipped = _filter_changed_policies(storage, policies_to_score, taxonomy)
 
         if not delta_policies:
-            print(f"  All {len(policies_to_score)} scorable policies unchanged. Skipping scoring.")
+            logger.info("All %d scorable policies unchanged. Skipping scoring.", len(policies_to_score))
             storage.log_stage_complete(run_id, 4, {
                 "policies_scored": 0,
                 "skipped_unchanged": skipped,
             })
-            print("\n  Stage 4 complete (no changes).")
+            logger.info("Stage 4 complete (no changes).")
             return
 
-        print(f"  Scoring {len(delta_policies)} policies ({skipped} unchanged)...")
+        logger.info("Scoring %d policies (%d unchanged)...", len(delta_policies), skipped)
         results = []
         for policy, h in delta_policies:
             result = _score_policy(storage, client, run_id, policy, taxonomy_context)
@@ -174,7 +177,7 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
                 "above_threshold": sum(1 for r in results if r["convergence_score"] >= threshold),
             },
         )
-        print(f"\n  Stage 4 complete: {len(results)} policies scored.")
+        logger.info("Stage 4 complete: %d policies scored.", len(results))
 
     except Exception as e:
         storage.log_stage_failed(run_id, 4, str(e))
@@ -183,7 +186,7 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
 
 def _print_ranking(results, threshold):
     """Print the policy vulnerability ranking."""
-    print(f"\n  Policy Vulnerability Ranking (threshold={threshold}):")
+    logger.info("Policy Vulnerability Ranking (threshold=%d):", threshold)
     for r in results:
         if r["convergence_score"] >= threshold:
             marker = "[HIGH]"
@@ -191,7 +194,7 @@ def _print_ranking(results, threshold):
             marker = "[MED] "
         else:
             marker = "[LOW] "
-        print(f"    {marker} {r['policy']}: score={r['convergence_score']}")
+        logger.info("%s %s: score=%d", marker, r['policy'], r['convergence_score'])
 
 
 def load_seed_policies(storage: SVAPStorage, seed_path: str):
@@ -200,7 +203,7 @@ def load_seed_policies(storage: SVAPStorage, seed_path: str):
         policies = json.load(f)
     for p in policies:
         storage.insert_policy(p)
-    print(f"  Loaded {len(policies)} seed policies.")
+    logger.info("Loaded %d seed policies.", len(policies))
 
 
 def _extract_policies_from_docs(storage, client, config):
@@ -233,6 +236,6 @@ DOCUMENT:
                 storage.insert_policy(policy)
                 all_policies.append(policy)
         except Exception as e:
-            print(f"    Warning: Could not extract policies from {doc['filename']}: {e}")
+            logger.warning("Could not extract policies from %s: %s", doc['filename'], e)
 
     return all_policies

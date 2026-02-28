@@ -12,11 +12,9 @@
 
 import { useEffect, useRef } from "react";
 import { usePipelineStore } from "./pipelineStore";
-import { config } from "../config";
-import { getToken } from "../auth";
+import { apiGet } from "./api";
 import type { Counts, PipelineStageStatus } from "../types";
 
-const API_BASE = config.apiBaseUrl || "/api";
 const FAST_MS = 3_000;
 const SLOW_MS = 15_000;
 
@@ -42,45 +40,34 @@ export function useStatusSubscription() {
   useEffect(() => {
     activeRef.current = true;
 
+    const handlePollResponse = async (data: { stages?: PipelineStageStatus[]; counts?: Counts }) => {
+      const stages: PipelineStageStatus[] = data.stages || [];
+      const counts: Counts = data.counts || ({} as Counts);
+
+      usePipelineStore.getState().updatePipelineStatus(stages);
+
+      const isRunning = hasRunningStage(stages);
+      const justStopped = wasRunningRef.current && !isRunning && stages.length > 0;
+      const countsChanged = !countsEqual(usePipelineStore.getState().counts, counts);
+
+      if (justStopped || countsChanged) {
+        await usePipelineStore.getState().refresh();
+      }
+
+      wasRunningRef.current = isRunning;
+      return isRunning;
+    };
+
     const poll = async () => {
       if (!activeRef.current) return;
 
       try {
-        const token = await getToken();
-        const headers: Record<string, string> = {};
-        if (token) headers["Authorization"] = `Bearer ${token}`;
-        const res = await fetch(`${API_BASE}/status`, {
-          headers,
-          signal: AbortSignal.timeout(8000),
-        });
+        const res = await apiGet("/status", { signal: AbortSignal.timeout(8000) });
+        if (!res.ok) { schedule(SLOW_MS); return; }
 
-        if (!res.ok) {
-          schedule(SLOW_MS);
-          return;
-        }
-
-        const data = await res.json();
-        const stages: PipelineStageStatus[] = data.stages || [];
-        const counts: Counts = data.counts || {};
-
-        // Update pipeline status (store skips no-ops internally)
-        usePipelineStore.getState().updatePipelineStatus(stages);
-
-        const isRunning = hasRunningStage(stages);
-        const storeCounts = usePipelineStore.getState().counts;
-
-        // Detect running→stopped transition or count mismatch → full refresh
-        const justStopped = wasRunningRef.current && !isRunning && stages.length > 0;
-        const countsChanged = !countsEqual(storeCounts, counts as Counts);
-
-        if (justStopped || countsChanged) {
-          await usePipelineStore.getState().refresh();
-        }
-
-        wasRunningRef.current = isRunning;
+        const isRunning = await handlePollResponse(await res.json());
         schedule(isRunning ? FAST_MS : SLOW_MS);
       } catch {
-        // Network error — retry at slow rate
         schedule(SLOW_MS);
       }
     };

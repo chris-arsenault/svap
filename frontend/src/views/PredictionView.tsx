@@ -12,6 +12,53 @@ const difficultyLevel = (d?: string): "critical" | "high" | "medium" | "neutral"
   return "medium";
 };
 
+function StepDetail({ step }: { step: ExploitationStep }) {
+  return (
+    <div className="tree-step-detail">
+      {step.description && (
+        <div className="tree-step-desc">{step.description}</div>
+      )}
+      {step.actor_action && (
+        <div className="tree-step-actor">{step.actor_action}</div>
+      )}
+      {step.enabling_qualities?.length > 0 && (
+        <div className="tree-step-qualities">
+          <QualityTags ids={step.enabling_qualities} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function StepHeader({ step, isExpanded }: { step: ExploitationStep; isExpanded: boolean }) {
+  return (
+    <div className="tree-step-header">
+      <span className="tree-step-order">{step.step_order}</span>
+      <span className="tree-step-title">{step.title}</span>
+      {step.is_branch_point && (
+        <span className="tree-branch-badge">
+          <GitBranch size={12} /> branch
+        </span>
+      )}
+      {step.branch_label && (
+        <Badge level="neutral">{step.branch_label}</Badge>
+      )}
+      {step.enabling_qualities?.length > 0 && !isExpanded && (
+        <span className="tree-step-qual-count">
+          {step.enabling_qualities.length}q
+        </span>
+      )}
+    </div>
+  );
+}
+
+function handleStepKeyDown(e: React.KeyboardEvent, callback: () => void) {
+  if (e.key === "Enter" || e.key === " ") {
+    e.preventDefault();
+    callback();
+  }
+}
+
 function StepNode({
   step,
   depth,
@@ -23,50 +70,20 @@ function StepNode({
   isExpanded: boolean;
   onToggle: (id: string) => void;
 }) {
-  const hasDetail = step.description || step.actor_action || step.enabling_qualities?.length > 0;
+  const hasDetail = [step.description, step.actor_action, step.enabling_qualities?.length].some(Boolean);
+  const toggle = () => onToggle(step.step_id);
+
   return (
-    <div className="tree-step" style={{ paddingLeft: `${depth * 24 + 8}px` }}>
+    <div className="tree-step" style={{ '--step-depth': depth } as React.CSSProperties}>
       <div
         className={`tree-step-content${hasDetail ? " clickable" : ""}`}
         role={hasDetail ? "button" : undefined}
         tabIndex={hasDetail ? 0 : undefined}
-        onClick={hasDetail ? () => onToggle(step.step_id) : undefined}
-        onKeyDown={hasDetail ? (e) => {
-          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onToggle(step.step_id); }
-        } : undefined}
+        onClick={hasDetail ? toggle : undefined}
+        onKeyDown={hasDetail ? (e) => handleStepKeyDown(e, toggle) : undefined}
       >
-        <div className="tree-step-header">
-          <span className="tree-step-order">{step.step_order}</span>
-          <span className="tree-step-title">{step.title}</span>
-          {step.is_branch_point && (
-            <span className="tree-branch-badge">
-              <GitBranch size={12} /> branch
-            </span>
-          )}
-          {step.branch_label && (
-            <Badge level="neutral">{step.branch_label}</Badge>
-          )}
-          {step.enabling_qualities?.length > 0 && !isExpanded && (
-            <span className="tree-step-qual-count">
-              {step.enabling_qualities.length}q
-            </span>
-          )}
-        </div>
-        {isExpanded && (
-          <div className="tree-step-detail">
-            {step.description && (
-              <div className="tree-step-desc">{step.description}</div>
-            )}
-            {step.actor_action && (
-              <div className="tree-step-actor">{step.actor_action}</div>
-            )}
-            {step.enabling_qualities?.length > 0 && (
-              <div className="tree-step-qualities">
-                <QualityTags ids={step.enabling_qualities} />
-              </div>
-            )}
-          </div>
-        )}
+        <StepHeader step={step} isExpanded={isExpanded} />
+        {isExpanded && <StepDetail step={step} />}
       </div>
     </div>
   );

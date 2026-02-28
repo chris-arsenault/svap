@@ -30,6 +30,9 @@ function SourceRegistry({ sources }: { sources: EnforcementSource[] }) {
               </div>
             </div>
           ))}
+          {sources.length === 0 && (
+            <div className="empty-state">No enforcement sources configured. Add sources in the Sources view.</div>
+          )}
         </div>
       </div>
     </div>
@@ -47,7 +50,12 @@ function CaseRow({
 }) {
   return (
     <React.Fragment>
-      <tr className="detail-row" onClick={() => onToggleId(caseData.case_id)}>
+      <tr
+        className="detail-row"
+        onClick={() => onToggleId(caseData.case_id)}
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onToggleId(caseData.case_id); } }}
+      >
         <td className="case-row-toggle">
           {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
         </td>
@@ -118,6 +126,9 @@ export default function CaseSourcing() {
                   onToggleId={toggleCase}
                 />
               ))}
+              {cases.length === 0 && (
+                <tr><td colSpan={5} className="empty-state">No cases assembled yet. Run stage 1 to extract cases from enforcement sources.</td></tr>
+              )}
             </tbody>
           </table>
         </div>

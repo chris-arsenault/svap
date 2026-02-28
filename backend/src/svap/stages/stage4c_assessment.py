@@ -13,10 +13,13 @@ Output: quality_assessments, policy_scores (backward compat)
 """
 
 import hashlib
+import logging
 
 from svap import delta
 from svap.bedrock_client import BedrockClient
 from svap.storage import SVAPStorage
+
+logger = logging.getLogger(__name__)
 
 ASSESSMENT_SYSTEM = (
     "You are assessing whether a structural vulnerability quality is present in a "
@@ -44,20 +47,20 @@ def _get_assessable_sessions(storage):
 
 def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
     """Execute quality assessment against accumulated structural findings."""
-    print("Stage 4C: Quality Assessment from Findings")
+    logger.info("Stage 4C: Quality Assessment from Findings")
     storage.log_stage_start(run_id, 42)  # 42 = stage 4c
 
     try:
         taxonomy = storage.get_approved_taxonomy()
         if not taxonomy:
-            print("  No taxonomy found. Run Stage 2 first.")
+            logger.info("No taxonomy found. Run Stage 2 first.")
             storage.log_stage_complete(run_id, 42, {"policies_assessed": 0})
             return
 
         sessions = _get_assessable_sessions(storage)
 
         if not sessions:
-            print("  No policies with completed research. Run Stage 4B first.")
+            logger.info("No policies with completed research. Run Stage 4B first.")
             storage.log_stage_complete(run_id, 42, {"policies_assessed": 0})
             return
 
@@ -83,7 +86,7 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
             sessions_to_assess.append((session, findings, h))
 
         if not sessions_to_assess:
-            print(f"  All {len(sessions)} researched policies unchanged. Skipping assessment.")
+            logger.info("All %d researched policies unchanged. Skipping assessment.", len(sessions))
             storage.log_stage_complete(run_id, 42, {
                 "policies_assessed": 0,
                 "skipped_unchanged": skipped,
@@ -97,7 +100,7 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
             policy = next((p for p in all_policies if p["policy_id"] == policy_id), None)
             policy_name = policy["name"] if policy else policy_id
 
-            print(f"  Assessing: {policy_name} ({len(findings)} findings)")
+            logger.info("Assessing: %s (%d findings)", policy_name, len(findings))
 
             findings_text = _format_findings(findings)
 
@@ -119,14 +122,14 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
             storage.update_policy_lifecycle(policy_id, "fully_assessed")
             storage.record_processing(42, policy_id, h, run_id)
             assessed += 1
-            print(f"    Assessed {len(taxonomy)} qualities")
+            logger.info("Assessed %d qualities", len(taxonomy))
 
         storage.log_stage_complete(run_id, 42, {
             "policies_assessed": assessed,
             "skipped": skipped,
             "qualities_per_policy": len(taxonomy),
         })
-        print(f"  Assessment complete: {assessed} policies ({skipped} unchanged).")
+        logger.info("Assessment complete: %d policies (%d unchanged).", assessed, skipped)
 
     except Exception as e:
         storage.log_stage_failed(run_id, 42, str(e))

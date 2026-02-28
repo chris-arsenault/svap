@@ -7,6 +7,7 @@ Save ADRs to `docs/adr/` (or wherever the project keeps documentation).
 ## Template
 
 ```markdown
+<!-- drift-generated -->
 # ADR-NNNN: [Title]
 
 **Status:** Proposed | Accepted | Deprecated | Superseded by ADR-XXXX

@@ -13,11 +13,14 @@ Output: Exploitation trees in `exploitation_trees` + `exploitation_steps` tables
 """
 
 import hashlib
+import logging
 
 from svap import delta
 from svap.bedrock_client import BedrockClient
 from svap.parallel import run_parallel_llm
 from svap.storage import SVAPStorage
+
+logger = logging.getLogger(__name__)
 
 SYSTEM_PROMPT = """You are a structural analyst building exploitation decision trees. You NEVER
 speculate freely. Every step must be CAUSED by a specific vulnerability quality or
@@ -105,8 +108,10 @@ def _store_tree(storage, run_id, policy_id, profile, result):
         parent_order = step_data.get("parent_step_order")
         parent_id = order_to_id.get(parent_order) if parent_order else None
         if parent_order and parent_id is None:
-            print(f"    WARNING: step {order} references parent_step_order={parent_order} "
-                  f"which hasn't been seen yet — treating as root")
+            logger.warning(
+                "step %d references parent_step_order=%s which hasn't been seen yet -- treating as root",
+                order, parent_order,
+            )
 
         step = {
             "step_id": step_id,
@@ -145,7 +150,7 @@ def _run_parallel_predictions(storage, client, run_id, jobs, max_concurrency):
 
 def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
     """Execute Stage 5: Generate exploitation trees for high-scoring policies."""
-    print("Stage 5: Exploitation Tree Generation")
+    logger.info("Stage 5: Exploitation Tree Generation")
     storage.log_stage_start(run_id, 5)
 
     try:
@@ -162,7 +167,7 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
         }
 
         if not high_risk:
-            print(f"  No policies scored at or above threshold ({threshold}).")
+            logger.info("No policies scored at or above threshold (%d).", threshold)
             storage.log_stage_complete(run_id, 5, {"trees_generated": 0})
             return
 
@@ -178,16 +183,16 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
                 to_predict.append((policy_id, profile, h))
 
         if not to_predict:
-            print(f"  All {len(high_risk)} high-risk policies unchanged — skipping.")
+            logger.info("All %d high-risk policies unchanged -- skipping.", len(high_risk))
             storage.log_stage_complete(run_id, 5, {
                 "trees_generated": 0,
                 "skipped_unchanged": len(high_risk),
             })
             return
 
-        print(
-            f"  {len(to_predict)}/{len(high_risk)} policies changed "
-            f"(threshold={threshold}), generating exploitation trees..."
+        logger.info(
+            "%d/%d policies changed (threshold=%d), generating exploitation trees...",
+            len(to_predict), len(high_risk), threshold,
         )
 
         # -- Delete stale data BEFORE LLM calls ----------------------------
@@ -212,16 +217,16 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
 
         if total_steps > 0:
             storage.log_stage_pending_review(run_id, 5)
-            print(f"\n  Stage 5 complete: {total_steps} steps generated across {len(jobs) - len(failed_policies)} trees.")
-            print("  HUMAN REVIEW REQUIRED before proceeding to Stage 6.")
-            print("    Approve with: python -m svap.orchestrator approve --stage 5")
+            logger.info("Stage 5 complete: %d steps generated across %d trees.", total_steps, len(jobs) - len(failed_policies))
+            logger.info("HUMAN REVIEW REQUIRED before proceeding to Stage 6.")
+            logger.info("Approve with: python -m svap.orchestrator approve --stage 5")
         else:
             storage.log_stage_complete(run_id, 5, {
                 "trees_generated": 0,
                 "steps_generated": 0,
                 "all_failed": len(failed_policies),
             })
-            print(f"\n  Stage 5 complete: no steps generated ({len(failed_policies)} failed).")
+            logger.info("Stage 5 complete: no steps generated (%d failed).", len(failed_policies))
 
     except Exception as e:
         storage.log_stage_failed(run_id, 5, str(e))
