@@ -79,3 +79,19 @@ export function RiskBadge({ level }: { level: RiskLevel }) {
 export function StageDot({ status }: { status: StageStatus }) {
   return <span className={`stage-dot ${status}`} />;
 }
+
+export function ErrorBanner({ error, onDismiss }: { error: string | null; onDismiss?: () => void }) {
+  if (!error) return null;
+  return (
+    <div className="error-banner panel stagger-in">
+      <div className="panel-body">
+        {error}
+        {onDismiss && (
+          <button className="btn btn-sm" onClick={onDismiss} style={{ marginLeft: "auto" }}>
+            Dismiss
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}

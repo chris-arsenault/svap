@@ -1,8 +1,13 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useShallow } from "zustand/shallow";
 import { usePipelineStore } from "../data/pipelineStore";
-import { ScoreBar, QualityTags, RiskBadge, StageDot } from "../components/SharedUI";
+import {
+  usePipelineStatus, useRunId, useApiAvailable,
+  useRunPipeline, useApproveStage, useSeedPipeline, useRefresh,
+} from "../data/usePipelineSelectors";
+import { useAsyncAction } from "../hooks";
+import { ScoreBar, QualityTags, RiskBadge, StageDot, ErrorBanner } from "../components/SharedUI";
 import { formatDollars } from "../utils";
 import type { Case, Policy, StageStatus } from "../types";
 
@@ -154,48 +159,35 @@ const STAGE_NAMES: Record<number, string> = {
 const HUMAN_GATE_STAGES = [2, 5];
 
 function PipelineControls() {
-  const { pipeline_status, run_id, apiAvailable, runPipeline, approveStage, seedPipeline, refresh } = usePipelineStore(
-    useShallow((s) => ({
-      pipeline_status: s.pipeline_status,
-      run_id: s.run_id,
-      apiAvailable: s.apiAvailable,
-      runPipeline: s.runPipeline,
-      approveStage: s.approveStage,
-      seedPipeline: s.seedPipeline,
-      refresh: s.refresh,
-    })),
-  );
-  const [busy, setBusy] = useState<string | null>(null);
-
-  const wrap = (label: string, fn: () => Promise<unknown>) => async () => {
-    setBusy(label);
-    try {
-      await fn();
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setBusy(null);
-    }
-  };
+  const pipeline_status = usePipelineStatus();
+  const run_id = useRunId();
+  const apiAvailable = useApiAvailable();
+  const runPipeline = useRunPipeline();
+  const approveStage = useApproveStage();
+  const seedPipeline = useSeedPipeline();
+  const refresh = useRefresh();
+  const { busy, error, run, clearError } = useAsyncAction();
 
   if (!apiAvailable) return null;
 
   const hasPipeline = run_id && run_id !== "static";
 
   return (
+    <>
+    <ErrorBanner error={error} onDismiss={clearError} />
     <div className="panel stagger-in">
       <div className="panel-header">
         <h3>Pipeline Controls</h3>
         <div className="pipeline-header-actions">
           {!hasPipeline && (
-            <button className="btn btn-accent" onClick={wrap("seed", seedPipeline)} disabled={!!busy}>
+            <button className="btn btn-accent" onClick={() => run("seed", seedPipeline)} disabled={!!busy}>
               {busy === "seed" ? "Seeding\u2026" : "Seed Pipeline"}
             </button>
           )}
-          <button className="btn btn-accent" onClick={wrap("run", runPipeline)} disabled={!!busy}>
+          <button className="btn btn-accent" onClick={() => run("run", runPipeline)} disabled={!!busy}>
             {busy === "run" ? "Running\u2026" : "Run Pipeline"}
           </button>
-          <button className="btn" onClick={wrap("refresh", refresh)} disabled={!!busy}>
+          <button className="btn" onClick={() => run("refresh", refresh)} disabled={!!busy}>
             {busy === "refresh" ? "Refreshing\u2026" : "Refresh"}
           </button>
         </div>
@@ -215,7 +207,7 @@ function PipelineControls() {
                 {needsApproval && (
                   <button
                     className="btn btn-warning btn-sm"
-                    onClick={wrap(`approve-${stage}`, () => approveStage(stage))}
+                    onClick={() => run(`approve-${stage}`, () => approveStage(stage))}
                     disabled={!!busy}
                   >
                     {busy === `approve-${stage}` ? "Approving\u2026" : "Approve"}
@@ -230,6 +222,7 @@ function PipelineControls() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

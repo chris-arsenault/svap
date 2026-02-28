@@ -49,27 +49,7 @@ CONFIG_BUCKET = os.environ.get("SVAP_CONFIG_BUCKET", "")
 
 # ── Helpers ──────────────────────────────────────────────────────────────
 
-_DEFAULT_CONFIG = {
-    "bedrock": {
-        "region": "us-east-1",
-        "model_id": "us.anthropic.claude-sonnet-4-6",
-        "max_tokens": 4096,
-        "temperature": 0.2,
-        "retry_attempts": 3,
-        "retry_delay_seconds": 5,
-    },
-    "rag": {
-        "chunk_size": 1500,
-        "chunk_overlap": 200,
-        "max_context_chunks": 10,
-        "embedding_model": None,
-    },
-    "pipeline": {
-        "human_gates": [2, 5],
-        "max_concurrency": 5,
-        "export_dir": "/tmp/results",
-    },
-}
+from svap.defaults import default_config as _default_config
 
 
 def _get_config(overrides: dict | None = None) -> dict:
@@ -83,14 +63,14 @@ def _get_config(overrides: dict | None = None) -> dict:
             obj = boto3.client("s3").get_object(Bucket=CONFIG_BUCKET, Key="config.yaml")
             config = yaml.safe_load(obj["Body"].read())
         except Exception:
-            config = dict(_DEFAULT_CONFIG)
+            config = _default_config()
     else:
         try:
             from svap.orchestrator import _load_config
 
             config = _load_config("config.yaml")
         except FileNotFoundError:
-            config = dict(_DEFAULT_CONFIG)
+            config = _default_config()
 
     if overrides:
         config.update(overrides)
@@ -116,6 +96,14 @@ def get_active_run_id(storage: SVAPStorage) -> str:
     if not run_id:
         raise ApiError(404, "No pipeline runs found. Seed the pipeline first.")
     return run_id
+
+
+def _path_param(event: dict, name: str) -> str:
+    """Extract a path parameter or raise 400."""
+    val = (event.get("pathParameters") or {}).get(name)
+    if not val:
+        raise ApiError(400, f"Missing path parameter: {name}")
+    return val
 
 
 def _json_body(event: dict) -> dict:
@@ -182,7 +170,7 @@ def _list_cases(event):
 
 
 def _get_case(event):
-    case_id = event["pathParameters"]["case_id"]
+    case_id = _path_param(event, "case_id")
     storage = get_storage()
     enriched = enrich_cases(storage.get_cases(), storage.get_convergence_matrix())
     case = next((c for c in enriched if c["case_id"] == case_id), None)
@@ -197,7 +185,7 @@ def _list_taxonomy(event):
 
 
 def _get_quality(event):
-    quality_id = event["pathParameters"]["quality_id"]
+    quality_id = _path_param(event, "quality_id")
     storage = get_storage()
     enriched = enrich_taxonomy(storage.get_taxonomy(), storage.get_convergence_matrix())
     quality = next((q for q in enriched if q["quality_id"] == quality_id), None)
@@ -232,7 +220,7 @@ def _list_policies(event):
 
 
 def _get_policy(event):
-    policy_id = event["pathParameters"]["policy_id"]
+    policy_id = _path_param(event, "policy_id")
     storage = get_storage()
 
     policies = storage.get_policies()
@@ -616,7 +604,7 @@ def _list_research_sessions(event):
 
 
 def _get_findings(event):
-    policy_id = event["pathParameters"]["policy_id"]
+    policy_id = _path_param(event, "policy_id")
     storage = get_storage()
     return {
         "policy_id": policy_id,
@@ -625,7 +613,7 @@ def _get_findings(event):
 
 
 def _get_assessments(event):
-    policy_id = event["pathParameters"]["policy_id"]
+    policy_id = _path_param(event, "policy_id")
     storage = get_storage()
     return {
         "policy_id": policy_id,

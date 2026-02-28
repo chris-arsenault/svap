@@ -13,10 +13,10 @@ Output: Detection patterns in the `detection_patterns` table
 """
 
 import hashlib
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from svap import delta
 from svap.bedrock_client import BedrockClient
+from svap.parallel import run_parallel_llm
 from svap.rag import ContextAssembler
 from svap.storage import SVAPStorage
 
@@ -139,32 +139,24 @@ def _detect_changed_steps(storage, all_steps):
 
 def _run_parallel_detection(storage, client, run_id, jobs, max_concurrency):
     """Execute LLM calls in parallel and store results. Returns (total, failed)."""
-    print(f"  Submitting {len(jobs)} parallel Bedrock calls (concurrency={max_concurrency})...")
 
-    total_patterns = 0
-    failed_steps = []
-    with ThreadPoolExecutor(max_workers=max_concurrency) as executor:
-        future_to_step = {
-            executor.submit(_invoke_llm, client, prompt): (step, h)
-            for step, h, prompt in jobs
-        }
-        for future in as_completed(future_to_step):
-            step, h = future_to_step[future]
-            try:
-                result = future.result()
-                count = _store_patterns(storage, run_id, step, result)
-                storage.record_processing(6, step["step_id"], h, run_id)
-                total_patterns += count
-                policy = step.get("policy_name", "")
-                print(f"    {policy}/{step['title']}: {count} patterns (total: {total_patterns})")
-            except Exception as e:
-                print(f"    FAILED {step['title']}: {e}")
-                failed_steps.append(step["step_id"])
+    def _on_result(result, ctx):
+        count = _store_patterns(storage, run_id, ctx["step"], result)
+        storage.record_processing(6, ctx["step"]["step_id"], ctx["h"], run_id)
+        return count
 
-    if failed_steps:
-        print(f"\n  WARNING: {len(failed_steps)} steps failed pattern generation")
-
-    return total_patterns, failed_steps
+    parallel_jobs = [
+        (
+            f"{step.get('policy_name', '')}/{step['title']}",
+            prompt,
+            {"step": step, "h": h},
+        )
+        for step, h, prompt in jobs
+    ]
+    return run_parallel_llm(
+        lambda prompt: _invoke_llm(client, prompt),
+        parallel_jobs, _on_result, max_concurrency,
+    )
 
 
 def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):

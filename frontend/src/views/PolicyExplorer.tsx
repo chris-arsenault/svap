@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { useShallow } from "zustand/shallow";
-import { usePipelineStore } from "../data/pipelineStore";
+import {
+  usePolicies, usePolicyCatalog, useScannedPrograms, useDataSources, useThreshold,
+} from "../data/usePipelineSelectors";
 import { ScoreBar, QualityTags, RiskBadge } from "../components/SharedUI";
 
 interface CatalogNode {
@@ -185,15 +186,11 @@ function DataSourcesPanel({ dataSources }: { dataSources: Record<string, unknown
 }
 
 export default function PolicyExplorer() {
-  const { policies, policy_catalog, scanned_programs, data_sources, threshold } = usePipelineStore(
-    useShallow((s) => ({
-      policies: s.policies,
-      policy_catalog: s.policy_catalog,
-      scanned_programs: s.scanned_programs,
-      data_sources: s.data_sources,
-      threshold: s.threshold,
-    })),
-  );
+  const policies = usePolicies();
+  const policy_catalog = usePolicyCatalog();
+  const scanned_programs = useScannedPrograms();
+  const data_sources = useDataSources();
+  const threshold = useThreshold();
 
   return (
     <div>

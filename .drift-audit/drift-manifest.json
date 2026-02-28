@@ -76,7 +76,7 @@
       "analysis": "svap-ui-project/ was committed once (2026-02-25) and never updated. frontend/ was committed in the same initial commit and received 10+ subsequent updates. There are zero cross-references between them. The prototype's SharedUI components have diverged from frontend/'s versions (QualityTag uses static seeds vs store subscription, formatDollars relocated to utils.ts). Its continued presence inflates tooling output and creates confusion about canonical source.",
       "recommendation": "Delete svap-ui-project/ entirely: rm -rf svap-ui-project/. There is no code in it that isn't already present (and improved) in frontend/.",
       "evidence_quality": "high",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "frontend-store-access-patterns",
@@ -177,7 +177,7 @@
       "analysis": "The project built usePipelineSelectors.ts as the canonical store access layer (14 hooks), but adoption stalled at 1 of 12 views. The remaining 11 views developed 3 ad-hoc patterns organically. The useShallow pattern for data is correct; the issue is mixing data+actions in useShallow (unnecessary overhead) and having multiple access patterns without a clear convention. New views have no template to follow.",
       "recommendation": "Converge on: (1) useShallow for multi-field data access, (2) selector hooks for individual actions. Add grouped data selectors to usePipelineSelectors.ts (e.g., useDashboardData() wrapping useShallow internally). Target: every view imports from usePipelineSelectors, never directly from usePipelineStore.",
       "evidence_quality": "high",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "frontend-error-loading-handling",
@@ -272,7 +272,7 @@
       "analysis": "This is genuine drift. The store exports useLoading() and useError() selectors but only ApiGate uses them. Views independently create local busy state with different types. The user-visible impact is significant: failed uploads, pipeline runs, and approvals produce no feedback. ManagementView is the only view that displays errors, using an ad-hoc inline-styled panel.",
       "recommendation": "Create shared useAsyncAction() hook returning { busy, error, run, clearError } and an ErrorBanner component. Target: every view that performs async operations uses useAsyncAction() and renders <ErrorBanner /> at the top of its content area.",
       "evidence_quality": "high",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "backend-config-duplication",
@@ -318,7 +318,7 @@
       "analysis": "Both files contain identical configuration values today. They diverged in form (dict vs function) but not content. The risk is future desynchronization — if the model ID or retry parameters change, both must be updated independently. The factory function pattern in stage_runner.py is safer (returns fresh dict), but having two sources of truth for defaults is unnecessary given they're in the same Python package.",
       "recommendation": "Extract to svap/defaults.py: def default_config() -> dict. Both api.py and stage_runner.py import from this single source. Use the factory function pattern (fresh dict per call).",
       "evidence_quality": "high",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "parallel-execution-duplication",
@@ -364,7 +364,7 @@
       "analysis": "This is textbook semantic duplication — the same functional concept ('execute LLM calls in parallel, store results, track failures') implemented twice with different variable names. The functions share identical control flow: ThreadPoolExecutor creation, future submission via _invoke_llm, as_completed iteration, try/except per future, success counting, failure tracking, and tuple return. The only meaningful differences are the job tuple shape and the store callback. This likely arose from copy-paste when stage6 was built from stage5.",
       "recommendation": "Extract a generic run_parallel_llm() utility to svap/parallel.py parameterized by (client, jobs, store_fn, max_concurrency). Interface: run_parallel_llm(client: BedrockClient, jobs: list[tuple], store_fn: Callable, max_concurrency: int, label: str) -> tuple[int, list[str]]. Both stages call this with their specific store function.",
       "evidence_quality": "high",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "frontend-inline-styles",
@@ -428,7 +428,7 @@
       "analysis": "The project has a well-structured CSS system with custom properties and utility classes, but 7 views bypass it with inline styles. Most are for common layout patterns (flex row with gap, flex wrap) that appear repeatedly across views. Creating new objects on every render is a minor perf concern but mainly it's a consistency issue — some views are pure CSS classes, others mix in inline styles. CSS variable injection via inline style is the correct React pattern for dynamic theming and should not change.",
       "recommendation": "Add utility classes to index.css for repeated patterns: .flex-row (display:flex; align-items:center; gap:0.5rem), .flex-wrap (display:flex; flex-wrap:wrap; gap:0.25rem), .score-critical (color:var(--critical); font-weight:600), .score-high (color:var(--high); font-weight:600). Keep CSS variable injection inline. This eliminates ~20 of 27 inline styles.",
       "evidence_quality": "high",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "backend-route-error-handling",
@@ -495,7 +495,7 @@
       "analysis": "The strict-404 vs graceful-fallback distinction is intentional and correct — the dashboard should work without runs, but /api/status should not. The actual bug is the unguarded path parameter access which could produce a raw 500 error instead of a proper 400. This is LOW impact because API Gateway validates path parameters before the Lambda runs, so the KeyError would only occur with a malformed test event.",
       "recommendation": "Add a _path_param(event, name) helper that extracts with .get() and raises ApiError(400) on missing. Use it in all path-parameterized routes.",
       "evidence_quality": "high",
-      "status": "pending"
+      "status": "completed"
     },
     {
       "id": "frontend-auth-token-access",
@@ -541,7 +541,7 @@
       "analysis": "ManagementView accesses admin endpoints that don't fit the pipeline store's data model (executions, run management). Rather than adding these to the store, it built its own fetch+auth layer. This is pragmatic but creates a second auth code path. If token refresh logic changes in pipelineStore, ManagementView's authHeaders() would need a parallel update.",
       "recommendation": "Extract apiGet/apiPost from pipelineStore.ts into a standalone api.ts utility module. Both the store and ManagementView import from this shared module. Interface: export async function apiGet(path: string): Promise<unknown>; export async function apiPost(path: string, body?: unknown): Promise<unknown>;",
       "evidence_quality": "high",
-      "status": "pending"
+      "status": "completed"
     }
   ]
 }

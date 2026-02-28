@@ -1,6 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { useShallow } from "zustand/shallow";
-import { usePipelineStore } from "../data/pipelineStore";
+import { useTaxonomy, useCases } from "../data/usePipelineSelectors";
 import type { Case, Quality } from "../types";
 
 function QualityCard({
@@ -81,12 +80,8 @@ function QualityDetail({ quality, matchingCases }: { quality: Quality; matchingC
 }
 
 export default function TaxonomyView() {
-  const { taxonomy, cases } = usePipelineStore(
-    useShallow((s) => ({
-      taxonomy: s.taxonomy,
-      cases: s.cases,
-    })),
-  );
+  const taxonomy = useTaxonomy();
+  const cases = useCases();
   const [selectedQuality, setSelectedQuality] = useState<string | null>(null);
   const toggleQuality = useCallback((id: string) => setSelectedQuality((prev) => (prev === id ? null : id)), []);
 

@@ -1,78 +1,98 @@
 {
   "created": "2026-02-27T17:20:00Z",
-  "updated": "2026-02-27T17:20:00Z",
+  "updated": "2026-02-28T01:00:00Z",
   "plan": [
     {
       "area_id": "dead-prototype-codebase",
       "rank": 1,
       "depends_on": [],
-      "phase": "planned",
+      "phase": "completed",
       "canonical_variant": "active-typescript-frontend",
-      "unify_summary": null,
+      "unify_summary": "Deleted svap-ui-project/ entirely",
       "guard_artifacts": []
     },
     {
       "area_id": "frontend-store-access-patterns",
       "rank": 2,
       "depends_on": [],
-      "phase": "planned",
-      "canonical_variant": null,
-      "unify_summary": null,
-      "guard_artifacts": []
+      "phase": "completed",
+      "canonical_variant": "selector-hooks",
+      "unify_summary": "All views migrated to usePipelineSelectors — actions via individual hooks, data via individual data selectors",
+      "guard_artifacts": [
+        "docs/adr/013-unified-store-access.md",
+        "docs/patterns/store-access.md",
+        "frontend/eslint-rules/no-direct-store-import.js"
+      ]
     },
     {
       "area_id": "frontend-error-loading-handling",
       "rank": 3,
       "depends_on": [],
-      "phase": "planned",
-      "canonical_variant": null,
-      "unify_summary": null,
-      "guard_artifacts": []
+      "phase": "completed",
+      "canonical_variant": "useAsyncAction-ErrorBanner",
+      "unify_summary": "Created useAsyncAction() hook and ErrorBanner component, adopted in Dashboard, SourcesView, ManagementView, DiscoveryView, ResearchView",
+      "guard_artifacts": [
+        "docs/adr/015-async-error-handling.md",
+        "docs/patterns/async-error-handling.md"
+      ]
     },
     {
       "area_id": "backend-config-duplication",
       "rank": 4,
       "depends_on": [],
-      "phase": "planned",
+      "phase": "completed",
       "canonical_variant": "factory-function",
-      "unify_summary": null,
-      "guard_artifacts": []
+      "unify_summary": "Extracted to svap/defaults.py, both api.py and stage_runner.py import from it",
+      "guard_artifacts": [
+        "docs/adr/016-backend-shared-modules.md"
+      ]
     },
     {
       "area_id": "parallel-execution-duplication",
       "rank": 5,
       "depends_on": [],
-      "phase": "planned",
-      "canonical_variant": null,
-      "unify_summary": null,
-      "guard_artifacts": []
+      "phase": "completed",
+      "canonical_variant": "run-parallel-llm",
+      "unify_summary": "Extracted run_parallel_llm() to svap/parallel.py, both stages use it via callbacks",
+      "guard_artifacts": [
+        "docs/adr/016-backend-shared-modules.md"
+      ]
     },
     {
       "area_id": "frontend-inline-styles",
       "rank": 6,
       "depends_on": [],
-      "phase": "planned",
+      "phase": "completed",
       "canonical_variant": "css-classes",
-      "unify_summary": null,
-      "guard_artifacts": []
+      "unify_summary": "Added utility CSS classes (flex-row, mb-2, ml-auto, etc.), reduced inline styles from 27 to 13 (remaining are CSS variable injection and dynamic values)",
+      "guard_artifacts": [
+        "docs/patterns/css-architecture.md",
+        "frontend/eslint-rules/no-inline-styles.js"
+      ]
     },
     {
       "area_id": "backend-route-error-handling",
       "rank": 7,
       "depends_on": [],
-      "phase": "planned",
-      "canonical_variant": null,
-      "unify_summary": null,
-      "guard_artifacts": []
+      "phase": "completed",
+      "canonical_variant": "path-param-helper",
+      "unify_summary": "Added _path_param() helper, all routes use it for path parameter extraction",
+      "guard_artifacts": [
+        "docs/adr/016-backend-shared-modules.md"
+      ]
     },
     {
       "area_id": "frontend-auth-token-access",
       "rank": 8,
       "depends_on": ["frontend-store-access-patterns"],
-      "phase": "planned",
-      "canonical_variant": null,
-      "unify_summary": null,
-      "guard_artifacts": []
+      "phase": "completed",
+      "canonical_variant": "shared-api-utility",
+      "unify_summary": "Extracted apiGet/apiPost to data/api.ts, ManagementView uses shared utility instead of local authHeaders()",
+      "guard_artifacts": [
+        "docs/adr/014-shared-api-utility.md",
+        "docs/patterns/api-access.md",
+        "frontend/eslint-rules/no-direct-fetch.js"
+      ]
     }
   ]
 }

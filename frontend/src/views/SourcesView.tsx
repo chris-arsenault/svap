@@ -1,7 +1,8 @@
 import React, { useState, useRef, useCallback } from "react";
 import { ExternalLink, Upload, Check, AlertTriangle, Clock, XCircle, Plus, Trash2, ChevronDown, ChevronRight } from "lucide-react";
-import { usePipelineStore } from "../data/pipelineStore";
-import { useUploadSourceDocument, useDeleteSource, useCreateSource } from "../data/usePipelineSelectors";
+import { useEnforcementSources, useUploadSourceDocument, useDeleteSource, useCreateSource } from "../data/usePipelineSelectors";
+import { useAsyncAction } from "../hooks";
+import { ErrorBanner } from "../components/SharedUI";
 import type { EnforcementSource, ValidationStatus } from "../types";
 
 function StatusBadge({ status, hasDocument }: { status: ValidationStatus; hasDocument: boolean }) {
@@ -160,26 +161,21 @@ function SourceRow({ source }: { source: EnforcementSource }) {
 
 function AddSourceForm({ onClose }: { onClose: () => void }) {
   const createSource = useCreateSource();
-  const [busy, setBusy] = useState(false);
+  const { busy, error, run, clearError } = useAsyncAction();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const name = String(fd.get("name") ?? "").trim();
     if (!name) return;
-    setBusy(true);
-    try {
+    await run("add", async () => {
       await createSource({
         name,
         url: String(fd.get("url") ?? "").trim() || undefined,
         description: String(fd.get("description") ?? "").trim() || undefined,
       });
       onClose();
-    } catch (err) {
-      console.error("Create source failed:", err);
-    } finally {
-      setBusy(false);
-    }
+    });
   };
 
   return (
@@ -192,8 +188,9 @@ function AddSourceForm({ onClose }: { onClose: () => void }) {
           <input name="name" placeholder="Source name (required)" required />
           <input name="url" placeholder="URL (optional)" type="url" />
           <input name="description" placeholder="Description (optional)" />
+          <ErrorBanner error={error} onDismiss={clearError} />
           <div className="add-source-actions">
-            <button type="submit" className="btn btn-accent" disabled={busy}>
+            <button type="submit" className="btn btn-accent" disabled={!!busy}>
               {busy ? "Adding..." : "Add Source"}
             </button>
             <button type="button" className="btn" onClick={onClose}>
@@ -207,7 +204,7 @@ function AddSourceForm({ onClose }: { onClose: () => void }) {
 }
 
 export default function SourcesView() {
-  const enforcement_sources = usePipelineStore((s) => s.enforcement_sources);
+  const enforcement_sources = useEnforcementSources();
   const [showAddForm, setShowAddForm] = useState(false);
 
   const withDoc = enforcement_sources.filter((s) => s.has_document).length;

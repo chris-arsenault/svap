@@ -1,6 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
-import { useShallow } from "zustand/shallow";
-import { usePipelineStore } from "../data/pipelineStore";
+import {
+  useSourceFeeds, useSourceCandidates,
+  useFetchDiscovery, useRunDiscoveryFeeds, useReviewCandidate,
+} from "../data/usePipelineSelectors";
+import { useAsyncAction } from "../hooks";
+import { ErrorBanner } from "../components/SharedUI";
 import { Badge } from "../components/SharedUI";
 import { ChevronDown, ChevronRight, ExternalLink } from "lucide-react";
 import type { SourceCandidate } from "../types";
@@ -25,18 +29,13 @@ function richnessColor(score: number | null): string {
 }
 
 export default function DiscoveryView() {
-  const { source_feeds, source_candidates, fetchDiscovery, runDiscoveryFeeds, reviewCandidate } =
-    usePipelineStore(
-      useShallow((s) => ({
-        source_feeds: s.source_feeds,
-        source_candidates: s.source_candidates,
-        fetchDiscovery: s.fetchDiscovery,
-        runDiscoveryFeeds: s.runDiscoveryFeeds,
-        reviewCandidate: s.reviewCandidate,
-      })),
-    );
+  const source_feeds = useSourceFeeds();
+  const source_candidates = useSourceCandidates();
+  const fetchDiscovery = useFetchDiscovery();
+  const runDiscoveryFeeds = useRunDiscoveryFeeds();
+  const reviewCandidate = useReviewCandidate();
 
-  const [running, setRunning] = useState(false);
+  const { busy, error, run, clearError } = useAsyncAction();
   const [expandedFeed, setExpandedFeed] = useState<string | null>(null);
   const [filter, setFilter] = useState<string | null>(null);
 
@@ -44,20 +43,15 @@ export default function DiscoveryView() {
     fetchDiscovery();
   }, [fetchDiscovery]);
 
-  const handleRunFeeds = useCallback(async () => {
-    setRunning(true);
-    try {
-      await runDiscoveryFeeds();
-    } finally {
-      setRunning(false);
-    }
-  }, [runDiscoveryFeeds]);
+  const handleRunFeeds = useCallback(
+    () => run("feeds", runDiscoveryFeeds),
+    [run, runDiscoveryFeeds],
+  );
 
   const handleReview = useCallback(
-    async (candidateId: string, action: "accept" | "reject") => {
-      await reviewCandidate(candidateId, action);
-    },
-    [reviewCandidate],
+    (candidateId: string, action: "accept" | "reject") =>
+      run("review", () => reviewCandidate(candidateId, action)),
+    [run, reviewCandidate],
   );
 
   const needsReview = source_candidates.filter((c) => c.status === "scored");
@@ -67,6 +61,7 @@ export default function DiscoveryView() {
 
   return (
     <div>
+      <ErrorBanner error={error} onDismiss={clearError} />
       <div className="view-header stagger-in">
         <h2>Case Discovery</h2>
         <div className="view-desc">
@@ -105,8 +100,8 @@ export default function DiscoveryView() {
       <div className="panel stagger-in">
         <div className="panel-header">
           <h3>Source Feeds</h3>
-          <button className="btn btn-accent" onClick={handleRunFeeds} disabled={running}>
-            {running ? "Checking..." : "Check All Feeds"}
+          <button className="btn btn-accent" onClick={handleRunFeeds} disabled={!!busy}>
+            {busy === "feeds" ? "Checking..." : "Check All Feeds"}
           </button>
         </div>
         <div className="panel-body dense">

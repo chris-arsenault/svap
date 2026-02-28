@@ -36,6 +36,7 @@ import traceback
 import boto3
 import yaml
 
+from svap.defaults import default_config as _default_config
 from svap.orchestrator import _load_config, _run_stage
 from svap.storage import SVAPStorage, resolve_database_url
 
@@ -131,26 +132,3 @@ def _get_config(overrides: dict | None = None) -> dict:
     return config
 
 
-def _default_config() -> dict:
-    """Minimal default config when no config file is available."""
-    return {
-        "bedrock": {
-            "region": "us-east-1",
-            "model_id": "us.anthropic.claude-sonnet-4-6",
-            "max_tokens": 4096,
-            "temperature": 0.2,
-            "retry_attempts": 3,
-            "retry_delay_seconds": 5,
-        },
-        "rag": {
-            "chunk_size": 1500,
-            "chunk_overlap": 200,
-            "max_context_chunks": 10,
-            "embedding_model": None,
-        },
-        "pipeline": {
-            "human_gates": [2, 5],
-            "max_concurrency": 5,
-            "export_dir": "/tmp/results",
-        },
-    }

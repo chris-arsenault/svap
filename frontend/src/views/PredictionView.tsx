@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { ChevronDown, ChevronRight, GitBranch } from "lucide-react";
-import { usePipelineStore } from "../data/pipelineStore";
+import { useExploitationTrees } from "../data/usePipelineSelectors";
 import { QualityTags, ScoreBar, Badge } from "../components/SharedUI";
 import type { ExploitationTree, ExploitationStep } from "../types";
 
@@ -160,7 +160,7 @@ function TreeCard({
 }
 
 export default function PredictionView() {
-  const trees = usePipelineStore((s) => s.exploitation_trees);
+  const trees = useExploitationTrees();
   const [expandedTree, setExpandedTree] = useState<string | null>(null);
   const toggle = useCallback(
     (id: string) => setExpandedTree((prev) => (prev === id ? null : id)),

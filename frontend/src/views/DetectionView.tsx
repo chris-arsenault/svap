@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { usePipelineStore } from "../data/pipelineStore";
+import { useDetectionPatterns } from "../data/usePipelineSelectors";
 import { Badge } from "../components/SharedUI";
 import type { DetectionPattern, RiskLevel } from "../types";
 
@@ -279,7 +279,7 @@ function toggleSet(prev: Set<string>, id: string): Set<string> {
 }
 
 export default function DetectionView() {
-  const detection_patterns = usePipelineStore((s) => s.detection_patterns);
+  const detection_patterns = useDetectionPatterns();
   const [filterPriority, setFilterPriority] = useState<RiskLevel | null>(null);
   const [expandedTrees, setExpandedTrees] = useState<Set<string>>(new Set());
   const [expandedSteps, setExpandedSteps] = useState<Set<string>>(new Set());

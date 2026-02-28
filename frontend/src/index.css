@@ -1011,11 +1011,29 @@ html, body, #root {
 /* Utility classes */
 .clickable { cursor: pointer; }
 .text-center { text-align: center; }
+.mb-2 { margin-bottom: var(--sp-2); }
 .mb-3 { margin-bottom: var(--sp-3); }
+.ml-auto { margin-left: auto; }
+.font-semibold { font-weight: 600; }
+.text-sm { font-size: 0.85em; }
+.text-secondary { color: var(--text-secondary); font-size: 0.8em; }
+.cursor-pointer { cursor: pointer; }
+.flex-row { display: flex; align-items: center; gap: var(--sp-2); }
+.list-compact { margin: 0; padding-left: 1.2rem; }
 .filter-bar-mb { margin-bottom: var(--sp-4); }
 .panel-body-bordered { border-top: 1px solid var(--border-subtle); }
+.panel-expand-body { padding: 0.75rem; border-top: 1px solid var(--border-subtle); }
 .panel-body-scroll-x { overflow-x: auto; }
 .hide-on-mobile {} /* shown by default, hidden in 480px query */
+
+/* Error banner */
+.error-banner { border-left: 3px solid var(--critical); }
+.error-banner .panel-body {
+  color: var(--critical);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
 
 /* Shared table cell classes */
 .td-name { font-weight: 500; }

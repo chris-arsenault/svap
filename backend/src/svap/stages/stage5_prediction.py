@@ -13,10 +13,10 @@ Output: Exploitation trees in `exploitation_trees` + `exploitation_steps` tables
 """
 
 import hashlib
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from svap import delta
 from svap.bedrock_client import BedrockClient
+from svap.parallel import run_parallel_llm
 from svap.storage import SVAPStorage
 
 SYSTEM_PROMPT = """You are a structural analyst building exploitation decision trees. You NEVER
@@ -127,31 +127,20 @@ def _store_tree(storage, run_id, policy_id, profile, result):
 
 def _run_parallel_predictions(storage, client, run_id, jobs, max_concurrency):
     """Execute LLM calls in parallel and store results. Returns (total_steps, failed)."""
-    print(f"  Submitting {len(jobs)} parallel Bedrock calls (concurrency={max_concurrency})...")
 
-    total_steps = 0
-    failed_policies = []
-    with ThreadPoolExecutor(max_workers=max_concurrency) as executor:
-        future_to_policy = {
-            executor.submit(_invoke_llm, client, prompt): (policy_id, profile, h)
-            for policy_id, profile, h, prompt in jobs
-        }
-        for future in as_completed(future_to_policy):
-            policy_id, profile, h = future_to_policy[future]
-            try:
-                result = future.result()
-                count = _store_tree(storage, run_id, policy_id, profile, result)
-                storage.record_processing(5, policy_id, h, run_id)
-                total_steps += count
-                print(f"    {profile['name']}: {count} steps (total: {total_steps})")
-            except Exception as e:
-                print(f"    FAILED {profile['name']}: {e}")
-                failed_policies.append(policy_id)
+    def _on_result(result, ctx):
+        count = _store_tree(storage, run_id, ctx["policy_id"], ctx["profile"], result)
+        storage.record_processing(5, ctx["policy_id"], ctx["h"], run_id)
+        return count
 
-    if failed_policies:
-        print(f"\n  WARNING: {len(failed_policies)} policies failed tree generation")
-
-    return total_steps, failed_policies
+    parallel_jobs = [
+        (profile["name"], prompt, {"policy_id": policy_id, "profile": profile, "h": h})
+        for policy_id, profile, h, prompt in jobs
+    ]
+    return run_parallel_llm(
+        lambda prompt: _invoke_llm(client, prompt),
+        parallel_jobs, _on_result, max_concurrency,
+    )
 
 
 def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):

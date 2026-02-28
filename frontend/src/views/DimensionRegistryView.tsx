@@ -1,6 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { useShallow } from "zustand/shallow";
-import { usePipelineStore } from "../data/pipelineStore";
+import { useDimensions, useFetchDimensions } from "../data/usePipelineSelectors";
 import { Badge, QualityTags } from "../components/SharedUI";
 import { ChevronDown, ChevronRight } from "lucide-react";
 
@@ -11,12 +10,8 @@ function originBadge(origin: string) {
 }
 
 export default function DimensionRegistryView() {
-  const { dimensions, fetchDimensions } = usePipelineStore(
-    useShallow((s) => ({
-      dimensions: s.dimensions,
-      fetchDimensions: s.fetchDimensions,
-    })),
-  );
+  const dimensions = useDimensions();
+  const fetchDimensions = useFetchDimensions();
 
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
@@ -68,7 +63,7 @@ export default function DimensionRegistryView() {
           dimensions.map((dim) => (
             <div key={dim.dimension_id} className="quality-card stagger-in">
               <div
-                className="quality-card-header clickable"
+                className="quality-card-header clickable cursor-pointer"
                 onClick={() => toggleId(dim.dimension_id)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
@@ -78,9 +73,8 @@ export default function DimensionRegistryView() {
                 }}
                 role="button"
                 tabIndex={0}
-                style={{ cursor: "pointer" }}
               >
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <div className="flex-row">
                   {expandedId === dim.dimension_id ? (
                     <ChevronDown size={16} />
                   ) : (
@@ -88,9 +82,9 @@ export default function DimensionRegistryView() {
                   )}
                   <span className="quality-card-name">{dim.name}</span>
                 </div>
-                <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                <div className="flex-row">
                   {originBadge(dim.origin)}
-                  <span style={{ fontSize: "0.8em", color: "var(--text-secondary)" }}>
+                  <span className="text-secondary">
                     {dim.dimension_id}
                   </span>
                 </div>
@@ -99,13 +93,13 @@ export default function DimensionRegistryView() {
               <div className="quality-card-def">{dim.definition}</div>
 
               {expandedId === dim.dimension_id && (
-                <div style={{ padding: "0.75rem", borderTop: "1px solid var(--border)" }}>
+                <div className="panel-expand-body">
                   <div className="detail-grid">
                     <div>
                       <div className="detail-label">Probing Questions</div>
                       <div className="detail-text">
                         {dim.probing_questions && dim.probing_questions.length > 0 ? (
-                          <ul style={{ margin: 0, paddingLeft: "1.2rem" }}>
+                          <ul className="list-compact">
                             {dim.probing_questions.map((q, i) => (
                               <li key={i}>{q}</li>
                             ))}

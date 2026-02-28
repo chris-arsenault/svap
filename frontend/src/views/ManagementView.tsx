@@ -1,10 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
-import { usePipelineStore } from "../data/pipelineStore";
-import { config } from "../config";
-import { getToken } from "../auth";
-import { Badge } from "../components/SharedUI";
-
-const API_BASE = config.apiBaseUrl || "/api";
+import { useRunPipeline, useSeedPipeline, useRefresh } from "../data/usePipelineSelectors";
+import { apiGet, apiPost } from "../data/api";
+import { ErrorBanner, Badge } from "../components/SharedUI";
 
 // ── Types ────────────────────────────────────────────────────────────────
 
@@ -78,23 +75,18 @@ const STAGE_ORDER = [0, 1, 2, 3, 4, 5, 6];
 // ── Component ────────────────────────────────────────────────────────────
 
 export default function ManagementView() {
-  const runPipeline = usePipelineStore((s) => s.runPipeline);
-  const seedPipeline = usePipelineStore((s) => s.seedPipeline);
-  const refresh = usePipelineStore((s) => s.refresh);
+  const runPipeline = useRunPipeline();
+  const seedPipeline = useSeedPipeline();
+  const refresh = useRefresh();
 
   const [executions, setExecutions] = useState<Execution[]>([]);
   const [runs, setRuns] = useState<PipelineRun[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const authHeaders = async (): Promise<Record<string, string>> => {
-    const token = await getToken();
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
-
   const fetchExecutions = useCallback(async () => {
     try {
-      const res = await fetch(`${API_BASE}/management/executions`, { headers: await authHeaders() });
+      const res = await apiGet("/management/executions");
       if (!res.ok) throw new Error(`${res.status}`);
       setExecutions(await res.json());
     } catch (e) {
@@ -104,7 +96,7 @@ export default function ManagementView() {
 
   const fetchRuns = useCallback(async () => {
     try {
-      const res = await fetch(`${API_BASE}/management/runs`, { headers: await authHeaders() });
+      const res = await apiGet("/management/runs");
       if (!res.ok) throw new Error(`${res.status}`);
       setRuns(await res.json());
     } catch (e) {
@@ -128,13 +120,7 @@ export default function ManagementView() {
     setBusy(arn);
     setError(null);
     try {
-      const hdrs = await authHeaders();
-      const res = await fetch(`${API_BASE}/management/executions/stop`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", ...hdrs },
-        body: JSON.stringify({ execution_arn: arn }),
-      });
-      if (!res.ok) throw new Error(`${res.status}`);
+      await apiPost("/management/executions/stop", { execution_arn: arn });
       await refreshAll();
     } catch (e) {
       setError(`Failed to stop execution: ${(e as Error).message}`);
@@ -148,13 +134,7 @@ export default function ManagementView() {
     setBusy(runId);
     setError(null);
     try {
-      const hdrs = await authHeaders();
-      const res = await fetch(`${API_BASE}/management/runs/delete`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", ...hdrs },
-        body: JSON.stringify({ run_id: runId }),
-      });
-      if (!res.ok) throw new Error(`${res.status}`);
+      await apiPost("/management/runs/delete", { run_id: runId });
       await Promise.all([refreshAll(), refresh()]);
     } catch (e) {
       setError(`Failed to delete run: ${(e as Error).message}`);
@@ -201,13 +181,7 @@ export default function ManagementView() {
         </div>
       </div>
 
-      {error && (
-        <div className="panel stagger-in" style={{ borderLeft: "3px solid var(--critical)" }}>
-          <div className="panel-body" style={{ color: "var(--critical)" }}>
-            {error}
-          </div>
-        </div>
-      )}
+      <ErrorBanner error={error} onDismiss={() => setError(null)} />
 
       <div className="metrics-row">
         <div className="metric-card stagger-in">
@@ -286,7 +260,7 @@ export default function ManagementView() {
       <div className="panel stagger-in">
         <div className="panel-header">
           <h3>Pipeline Runs</h3>
-          <div style={{ display: "flex", gap: "8px" }}>
+          <div className="flex-row">
             <button
               className="btn btn-accent"
               onClick={handleNewRun}

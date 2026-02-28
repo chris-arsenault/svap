@@ -1,6 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
-import { useShallow } from "zustand/shallow";
-import { usePipelineStore } from "../data/pipelineStore";
+import {
+  useTriageResults, useResearchSessions, usePolicies,
+  useFetchTriageResults, useFetchResearchSessions,
+  useRunTriage, useRunDeepResearch, useFetchFindings, useFetchAssessments,
+} from "../data/usePipelineSelectors";
+import { useAsyncAction } from "../hooks";
+import { ErrorBanner } from "../components/SharedUI";
 import { Badge, QualityTag, QualityTags } from "../components/SharedUI";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import type { StructuralFinding, QualityAssessment } from "../types";
@@ -16,31 +21,17 @@ function presentBadge(present: string) {
 }
 
 export default function ResearchView() {
-  const {
-    triage_results,
-    research_sessions,
-    policies,
-    fetchTriageResults,
-    fetchResearchSessions,
-    runTriage,
-    runDeepResearch,
-    fetchFindings,
-    fetchAssessments,
-  } = usePipelineStore(
-    useShallow((s) => ({
-      triage_results: s.triage_results,
-      research_sessions: s.research_sessions,
-      policies: s.policies,
-      fetchTriageResults: s.fetchTriageResults,
-      fetchResearchSessions: s.fetchResearchSessions,
-      runTriage: s.runTriage,
-      runDeepResearch: s.runDeepResearch,
-      fetchFindings: s.fetchFindings,
-      fetchAssessments: s.fetchAssessments,
-    })),
-  );
+  const triage_results = useTriageResults();
+  const research_sessions = useResearchSessions();
+  const policies = usePolicies();
+  const fetchTriageResults = useFetchTriageResults();
+  const fetchResearchSessions = useFetchResearchSessions();
+  const runTriage = useRunTriage();
+  const runDeepResearch = useRunDeepResearch();
+  const fetchFindings = useFetchFindings();
+  const fetchAssessments = useFetchAssessments();
 
-  const [running, setRunning] = useState<string | null>(null);
+  const { busy, error, run, clearError } = useAsyncAction();
   const [expandedPolicy, setExpandedPolicy] = useState<string | null>(null);
   const [findings, setFindings] = useState<StructuralFinding[]>([]);
   const [assessments, setAssessments] = useState<QualityAssessment[]>([]);
@@ -58,23 +49,15 @@ export default function ResearchView() {
     [policies],
   );
 
-  const handleRunTriage = useCallback(async () => {
-    setRunning("triage");
-    try {
-      await runTriage();
-    } finally {
-      setRunning(null);
-    }
-  }, [runTriage]);
+  const handleRunTriage = useCallback(
+    () => run("triage", runTriage),
+    [run, runTriage],
+  );
 
-  const handleRunResearch = useCallback(async () => {
-    setRunning("research");
-    try {
-      await runDeepResearch();
-    } finally {
-      setRunning(null);
-    }
-  }, [runDeepResearch]);
+  const handleRunResearch = useCallback(
+    () => run("research", runDeepResearch),
+    [run, runDeepResearch],
+  );
 
   const handleExpand = useCallback(
     async (policyId: string) => {
@@ -96,6 +79,7 @@ export default function ResearchView() {
 
   return (
     <div>
+      <ErrorBanner error={error} onDismiss={clearError} />
       <div className="view-header stagger-in">
         <h2>Policy Research</h2>
         <div className="view-desc">
@@ -125,11 +109,11 @@ export default function ResearchView() {
 
       {/* Actions bar */}
       <div className="filter-bar filter-bar-mb stagger-in">
-        <button className="btn btn-accent" onClick={handleRunTriage} disabled={running !== null}>
-          {running === "triage" ? "Running Triage..." : "Run Triage"}
+        <button className="btn btn-accent" onClick={handleRunTriage} disabled={!!busy}>
+          {busy === "triage" ? "Running Triage..." : "Run Triage"}
         </button>
-        <button className="btn btn-accent" onClick={handleRunResearch} disabled={running !== null}>
-          {running === "research" ? "Researching..." : "Run Deep Research"}
+        <button className="btn btn-accent" onClick={handleRunResearch} disabled={!!busy}>
+          {busy === "research" ? "Researching..." : "Run Deep Research"}
         </button>
       </div>
 
@@ -187,7 +171,7 @@ export default function ResearchView() {
             <div className="empty-state">No research sessions. Run deep research after triage.</div>
           ) : (
             research_sessions.map((session) => (
-              <div key={session.session_id} className="panel" style={{ marginBottom: "0.5rem" }}>
+              <div key={session.session_id} className="panel mb-2">
                 <div
                   className="panel-header clickable"
                   onClick={() => handleExpand(session.policy_id)}
@@ -205,10 +189,10 @@ export default function ResearchView() {
                   ) : (
                     <ChevronRight size={16} />
                   )}
-                  <span style={{ marginLeft: "0.5rem", fontWeight: 600 }}>
+                  <span className="font-semibold" style={{ marginLeft: "0.5rem" }}>
                     {policyName(session.policy_id)}
                   </span>
-                  <span style={{ marginLeft: "auto" }}>
+                  <span className="ml-auto">
                     <Badge
                       level={
                         session.status === "assessment_complete"
@@ -226,13 +210,13 @@ export default function ResearchView() {
                 {expandedPolicy === session.policy_id && (
                   <div className="panel-body panel-body-bordered">
                     {/* Findings */}
-                    <h4 style={{ marginBottom: "0.5rem" }}>
+                    <h4 className="mb-2">
                       Structural Findings ({findings.length})
                     </h4>
                     {findings.length === 0 ? (
                       <div className="empty-state">No findings yet.</div>
                     ) : (
-                      <table className="data-table" style={{ marginBottom: "1rem" }}>
+                      <table className="data-table mb-3">
                         <thead>
                           <tr>
                             <th>Dimension</th>
@@ -246,7 +230,7 @@ export default function ResearchView() {
                             <tr key={f.finding_id}>
                               <td>{f.dimension_id}</td>
                               <td>{f.observation.slice(0, 150)}{f.observation.length > 150 ? "..." : ""}</td>
-                              <td style={{ fontSize: "0.85em" }}>{f.source_citation || f.source_type}</td>
+                              <td className="text-sm">{f.source_citation || f.source_type}</td>
                               <td>{confidenceBadge(f.confidence)}</td>
                             </tr>
                           ))}
@@ -255,7 +239,7 @@ export default function ResearchView() {
                     )}
 
                     {/* Assessments */}
-                    <h4 style={{ marginBottom: "0.5rem" }}>
+                    <h4 className="mb-2">
                       Quality Assessments ({assessments.length})
                     </h4>
                     {assessments.length === 0 ? (
