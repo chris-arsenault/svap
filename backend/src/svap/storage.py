@@ -148,7 +148,7 @@ def _migrate(conn):
 # To add a migration: append a new entry with version = SCHEMA_VERSION + 1,
 # then bump SCHEMA_VERSION to match.
 
-SCHEMA_VERSION = 6
+SCHEMA_VERSION = 7
 
 MIGRATIONS: list[tuple[int, list[str]]] = [
     # ── v1: Initial schema (all tables) ──────────────────────────────
@@ -624,6 +624,10 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
         "ALTER TABLE detection_patterns DROP CONSTRAINT IF EXISTS detection_patterns_prediction_id_fkey",
         # Invalidate stage 5 + 6 processing logs to force regeneration
         "DELETE FROM stage_processing_log WHERE stage IN (5, 6)",
+    ]),
+    # ── v7: Make prediction_id nullable (new stage 6 writes step_id only) ──
+    (7, [
+        "ALTER TABLE detection_patterns ALTER COLUMN prediction_id DROP NOT NULL",
     ]),
 ]
 
