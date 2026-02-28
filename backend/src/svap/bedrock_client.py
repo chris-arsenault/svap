@@ -6,8 +6,11 @@ retries, and token counting.
 """
 
 import json
+import logging
 import time
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 PROMPTS_DIR = Path(__file__).parent / "prompts"
 
@@ -73,8 +76,9 @@ class BedrockClient:
             except Exception as e:
                 if attempt < self.retry_attempts - 1:
                     wait = self.retry_delay * (2**attempt)
-                    print(
-                        f"  Bedrock call failed (attempt {attempt + 1}): {e}. Retrying in {wait}s..."
+                    logger.warning(
+                        "Bedrock call failed (attempt %d): %s. Retrying in %ds...",
+                        attempt + 1, e, wait,
                     )
                     time.sleep(wait)
                 else:

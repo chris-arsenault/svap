@@ -2,7 +2,7 @@ import React, { useState, useRef, useCallback } from "react";
 import { ExternalLink, Upload, Check, AlertTriangle, Clock, XCircle, Plus, Trash2, ChevronDown, ChevronRight } from "lucide-react";
 import { useEnforcementSources, useUploadSourceDocument, useDeleteSource, useCreateSource } from "../data/usePipelineSelectors";
 import { useAsyncAction } from "../hooks";
-import { ErrorBanner } from "../components/SharedUI";
+import { ErrorBanner, ViewHeader, MetricCard } from "../components/SharedUI";
 import type { EnforcementSource, ValidationStatus } from "../types";
 
 function StatusBadge({ status, hasDocument }: { status: ValidationStatus; hasDocument: boolean }) {
@@ -98,6 +98,7 @@ function SourceRow({ source }: { source: EnforcementSource }) {
   const deleteSource = useDeleteSource();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { busy, error, run, clearError } = useAsyncAction();
+  // eslint-disable-next-line local/no-manual-expand-state -- per-row local boolean (ADR-020)
   const [expanded, setExpanded] = useState(false);
   const toggleExpanded = useCallback(() => setExpanded((prev) => !prev), []);
 
@@ -209,29 +210,15 @@ export default function SourcesView() {
 
   return (
     <div>
-      <div className="view-header stagger-in">
-        <h2>Enforcement Sources</h2>
-        <div className="view-desc">
-          Manage enforcement source documents. Upload files manually or let the pipeline fetch from
-          URLs. Documents are validated during Stage 0.
-        </div>
-      </div>
+      <ViewHeader
+        title="Enforcement Sources"
+        description="Manage enforcement source documents. Upload files manually or let the pipeline fetch from URLs. Documents are validated during Stage 0."
+      />
 
       <div className="metrics-row">
-        <div className="metric-card stagger-in">
-          <div className="metric-label">Total Sources</div>
-          <div className="metric-value">{enforcement_sources.length}</div>
-        </div>
-        <div className="metric-card stagger-in">
-          <div className="metric-label">With Documents</div>
-          <div className="metric-value">{withDoc}</div>
-          <div className="metric-sub">{enforcement_sources.length - withDoc} pending fetch</div>
-        </div>
-        <div className="metric-card stagger-in">
-          <div className="metric-label">Validated</div>
-          <div className="metric-value">{validated}</div>
-          <div className="metric-sub">confirmed by LLM</div>
-        </div>
+        <MetricCard label="Total Sources" value={enforcement_sources.length} />
+        <MetricCard label="With Documents" value={withDoc} sub={<>{enforcement_sources.length - withDoc} pending fetch</>} />
+        <MetricCard label="Validated" value={validated} sub="confirmed by LLM" />
       </div>
 
       {showAddForm && <AddSourceForm onClose={hideAddForm} />}

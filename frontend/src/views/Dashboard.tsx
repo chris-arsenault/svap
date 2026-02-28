@@ -6,11 +6,11 @@ import {
   useCases, useTaxonomy, usePolicies, useDetectionPatterns, useThreshold,
 } from "../data/usePipelineSelectors";
 import { useAsyncAction } from "../hooks";
-import { ScoreBar, QualityTags, RiskBadge, StageDot, ErrorBanner } from "../components/SharedUI";
+import { ScoreBar, QualityTags, RiskBadge, StageDot, ErrorBanner, ViewHeader, MetricCard } from "../components/SharedUI";
 import { formatDollars } from "../utils";
 import type { Case, Policy, StageStatus } from "../types";
 
-function MetricsRow({
+function DashboardMetrics({
   cases,
   taxonomy,
   policies,
@@ -31,26 +31,10 @@ function MetricsRow({
 }) {
   return (
     <div className="metrics-row">
-      <div className="metric-card stagger-in">
-        <div className="metric-label">Enforcement Cases</div>
-        <div className="metric-value">{cases}</div>
-        <div className="metric-sub">{formatDollars(totalFraudDollars)} total intended losses</div>
-      </div>
-      <div className="metric-card stagger-in">
-        <div className="metric-label">Vulnerability Qualities</div>
-        <div className="metric-value">{taxonomy}</div>
-        <div className="metric-sub">Threshold: {"\u2265"}{threshold} = high risk</div>
-      </div>
-      <div className="metric-card stagger-in">
-        <div className="metric-label">Policies Scanned</div>
-        <div className="metric-value">{policies}</div>
-        <div className="metric-sub metric-sub-critical">{criticalPolicies} critical risk</div>
-      </div>
-      <div className="metric-card stagger-in">
-        <div className="metric-label">Detection Patterns</div>
-        <div className="metric-value">{detectionPatterns}</div>
-        <div className="metric-sub metric-sub-critical">{criticalPatterns} critical priority</div>
-      </div>
+      <MetricCard label="Enforcement Cases" value={cases} sub={<>{formatDollars(totalFraudDollars)} total intended losses</>} />
+      <MetricCard label="Vulnerability Qualities" value={taxonomy} sub={<>Threshold: {"\u2265"}{threshold} = high risk</>} />
+      <MetricCard label="Policies Scanned" value={policies} sub={<span className="metric-sub-critical">{criticalPolicies} critical risk</span>} />
+      <MetricCard label="Detection Patterns" value={detectionPatterns} sub={<span className="metric-sub-critical">{criticalPatterns} critical priority</span>} />
     </div>
   );
 }
@@ -237,17 +221,14 @@ export default function Dashboard() {
 
   return (
     <div>
-      <div className="view-header stagger-in">
-        <h2>Structural Vulnerability Analysis</h2>
-        <div className="view-desc">
-          HHS OIG fraud detection pipeline — convergence threshold: {"\u2265"}{threshold} qualities = high exploitation
-          risk
-        </div>
-      </div>
+      <ViewHeader
+        title="Structural Vulnerability Analysis"
+        description={<>HHS OIG fraud detection pipeline — convergence threshold: {"\u2265"}{threshold} qualities = high exploitation risk</>}
+      />
 
       <PipelineControls />
 
-      <MetricsRow
+      <DashboardMetrics
         cases={cases.length}
         taxonomy={taxonomy.length}
         policies={policies.length}

@@ -3,18 +3,18 @@
   "project_root": "/home/tsonu/src/svap",
   "project_name": "svap",
   "summary": {
-    "total_drift_areas": 12,
-    "total_files_affected": 48,
-    "high_impact": 4,
+    "total_drift_areas": 14,
+    "total_files_affected": 50,
+    "high_impact": 6,
     "medium_impact": 6,
     "low_impact": 2,
     "by_type": {
       "structural": 7,
-      "behavioral": 4,
-      "semantic": 1
+      "behavioral": 3,
+      "semantic": 4
     },
     "evidence_coverage": {
-      "high": 12,
+      "high": 14,
       "medium": 0,
       "low": 0
     }
@@ -271,10 +271,13 @@
           "implementation_details": "Factory function returning fresh dict. Safer pattern (no shared mutable state) but duplicates all values from api.py."
         }
       ],
-      "analysis": "Both files contain identical configuration values today. They diverged in form (dict vs function) but not content. The risk is future desynchronization \u2014 if the model ID or retry parameters change, both must be updated independently. The factory function pattern in stage_runner.py is safer (returns fresh dict), but having two sources of truth for defaults is unnecessary given they're in the same Python package.",
+      "analysis": "Both files contain identical configuration values today. They diverged in form (dict vs function) but not content. The risk is future desynchronization \u2014 if the model ID or retry parameters change, both must be updated independently. The factory function pattern in stage_runner.py is safer (returns fresh dict), but having two sources of truth for defaults is unnecessary given they're in the same Python package.\n\nAlso noted by structural audit: These two functions have identical control flow \u2014 load from S3 if CONFIG_BUCKET is set, else load from local file, fall back to defaults, apply overrides. The only difference is import style (lazy vs top-level) and a minor variable naming difference (inline vs named s3 client). This is exactly the pattern the backend-config-duplication area solved for default values \u2014 the loading logic was left behind. If config loading needs to change (e.g., adding caching, changing the S3 key, supporting SSM parameter store), both files must be updated independently.",
       "recommendation": "Extract to svap/defaults.py: def default_config() -> dict. Both api.py and stage_runner.py import from this single source. Use the factory function pattern (fresh dict per call).",
       "evidence_quality": "high",
-      "status": "completed"
+      "status": "completed",
+      "merged_from": [
+        "backend-config-loading-duplication"
+      ]
     },
     {
       "id": "parallel-execution-duplication",
@@ -457,7 +460,7 @@
       "recommendation": "Extract apiGet/apiPost from pipelineStore.ts into a standalone api.ts utility module. Both the store and ManagementView import from this shared module. Interface: export async function apiGet(path: string): Promise<unknown>; export async function apiPost(path: string, body?: unknown): Promise<unknown>;",
       "evidence_quality": "high",
       "status": "completed",
-      "reaudit_note": "2026-02-28: api.ts extracted and ManagementView migrated. One residual: useStatusSubscription.ts (lines 49-52) still manually constructs auth headers and calls fetch() directly, bypassing api.ts. Migration is feasible \u2014 apiGet supports signal option for AbortSignal.timeout."
+      "reaudit_note": "2026-02-28: Fully resolved. api.ts extracted, ManagementView migrated, useStatusSubscription.ts migrated to apiGet (imports from data/api.ts, line 15). Zero files now bypass the shared API utility."
     },
     {
       "id": "dead-pipeline-prototype",
@@ -747,6 +750,319 @@
       "merged_from": [
         "frontend-expandable-accessibility"
       ]
+    },
+    {
+      "id": "backend-utility-print-statements",
+      "name": "Backend Utility Print Statements",
+      "type": "structural",
+      "description": "Three core utility files (parallel.py, storage.py, bedrock_client.py) still use print() for output while all 11 stage files and both Lambda handlers use the logging module. These files were outside the scope of the original logging unification which targeted stage files only.",
+      "impact": "MEDIUM",
+      "total_files": 3,
+      "variants": [
+        {
+          "name": "logging-module",
+          "description": "All 11 stage files + api.py + stage_runner.py use logger = logging.getLogger(__name__)",
+          "file_count": 13,
+          "files": [
+            "backend/src/svap/api.py:1-20",
+            "backend/src/svap/stage_runner.py:1-20",
+            "backend/src/svap/stages/stage0_source_fetch.py:1-10",
+            "backend/src/svap/stages/stage1_case_assembly.py:1-10",
+            "backend/src/svap/stages/stage2_taxonomy.py:1-10"
+          ],
+          "sample_file": "backend/src/svap/api.py",
+          "code_excerpts": [
+            {
+              "file": "backend/src/svap/api.py",
+              "start_line": 18,
+              "end_line": 18,
+              "snippet": "logger = logging.getLogger(__name__)"
+            }
+          ],
+          "implementation_details": "Structured logging with severity levels, module context, and format strings. Integrates with CloudWatch Logs in Lambda."
+        },
+        {
+          "name": "print-statements",
+          "description": "Utility files use print() \u2014 parallel.py (4 calls), storage.py (4 calls), bedrock_client.py (1 call)",
+          "file_count": 3,
+          "files": [
+            "backend/src/svap/parallel.py:24-45",
+            "backend/src/svap/storage.py:57-134",
+            "backend/src/svap/bedrock_client.py:76-78"
+          ],
+          "sample_file": "backend/src/svap/parallel.py",
+          "code_excerpts": [
+            {
+              "file": "backend/src/svap/parallel.py",
+              "start_line": 24,
+              "end_line": 24,
+              "snippet": "print(f\"  Submitting {len(jobs)} parallel Bedrock calls (concurrency={max_concurrency})...\")"
+            },
+            {
+              "file": "backend/src/svap/bedrock_client.py",
+              "start_line": 76,
+              "end_line": 78,
+              "snippet": "print(\n    f\"  Bedrock call failed (attempt {attempt + 1}): {e}. Retrying in {wait}s...\"\n)"
+            },
+            {
+              "file": "backend/src/svap/storage.py",
+              "start_line": 125,
+              "end_line": 125,
+              "snippet": "print(f\"  Migration: applying v{version} ({len(statements)} statements)\")"
+            }
+          ],
+          "implementation_details": "9 total print() calls across 3 files. parallel.py prints progress/failures, storage.py prints migration status, bedrock_client.py prints retry warnings. All are called from Lambda context where print() lacks CloudWatch structured fields."
+        }
+      ],
+      "analysis": "The original backend-logging-inconsistency area (now completed) targeted the 11 stage files, replacing 129 print() calls. These 3 utility files were outside that scope. They are called from Lambda via stage_runner.py and api.py, so their print() output goes to CloudWatch without timestamps, severity, or module context. The bedrock_client retry message is particularly problematic \u2014 it should be logger.warning() to appear in error dashboards. storage.py's migration prints are less critical (run once per cold start) but should still be logger.info() for consistency. Note: orchestrator.py and dev_server.py print() is intentional \u2014 they're CLI tools, not Lambda code.",
+      "recommendation": "Add `import logging; logger = logging.getLogger(__name__)` to parallel.py, storage.py, and bedrock_client.py. Replace print() with logger.info() for status messages, logger.warning() for failures/retries, and logger.error() for errors. Exclude storage.py line 57 (sys.exit path) which is CLI-only.",
+      "evidence_quality": "high",
+      "status": "completed"
+    },
+    {
+      "id": "view-scaffold-duplication",
+      "name": "View Scaffold Duplication",
+      "type": "semantic",
+      "description": "Semantic cluster-001 (similarity 0.42) identifies 5 async-action views that repeat an identical scaffold: view-header with title/description, ErrorBanner, inline MetricsRow component, panel containers with action buttons, data tables with expandable rows. Each view re-implements the same structural template with ~300 lines of boilerplate, totaling ~1500 lines of semantic duplication across 5 files. MetricsRow alone is defined as a fresh inline component in each file despite identical structure (metrics-row CSS grid \u2192 metric-card children). The scaffold was never extracted because each view was built incrementally.",
+      "impact": "HIGH",
+      "total_files": 5,
+      "variants": [
+        {
+          "name": "dashboard-scaffold",
+          "description": "Dashboard.tsx \u2014 view-header + MetricsRow (4 metrics) + PipelineControls + split-view with 2 tables",
+          "file_count": 1,
+          "files": [
+            "frontend/src/views/Dashboard.tsx:1-283"
+          ],
+          "sample_file": "frontend/src/views/Dashboard.tsx",
+          "code_excerpts": [
+            {
+              "file": "frontend/src/views/Dashboard.tsx",
+              "start_line": 216,
+              "end_line": 230,
+              "snippet": "return (\n  <div>\n    <div className=\"view-header stagger-in\">\n      <h2>Structural Vulnerability Analysis</h2>\n      <div className=\"view-desc\">...</div>\n    </div>\n    <ErrorBanner error={error} onDismiss={clearError} />\n    <MetricsRow ... />\n    <PipelineControls busy={busy} run={run} />\n    <div className=\"split-view\">\n      <HighRiskTable ... />\n      <TopCasesTable ... />\n    </div>\n  </div>\n)"
+            }
+          ],
+          "implementation_details": "4 inline sub-components (MetricsRow, HighRiskTable, TopCasesTable, PipelineControls). Metrics computed inline from store selectors. Action buttons use run('key', fn) pattern. No useEffect \u2014 data pre-loaded."
+        },
+        {
+          "name": "discovery-scaffold",
+          "description": "DiscoveryView.tsx \u2014 same scaffold + filter bar + 2 panels (feeds table, candidates panel)",
+          "file_count": 1,
+          "files": [
+            "frontend/src/views/DiscoveryView.tsx:1-282"
+          ],
+          "sample_file": "frontend/src/views/DiscoveryView.tsx",
+          "code_excerpts": [
+            {
+              "file": "frontend/src/views/DiscoveryView.tsx",
+              "start_line": 63,
+              "end_line": 75,
+              "snippet": "const { busy, error, run, clearError } = useAsyncAction();\n// ... identical scaffold pattern\nconst feedCount = source_feeds.length;\nconst candidateCount = source_candidates.length;\nconst reviewCount = source_candidates.filter((c) => c.status === 'scored').length;\nconst acceptedCount = source_candidates.filter((c) => c.status === 'accepted').length;"
+            }
+          ],
+          "implementation_details": "4 inline sub-components (DiscoveryMetrics, FeedsTable, CandidatesPanel, CandidateRow). Metrics computed as .filter().length inline. useEffect fetches on mount. Filter state: useState<string|null> for candidate status."
+        },
+        {
+          "name": "management-scaffold",
+          "description": "ManagementView.tsx \u2014 same scaffold + 2 panels (executions, runs) with per-item async actions",
+          "file_count": 1,
+          "files": [
+            "frontend/src/views/ManagementView.tsx:1-310"
+          ],
+          "sample_file": "frontend/src/views/ManagementView.tsx",
+          "code_excerpts": [
+            {
+              "file": "frontend/src/views/ManagementView.tsx",
+              "start_line": 241,
+              "end_line": 260,
+              "snippet": "return (\n  <div>\n    <div className=\"view-header stagger-in\">\n      <h2>Pipeline Management</h2>\n      <div className=\"view-desc\">...</div>\n    </div>\n    <ErrorBanner error={error} onDismiss={clearError} />\n    <ManagementMetrics runningCount={runningCount} totalRuns={runs.length} />\n    <ExecutionsPanel ... />\n    <RunsPanel ... />\n  </div>\n)"
+            }
+          ],
+          "implementation_details": "3 inline sub-components (ManagementMetrics, ExecutionsPanel, RunsPanel). Uses confirm() for destructive actions. Per-item busy tracking (busy === arn). useEffect fetches executions + runs on mount."
+        },
+        {
+          "name": "research-scaffold",
+          "description": "ResearchView.tsx \u2014 same scaffold + triage table + sessions panel with async-on-expand",
+          "file_count": 1,
+          "files": [
+            "frontend/src/views/ResearchView.tsx:1-322"
+          ],
+          "sample_file": "frontend/src/views/ResearchView.tsx",
+          "code_excerpts": [
+            {
+              "file": "frontend/src/views/ResearchView.tsx",
+              "start_line": 264,
+              "end_line": 280,
+              "snippet": "return (\n  <div>\n    <div className=\"view-header stagger-in\">\n      <h2>Deep Research</h2>\n      <div className=\"view-desc\">...</div>\n    </div>\n    <ErrorBanner error={error} onDismiss={clearError} />\n    <ResearchMetrics ... />\n    <div className=\"panel stagger-in\">...</div>\n    <SessionsPanel ... />\n  </div>\n)"
+            }
+          ],
+          "implementation_details": "5 inline sub-components (TriageTable, SessionDetail, ResearchMetrics, SessionCard, SessionsPanel). Async data fetch on expand (Promise.all for findings + assessments). useEffect fetches triage + sessions on mount."
+        },
+        {
+          "name": "sources-scaffold",
+          "description": "SourcesView.tsx \u2014 same scaffold + source table with per-row CRUD actions",
+          "file_count": 1,
+          "files": [
+            "frontend/src/views/SourcesView.tsx:1-278"
+          ],
+          "sample_file": "frontend/src/views/SourcesView.tsx",
+          "code_excerpts": [
+            {
+              "file": "frontend/src/views/SourcesView.tsx",
+              "start_line": 200,
+              "end_line": 215,
+              "snippet": "return (\n  <div>\n    <div className=\"view-header stagger-in\">\n      <h2>Enforcement Sources</h2>\n      <div className=\"view-desc\">...</div>\n    </div>\n    <ErrorBanner error={error} onDismiss={clearError} />\n    <div className=\"metrics-row stagger-in\">\n      <div className=\"metric-card\">...</div>\n      ...\n    </div>\n    <div className=\"panel stagger-in\">...</div>\n  </div>\n)"
+            }
+          ],
+          "implementation_details": "6 inline sub-components (StatusBadge, StatusIcon, SourceExpandedDetail, SourceRowActions, SourceRow, AddSourceForm). SourcesView is the only view that inlines its MetricsRow rather than extracting it as a named component. Per-row expand state is LOCAL to SourceRow."
+        }
+      ],
+      "analysis": "This is the highest-value finding from semantic cluster-001. Every async-action view independently implements the same 5-part scaffold: (1) view-header with h2 + view-desc, (2) ErrorBanner from useAsyncAction, (3) MetricsRow as an inline component computing .filter().length from store selectors, (4) panel containers with panel-header + action buttons + panel-body, (5) data tables with expandable rows. The scaffold accounts for ~60% of each view's code. Adding a new view requires copy-pasting an existing one and modifying the domain-specific parts, which propagates any structural issues. Purpose statements confirm these views serve different data domains but share identical UI orchestration \u2014 cluster semantic score 0.44 is driven by shared imports (0.75) and behavior (0.84), not just co-location.",
+      "recommendation": "Extract a ViewShell component to components/ that provides the view-header + ErrorBanner + metrics slot + children layout. Extract a MetricCard component (the .metric-card div with label + value is repeated 16 times across 5 views). Extract an ActionButton component wrapping the run('key', fn) + disabled={!!busy} + conditional label pattern. Each view reduces from ~300 lines to ~100 lines of domain-specific content composed into the shell.",
+      "evidence_quality": "high",
+      "status": "completed",
+      "cluster_id": "cluster-001"
+    },
+    {
+      "id": "tree-hierarchy-duplication",
+      "name": "Tree Hierarchy Rendering Duplication",
+      "type": "semantic",
+      "description": "Semantic cluster-004 (similarity 0.43) identifies 3 views that independently implement the same concept: 'render hierarchical data as an expandable tree with keyboard-accessible nodes, visual connectors, and severity badges.' DetectionView builds a 3-level fixed hierarchy with Set<string> expand state. PredictionView builds dynamic-depth trees from parent_step_id references with CSS custom property indentation. PolicyExplorer builds arbitrary-depth trees from nested objects with local per-node state. Each implements its own toggle logic, keyboard handler, connector CSS, and depth-based styling \u2014 the same functional machinery built 3 times.",
+      "impact": "HIGH",
+      "total_files": 3,
+      "variants": [
+        {
+          "name": "detection-tree",
+          "description": "DetectionView \u2014 3-level fixed hierarchy (tree \u2192 steps \u2192 patterns) with Set<string> multi-expand and ::before CSS connectors",
+          "file_count": 1,
+          "files": [
+            "frontend/src/views/DetectionView.tsx:1-363"
+          ],
+          "sample_file": "frontend/src/views/DetectionView.tsx",
+          "code_excerpts": [
+            {
+              "file": "frontend/src/views/DetectionView.tsx",
+              "start_line": 86,
+              "end_line": 110,
+              "snippet": "function TreePanel({ group, isExpanded, onToggle, expandedSteps, onToggleStep, expandedPatterns, onTogglePattern }: {...}) {\n  return (\n    <div className=\"panel stagger-in\">\n      <div className=\"panel-header clickable\" role=\"button\" tabIndex={0}\n        onClick={() => onToggle(group.tree_id)}\n        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle(group.tree_id); } }}>\n        <div className=\"detection-header-left\">\n          {isExpanded ? <ChevronDown size={16}/> : <ChevronRight size={16}/>}\n          <h3>{group.policy_name}</h3>\n        </div>\n      </div>\n      {isExpanded && <div className=\"panel-body panel-body-bordered\"><div className=\"detection-steps\">...</div></div>}\n    </div>\n  );\n}"
+            },
+            {
+              "file": "frontend/src/views/DetectionView.tsx",
+              "start_line": 274,
+              "end_line": 280,
+              "snippet": "function toggleSet(prev: Set<string>, id: string) {\n  const next = new Set(prev);\n  next.has(id) ? next.delete(id) : next.add(id);\n  return next;\n}"
+            }
+          ],
+          "implementation_details": "3 inline sub-components (TreePanel, StepRow, PatternBlock). 3 independent Set<string> states for each tree level. Local toggleSet() utility. Expand-all/collapse-all buttons. CSS: .detection-step::before horizontal branch connector, border-left vertical line, margin-left indentation. Priority pills with color-mix(). Lucide chevron icons."
+        },
+        {
+          "name": "prediction-tree",
+          "description": "PredictionView \u2014 dynamic-depth tree from parent_step_id with CSS custom property --step-depth for indentation",
+          "file_count": 1,
+          "files": [
+            "frontend/src/views/PredictionView.tsx:1-207"
+          ],
+          "sample_file": "frontend/src/views/PredictionView.tsx",
+          "code_excerpts": [
+            {
+              "file": "frontend/src/views/PredictionView.tsx",
+              "start_line": 30,
+              "end_line": 55,
+              "snippet": "function StepNode({ step, depth, isExpanded, onToggle }: {...}) {\n  const hasDetail = [step.description, step.actor_action, step.enabling_qualities?.length].some(Boolean);\n  return (\n    <div className=\"tree-step\" style={{ '--step-depth': depth } as React.CSSProperties}>\n      <div className={`tree-step-content${hasDetail ? ' clickable' : ''}`}\n        role={hasDetail ? 'button' : undefined}\n        tabIndex={hasDetail ? 0 : undefined}\n        onClick={hasDetail ? () => onToggle(step.step_id) : undefined}\n        onKeyDown={hasDetail ? (e) => handleStepKeyDown(e, () => onToggle(step.step_id)) : undefined}>\n        <StepHeader step={step} isExpanded={isExpanded} />\n        {isExpanded && <StepDetail step={step} />}\n      </div>\n    </div>\n  );\n}"
+            },
+            {
+              "file": "frontend/src/views/PredictionView.tsx",
+              "start_line": 10,
+              "end_line": 25,
+              "snippet": "function buildStepTree(steps: ExploitationStep[]): { step: ExploitationStep; depth: number }[] {\n  const depthMap = new Map<string, number>();\n  const result: { step: ExploitationStep; depth: number }[] = [];\n  for (const step of steps) {\n    const parentDepth = step.parent_step_id ? (depthMap.get(step.parent_step_id) ?? 0) : 0;\n    const depth = step.parent_step_id ? parentDepth + 1 : 0;\n    depthMap.set(step.step_id, depth);\n    result.push({ step, depth });\n  }\n  return result;\n}"
+            }
+          ],
+          "implementation_details": "4 inline sub-components (TreeCard, StepNode, StepHeader, StepDetail). 2 nullable string states (expandedTree, expandedStep). buildStepTree() computes depth from parent_step_id. CSS: .tree-step uses calc(var(--step-depth) * 24px + 8px) for indentation, ::before connectors at top: 50%. Shared handleStepKeyDown() utility. Conditional interactivity (only expand if step has detail)."
+        },
+        {
+          "name": "policy-tree",
+          "description": "PolicyExplorer \u2014 arbitrary-depth recursive tree from nested CatalogNode objects with per-node local expand state",
+          "file_count": 1,
+          "files": [
+            "frontend/src/views/PolicyExplorer.tsx:1-225"
+          ],
+          "sample_file": "frontend/src/views/PolicyExplorer.tsx",
+          "code_excerpts": [
+            {
+              "file": "frontend/src/views/PolicyExplorer.tsx",
+              "start_line": 10,
+              "end_line": 35,
+              "snippet": "function TreeNode({ nodeKey, node, depth = 0, scannedPrograms = [] }: TreeNodeProps) {\n  const [expanded, setExpanded] = useState(depth < 2);\n  const isExpandable = !!node.children || !!node.programs;\n  return (\n    <div className={depth === 0 ? 'tree-node root' : 'tree-node'}>\n      <div className=\"tree-label\" role=\"button\" tabIndex={0}\n        onClick={() => setExpanded(!expanded)}\n        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpanded(!expanded); } }}>\n        <span className=\"tree-icon\">{treeIcon(isExpandable, expanded)}</span>\n        <span className={treeTextClass(depth)}>{node.label}</span>\n      </div>\n      {expanded && <TreeChildren node={node} depth={depth} ... />}\n    </div>\n  );\n}"
+            }
+          ],
+          "implementation_details": "Recursive TreeNode component with local useState per node. Auto-expands first 2 levels. No global expand state. Padding-based indentation (no CSS connectors). Unicode icons (middle dot, triangles) instead of lucide. Depth-based font-weight via treeTextClass(). Split-view layout with ScanResultsTable and DataSourcesPanel on the right."
+        }
+      ],
+      "analysis": "This is the second highest-value finding from semantic cluster-004. Three views implement the same functional concept \u2014 'render a collapsible tree' \u2014 with three different data models, three different expand state strategies, three different indentation systems, and three different icon systems. The shared kernel is: (a) a node with an expand toggle, (b) keyboard accessibility via Enter/Space, (c) depth-aware visual hierarchy, (d) conditional detail rendering when expanded. Purpose statements confirm different data domains but identical UI orchestration \u2014 cluster semantic score 0.42. The CSS duplication is a symptom: .detection-step and .tree-step both use ::before connectors with near-identical rules (differ only in top: 14px vs top: 50%), while .tree-node uses padding-only. A shared TreeNode primitive would eliminate ~400 lines of duplicated toggle/keyboard/connector logic and provide a template for future tree views.",
+      "recommendation": "Extract a TreeNode component to components/ parameterized by: (a) expand state strategy (useToggleSet for multi-expand, useState for per-node, nullable for single-expand), (b) indentation mode (css-var depth, padding, or none), (c) connector style (::before lines or none), (d) icon set (lucide or unicode). Extract shared useTreeKeyHandler hook (identical Enter/Space handler in all 3). Unify CSS: create .tree-node-base with shared padding/cursor/transition, derive .detection-step and .tree-step from it.",
+      "evidence_quality": "high",
+      "status": "completed",
+      "cluster_id": "cluster-004"
+    },
+    {
+      "id": "data-display-view-duplication",
+      "name": "Data Display View Duplication",
+      "type": "semantic",
+      "description": "Semantic cluster-002 (similarity 0.41) identifies 4 read-only views that independently implement the same concept: 'display a collection of items as cards or table rows with an expandable detail panel, keyboard accessibility, and store-driven data.' CaseSourcing and ConvergenceMatrix use data tables with expandable rows. DimensionRegistryView and TaxonomyView use card grids with select-to-expand. All 4 implement identical single-item toggle state (string|null + useCallback), identical keyboard handlers (Enter/Space), and identical detail panel layouts (.detail-grid 2-column). The card grid pattern (.quality-grid + .quality-card) is copy-pasted between DimensionRegistryView and TaxonomyView despite rendering different domain data with identical UI structure.",
+      "impact": "MEDIUM",
+      "total_files": 4,
+      "variants": [
+        {
+          "name": "table-with-expand-rows",
+          "description": "CaseSourcing + ConvergenceMatrix \u2014 data-table with expandable tbody rows via colSpan",
+          "file_count": 2,
+          "files": [
+            "frontend/src/views/CaseSourcing.tsx:1-138",
+            "frontend/src/views/ConvergenceMatrix.tsx:1-173"
+          ],
+          "sample_file": "frontend/src/views/CaseSourcing.tsx",
+          "code_excerpts": [
+            {
+              "file": "frontend/src/views/CaseSourcing.tsx",
+              "start_line": 15,
+              "end_line": 40,
+              "snippet": "function CaseRow({ caseData, isExpanded, onToggle, taxonomy }: {...}) {\n  return (\n    <>\n      <tr className=\"detail-row\" onClick={() => onToggle(caseData.case_id)}\n        tabIndex={0} role=\"button\"\n        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle(caseData.case_id); } }}>\n        <td>{isExpanded ? <ChevronDown/> : <ChevronRight/>}</td>\n        <td className=\"td-name\">{caseData.entity_name}</td>\n        ...\n      </tr>\n      {isExpanded && <tr><td colSpan={5} className=\"case-detail-cell\">\n        <div className=\"detail-expand\">...</div>\n      </td></tr>}\n    </>\n  );\n}"
+            }
+          ],
+          "implementation_details": "Table rows toggle a sibling detail row via colSpan. CaseSourcing has CaseRow + SourceRegistry sub-components. ConvergenceMatrix has MatrixRow + MatrixCell + MatrixFooter. Both use .data-table CSS. Identical keyboard handler pattern."
+        },
+        {
+          "name": "card-grid-with-detail",
+          "description": "DimensionRegistryView + TaxonomyView \u2014 quality-grid card layout with select-to-detail pattern",
+          "file_count": 2,
+          "files": [
+            "frontend/src/views/DimensionRegistryView.tsx:1-150",
+            "frontend/src/views/TaxonomyView.tsx:1-117"
+          ],
+          "sample_file": "frontend/src/views/TaxonomyView.tsx",
+          "code_excerpts": [
+            {
+              "file": "frontend/src/views/TaxonomyView.tsx",
+              "start_line": 25,
+              "end_line": 55,
+              "snippet": "function QualityCard({ quality, isSelected, onSelect }: {...}) {\n  return (\n    <div className={`quality-card stagger-in${isSelected ? ' selected' : ''}`}\n      style={{ '--q-color': quality.color } as React.CSSProperties}\n      onClick={() => onSelect(quality.quality_id)}\n      tabIndex={0} role=\"button\"\n      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(quality.quality_id); } }}>\n      <div className=\"quality-card-header\">...</div>\n      <div className=\"quality-card-def\">{quality.definition}</div>\n    </div>\n  );\n}"
+            },
+            {
+              "file": "frontend/src/views/DimensionRegistryView.tsx",
+              "start_line": 20,
+              "end_line": 50,
+              "snippet": "function DimensionCard({ dim, isExpanded, onToggle }: {...}) {\n  return (\n    <div className={`quality-card stagger-in${isExpanded ? ' selected' : ''}`}\n      onClick={() => onToggle(dim.dimension_id)}\n      tabIndex={0} role=\"button\"\n      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle(dim.dimension_id); } }}>\n      <div className=\"quality-card-header\">...</div>\n      {isExpanded && <div className=\"panel-expand-body\"><div className=\"detail-grid\">...</div></div>}\n    </div>\n  );\n}"
+            }
+          ],
+          "implementation_details": "Both use .quality-grid CSS grid (auto-fill, minmax 280px). Both use .quality-card class with .selected state. DimensionRegistryView expands inline (panel-expand-body inside card). TaxonomyView shows detail panel below grid (QualityDetail component). Identical keyboard handlers. DimensionRegistryView reuses .quality-card despite rendering dimensions, not qualities \u2014 CSS class name mismatch."
+        }
+      ],
+      "analysis": "Cluster-002 confirms these 4 views share behavioral signature (0.90) and import patterns (0.70). The card grid pair (DimensionRegistryView + TaxonomyView) is the clearest duplication \u2014 DimensionCard and QualityCard are structurally identical components with different prop names. DimensionRegistryView even reuses the .quality-card CSS class for dimensions, confirming it was copy-pasted from TaxonomyView. The table pair (CaseSourcing + ConvergenceMatrix) shares the data-table + expandable row pattern but diverges more in content structure. All 4 share the toggle state pattern (string|null + useCallback), the keyboard handler, and the detail-grid 2-column layout. Purpose statements distinguish the data domains but confirm identical UI purpose \u2014 'display a collection of domain entities with expandable detail.'",
+      "recommendation": "Extract a CardGrid component to components/ that provides: quality-grid layout, click-to-select with keyboard handling, selected state styling, and a detail panel slot (inline or external). Extract a shared ExpandableRow component for the table pattern. Rename .quality-card to .item-card and .quality-grid to .item-grid since they're used for both qualities and dimensions. DimensionCard and QualityCard should become a single ItemCard component parameterized by render props for header and detail content.",
+      "evidence_quality": "high",
+      "status": "completed",
+      "cluster_id": "cluster-002"
     }
   ]
 }

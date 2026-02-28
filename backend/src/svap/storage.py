@@ -9,6 +9,7 @@ from the database and writes its outputs back. This enables:
 """
 
 import json
+import logging
 import os
 import subprocess
 import sys
@@ -17,6 +18,8 @@ from pathlib import Path
 
 import psycopg2
 import psycopg2.extras
+
+logger = logging.getLogger(__name__)
 
 _TERRAFORM_DIR = Path(__file__).resolve().parent.parent.parent.parent / "infrastructure" / "terraform"
 
@@ -54,11 +57,9 @@ def resolve_database_url(config: dict | None = None) -> str:
         if url:
             return url
 
-    print(
-        "Error: Could not resolve database URL.\n"
-        "  Set DATABASE_URL or ensure terraform is initialized in\n"
-        f"  {_TERRAFORM_DIR}",
-        file=sys.stderr,
+    logger.error(
+        "Could not resolve database URL. Set DATABASE_URL or ensure terraform is initialized in %s",
+        _TERRAFORM_DIR,
     )
     sys.exit(1)
 
@@ -98,7 +99,7 @@ def _migrate(conn):
                         return
                 except Exception:
                     conn.rollback()
-                print("  Migration: another instance holds the lock, skipping")
+                logger.info("Migration: another instance holds the lock, skipping")
                 return
 
             try:
@@ -122,7 +123,7 @@ def _migrate(conn):
                 for version, statements in MIGRATIONS:
                     if version <= current:
                         continue
-                    print(f"  Migration: applying v{version} ({len(statements)} statements)")
+                    logger.info("Migration: applying v%d (%d statements)", version, len(statements))
                     for stmt in statements:
                         cur.execute(stmt)
 
@@ -131,7 +132,7 @@ def _migrate(conn):
                     (SCHEMA_VERSION,),
                 )
                 conn.commit()
-                print(f"  Migration: schema now at v{SCHEMA_VERSION}")
+                logger.info("Migration: schema now at v%d", SCHEMA_VERSION)
             except Exception:
                 conn.rollback()
                 raise

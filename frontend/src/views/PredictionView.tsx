@@ -1,7 +1,8 @@
-import React, { useCallback, useState } from "react";
+import React from "react";
 import { ChevronDown, ChevronRight, GitBranch } from "lucide-react";
 import { useExploitationTrees } from "../data/usePipelineSelectors";
-import { QualityTags, ScoreBar, Badge } from "../components/SharedUI";
+import { useExpandSingle, expandableProps } from "../hooks";
+import { QualityTags, ScoreBar, Badge, ViewHeader } from "../components/SharedUI";
 import type { ExploitationTree, ExploitationStep } from "../types";
 
 const difficultyLevel = (d?: string): "critical" | "high" | "medium" | "neutral" => {
@@ -52,13 +53,6 @@ function StepHeader({ step, isExpanded }: { step: ExploitationStep; isExpanded: 
   );
 }
 
-function handleStepKeyDown(e: React.KeyboardEvent, callback: () => void) {
-  if (e.key === "Enter" || e.key === " ") {
-    e.preventDefault();
-    callback();
-  }
-}
-
 function StepNode({
   step,
   depth,
@@ -71,16 +65,12 @@ function StepNode({
   onToggle: (id: string) => void;
 }) {
   const hasDetail = [step.description, step.actor_action, step.enabling_qualities?.length].some(Boolean);
-  const toggle = () => onToggle(step.step_id);
 
   return (
     <div className="tree-step" style={{ '--step-depth': depth } as React.CSSProperties}>
       <div
         className={`tree-step-content${hasDetail ? " clickable" : ""}`}
-        role={hasDetail ? "button" : undefined}
-        tabIndex={hasDetail ? 0 : undefined}
-        onClick={hasDetail ? toggle : undefined}
-        onKeyDown={hasDetail ? (e) => handleStepKeyDown(e, toggle) : undefined}
+        {...(hasDetail ? expandableProps(() => onToggle(step.step_id)) : {})}
       >
         <StepHeader step={step} isExpanded={isExpanded} />
         {isExpanded && <StepDetail step={step} />}
@@ -113,25 +103,13 @@ function TreeCard({
 }) {
   const stepTree = buildStepTree(tree.steps || []);
   const branchCount = (tree.steps || []).filter((s) => s.is_branch_point).length;
-  const [expandedStep, setExpandedStep] = useState<string | null>(null);
-  const toggleStep = useCallback(
-    (id: string) => setExpandedStep((prev) => (prev === id ? null : id)),
-    [],
-  );
+  const { expandedId: expandedStep, toggle: toggleStep } = useExpandSingle();
 
   return (
     <div className="panel stagger-in">
       <div
         className="panel-header clickable"
-        role="button"
-        tabIndex={0}
-        onClick={() => onToggle(tree.tree_id)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            onToggle(tree.tree_id);
-          }
-        }}
+        {...expandableProps(() => onToggle(tree.tree_id))}
       >
         <div className="prediction-header-left">
           {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
@@ -178,21 +156,14 @@ function TreeCard({
 
 export default function PredictionView() {
   const trees = useExploitationTrees();
-  const [expandedTree, setExpandedTree] = useState<string | null>(null);
-  const toggle = useCallback(
-    (id: string) => setExpandedTree((prev) => (prev === id ? null : id)),
-    [],
-  );
+  const { expandedId: expandedTree, toggle } = useExpandSingle();
 
   return (
     <div>
-      <div className="view-header stagger-in">
-        <h2>Exploitation Trees</h2>
-        <div className="view-desc">
-          {trees.length} exploitation trees — each models a branching attack pathway for a
-          high-risk policy, with steps linked to enabling qualities
-        </div>
-      </div>
+      <ViewHeader
+        title="Exploitation Trees"
+        description={<>{trees.length} exploitation trees — each models a branching attack pathway for a high-risk policy, with steps linked to enabling qualities</>}
+      />
 
       {trees.map((tree) => (
         <TreeCard

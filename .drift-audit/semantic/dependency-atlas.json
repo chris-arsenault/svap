@@ -2,397 +2,114 @@
   "edges": [
     {
       "dominantSignal": "typeSignature",
-      "source": "frontend/src/auth.ts::signOut",
-      "target": "frontend/src/data/useStatusSubscription.ts::useStatusSubscription",
-      "weight": 0.5424
+      "source": "frontend/src/views/PolicyExplorer.tsx::default",
+      "target": "frontend/src/views/PredictionView.tsx::default",
+      "weight": 0.4579
     },
     {
       "dominantSignal": "typeSignature",
       "source": "frontend/src/views/DiscoveryView.tsx::default",
-      "target": "frontend/src/views/ResearchView.tsx::default",
-      "weight": 0.4656
-    },
-    {
-      "dominantSignal": "behavior",
-      "source": "frontend/src/auth.ts::getSession",
-      "target": "frontend/src/data/usePipelineSelectors.ts::useError",
-      "weight": 0.4623
-    },
-    {
-      "dominantSignal": "consumerSet",
-      "source": "frontend/src/auth.ts::getSession",
-      "target": "frontend/src/data/usePipelineSelectors.ts::useLoading",
-      "weight": 0.4591
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/CaseSourcing.tsx::default",
       "target": "frontend/src/views/SourcesView.tsx::default",
-      "weight": 0.4464
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/CaseSourcing.tsx::default",
-      "target": "frontend/src/views/PredictionView.tsx::default",
-      "weight": 0.4403
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/DetectionView.tsx::default",
-      "target": "frontend/src/views/PredictionView.tsx::default",
-      "weight": 0.4402
+      "weight": 0.452
     },
     {
       "dominantSignal": "typeSignature",
       "source": "frontend/src/views/CaseSourcing.tsx::default",
       "target": "frontend/src/views/ConvergenceMatrix.tsx::default",
-      "weight": 0.4379
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/ConvergenceMatrix.tsx::default",
-      "target": "frontend/src/views/TaxonomyView.tsx::default",
-      "weight": 0.4363
+      "weight": 0.4291
     },
     {
       "dominantSignal": "typeSignature",
       "source": "frontend/src/views/CaseSourcing.tsx::default",
-      "target": "frontend/src/views/DetectionView.tsx::default",
-      "weight": 0.4302
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/DetectionView.tsx::default",
-      "target": "frontend/src/views/DimensionRegistryView.tsx::default",
-      "weight": 0.4244
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/ManagementView.tsx::default",
-      "target": "frontend/src/views/ResearchView.tsx::default",
-      "weight": 0.4244
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/DimensionRegistryView.tsx::default",
-      "target": "frontend/src/views/ResearchView.tsx::default",
-      "weight": 0.4236
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/ConvergenceMatrix.tsx::default",
-      "target": "frontend/src/views/PolicyExplorer.tsx::default",
-      "weight": 0.4232
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/DimensionRegistryView.tsx::default",
-      "target": "frontend/src/views/DiscoveryView.tsx::default",
-      "weight": 0.4227
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/PredictionView.tsx::default",
       "target": "frontend/src/views/SourcesView.tsx::default",
-      "weight": 0.4223
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/DetectionView.tsx::default",
-      "target": "frontend/src/views/TaxonomyView.tsx::default",
-      "weight": 0.4202
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/DetectionView.tsx::default",
-      "target": "frontend/src/views/ResearchView.tsx::default",
-      "weight": 0.4199
+      "weight": 0.4183
     },
     {
       "dominantSignal": "typeSignature",
       "source": "frontend/src/views/CaseSourcing.tsx::default",
-      "target": "frontend/src/views/TaxonomyView.tsx::default",
+      "target": "frontend/src/views/DimensionRegistryView.tsx::default",
       "weight": 0.4172
     },
     {
       "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/DiscoveryView.tsx::default",
-      "target": "frontend/src/views/ManagementView.tsx::default",
+      "source": "frontend/src/views/DimensionRegistryView.tsx::default",
+      "target": "frontend/src/views/TaxonomyView.tsx::default",
       "weight": 0.4165
     },
     {
       "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/DetectionView.tsx::default",
-      "target": "frontend/src/views/DiscoveryView.tsx::default",
-      "weight": 0.4152
+      "source": "frontend/src/views/DiscoveryView.tsx::default",
+      "target": "frontend/src/views/ResearchView.tsx::default",
+      "weight": 0.4156
     },
     {
       "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/PolicyExplorer.tsx::default",
-      "target": "frontend/src/views/PredictionView.tsx::default",
-      "weight": 0.414
+      "source": "frontend/src/views/Dashboard.tsx::default",
+      "target": "frontend/src/views/ManagementView.tsx::default",
+      "weight": 0.415
     },
     {
       "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/DetectionView.tsx::default",
-      "target": "frontend/src/views/SourcesView.tsx::default",
-      "weight": 0.4089
+      "source": "frontend/src/auth.ts::signOut",
+      "target": "frontend/src/data/useStatusSubscription.ts::useStatusSubscription",
+      "weight": 0.4146
     },
     {
       "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/DimensionRegistryView.tsx::default",
-      "target": "frontend/src/views/PredictionView.tsx::default",
-      "weight": 0.4068
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/CaseSourcing.tsx::default",
-      "target": "frontend/src/views/DimensionRegistryView.tsx::default",
+      "source": "frontend/src/views/DiscoveryView.tsx::default",
+      "target": "frontend/src/views/ManagementView.tsx::default",
       "weight": 0.4044
     },
     {
       "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/ResearchView.tsx::default",
-      "target": "frontend/src/views/SourcesView.tsx::default",
-      "weight": 0.4036
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/DiscoveryView.tsx::default",
-      "target": "frontend/src/views/SourcesView.tsx::default",
-      "weight": 0.4034
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/PredictionView.tsx::default",
-      "target": "frontend/src/views/ResearchView.tsx::default",
-      "weight": 0.4031
-    },
-    {
-      "dominantSignal": "typeSignature",
       "source": "frontend/src/views/CaseSourcing.tsx::default",
-      "target": "frontend/src/views/ResearchView.tsx::default",
-      "weight": 0.4012
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/CaseSourcing.tsx::default",
-      "target": "frontend/src/views/PolicyExplorer.tsx::default",
-      "weight": 0.401
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/DiscoveryView.tsx::default",
-      "target": "frontend/src/views/PredictionView.tsx::default",
-      "weight": 0.3994
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/ConvergenceMatrix.tsx::default",
-      "target": "frontend/src/views/PredictionView.tsx::default",
-      "weight": 0.3984
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/PredictionView.tsx::default",
       "target": "frontend/src/views/TaxonomyView.tsx::default",
-      "weight": 0.3979
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/CaseSourcing.tsx::default",
-      "target": "frontend/src/views/DiscoveryView.tsx::default",
-      "weight": 0.3976
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/PolicyExplorer.tsx::default",
-      "target": "frontend/src/views/SourcesView.tsx::default",
-      "weight": 0.3976
+      "weight": 0.4004
     },
     {
       "dominantSignal": "typeSignature",
       "source": "frontend/src/views/DetectionView.tsx::default",
-      "target": "frontend/src/views/PolicyExplorer.tsx::default",
-      "weight": 0.3941
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/DimensionRegistryView.tsx::default",
-      "target": "frontend/src/views/SourcesView.tsx::default",
-      "weight": 0.3928
+      "target": "frontend/src/views/PredictionView.tsx::default",
+      "weight": 0.3946
     },
     {
       "dominantSignal": "typeSignature",
       "source": "frontend/src/views/ConvergenceMatrix.tsx::default",
-      "target": "frontend/src/views/SourcesView.tsx::default",
-      "weight": 0.3901
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/SourcesView.tsx::default",
-      "target": "frontend/src/views/TaxonomyView.tsx::default",
+      "target": "frontend/src/views/PolicyExplorer.tsx::default",
       "weight": 0.3856
     },
     {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/ConvergenceMatrix.tsx::default",
-      "target": "frontend/src/views/DetectionView.tsx::default",
-      "weight": 0.385
+      "dominantSignal": "behavior",
+      "source": "frontend/src/auth.ts::getSession",
+      "target": "frontend/src/data/usePipelineSelectors.ts::useError",
+      "weight": 0.3842
     },
     {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/DimensionRegistryView.tsx::default",
-      "target": "frontend/src/views/ManagementView.tsx::default",
-      "weight": 0.3848
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/DimensionRegistryView.tsx::default",
-      "target": "frontend/src/views/TaxonomyView.tsx::default",
-      "weight": 0.3844
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/DimensionRegistryView.tsx::default",
-      "target": "frontend/src/views/PolicyExplorer.tsx::default",
-      "weight": 0.3833
+      "dominantSignal": "consumerSet",
+      "source": "frontend/src/auth.ts::getSession",
+      "target": "frontend/src/data/usePipelineSelectors.ts::useLoading",
+      "weight": 0.3811
     },
     {
       "dominantSignal": "typeSignature",
       "source": "frontend/src/views/ResearchView.tsx::default",
       "target": "frontend/src/views/TaxonomyView.tsx::default",
-      "weight": 0.3803
+      "weight": 0.3634
     },
     {
       "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/PolicyExplorer.tsx::default",
-      "target": "frontend/src/views/ResearchView.tsx::default",
-      "weight": 0.3798
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/PolicyExplorer.tsx::default",
+      "source": "frontend/src/views/ConvergenceMatrix.tsx::default",
       "target": "frontend/src/views/TaxonomyView.tsx::default",
-      "weight": 0.378
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/DiscoveryView.tsx::default",
-      "target": "frontend/src/views/TaxonomyView.tsx::default",
-      "weight": 0.3776
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/DiscoveryView.tsx::default",
-      "target": "frontend/src/views/PolicyExplorer.tsx::default",
-      "weight": 0.3744
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/DetectionView.tsx::default",
-      "target": "frontend/src/views/ManagementView.tsx::default",
-      "weight": 0.371
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/ManagementView.tsx::default",
-      "target": "frontend/src/views/SourcesView.tsx::default",
-      "weight": 0.3709
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/ManagementView.tsx::default",
-      "target": "frontend/src/views/TaxonomyView.tsx::default",
-      "weight": 0.3632
+      "weight": 0.3627
     },
     {
       "dominantSignal": "typeSignature",
       "source": "frontend/src/views/CaseSourcing.tsx::default",
-      "target": "frontend/src/views/ManagementView.tsx::default",
-      "weight": 0.3588
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/App.tsx::default",
-      "target": "frontend/src/views/ResearchView.tsx::default",
-      "weight": 0.3585
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/Dashboard.tsx::default",
-      "target": "frontend/src/views/SourcesView.tsx::default",
-      "weight": 0.3577
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/App.tsx::default",
-      "target": "frontend/src/views/DiscoveryView.tsx::default",
-      "weight": 0.3568
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/ConvergenceMatrix.tsx::default",
-      "target": "frontend/src/views/ResearchView.tsx::default",
-      "weight": 0.3567
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/Dashboard.tsx::default",
       "target": "frontend/src/views/PolicyExplorer.tsx::default",
-      "weight": 0.3565
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/ManagementView.tsx::default",
-      "target": "frontend/src/views/PolicyExplorer.tsx::default",
-      "weight": 0.3565
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/ConvergenceMatrix.tsx::default",
-      "target": "frontend/src/views/Dashboard.tsx::default",
-      "weight": 0.3563
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/ConvergenceMatrix.tsx::default",
-      "target": "frontend/src/views/DimensionRegistryView.tsx::default",
-      "weight": 0.3563
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/ManagementView.tsx::default",
-      "target": "frontend/src/views/PredictionView.tsx::default",
-      "weight": 0.356
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/Dashboard.tsx::default",
-      "target": "frontend/src/views/PredictionView.tsx::default",
-      "weight": 0.3539
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/CaseSourcing.tsx::default",
-      "target": "frontend/src/views/Dashboard.tsx::default",
-      "weight": 0.3538
-    },
-    {
-      "dominantSignal": "typeSignature",
-      "source": "frontend/src/views/ConvergenceMatrix.tsx::default",
-      "target": "frontend/src/views/DiscoveryView.tsx::default",
-      "weight": 0.3509
+      "weight": 0.3504
     }
   ],
   "nodes": [
-    {
-      "cluster": "cluster-001",
-      "filePath": "frontend/src/App.tsx",
-      "id": "frontend/src/App.tsx::default",
-      "kind": "function",
-      "name": "default"
-    },
     {
       "cluster": "cluster-003",
       "filePath": "frontend/src/auth.ts",
@@ -401,7 +118,7 @@
       "name": "getSession"
     },
     {
-      "cluster": "cluster-004",
+      "cluster": "cluster-005",
       "filePath": "frontend/src/auth.ts",
       "id": "frontend/src/auth.ts::signOut",
       "kind": "function",
@@ -422,7 +139,7 @@
       "name": "useLoading"
     },
     {
-      "cluster": "cluster-004",
+      "cluster": "cluster-005",
       "filePath": "frontend/src/data/useStatusSubscription.ts",
       "id": "frontend/src/data/useStatusSubscription.ts::useStatusSubscription",
       "kind": "hook",
@@ -443,21 +160,21 @@
       "name": "default"
     },
     {
-      "cluster": "cluster-002",
+      "cluster": "cluster-001",
       "filePath": "frontend/src/views/Dashboard.tsx",
       "id": "frontend/src/views/Dashboard.tsx::default",
       "kind": "function",
       "name": "default"
     },
     {
-      "cluster": "cluster-001",
+      "cluster": "cluster-004",
       "filePath": "frontend/src/views/DetectionView.tsx",
       "id": "frontend/src/views/DetectionView.tsx::default",
       "kind": "function",
       "name": "default"
     },
     {
-      "cluster": "cluster-001",
+      "cluster": "cluster-002",
       "filePath": "frontend/src/views/DimensionRegistryView.tsx",
       "id": "frontend/src/views/DimensionRegistryView.tsx::default",
       "kind": "function",
@@ -478,14 +195,14 @@
       "name": "default"
     },
     {
-      "cluster": "cluster-002",
+      "cluster": "cluster-004",
       "filePath": "frontend/src/views/PolicyExplorer.tsx",
       "id": "frontend/src/views/PolicyExplorer.tsx::default",
       "kind": "function",
       "name": "default"
     },
     {
-      "cluster": "cluster-002",
+      "cluster": "cluster-004",
       "filePath": "frontend/src/views/PredictionView.tsx",
       "id": "frontend/src/views/PredictionView.tsx::default",
       "kind": "function",
@@ -499,14 +216,14 @@
       "name": "default"
     },
     {
-      "cluster": "cluster-002",
+      "cluster": "cluster-001",
       "filePath": "frontend/src/views/SourcesView.tsx",
       "id": "frontend/src/views/SourcesView.tsx::default",
       "kind": "function",
       "name": "default"
     },
     {
-      "cluster": "cluster-001",
+      "cluster": "cluster-002",
       "filePath": "frontend/src/views/TaxonomyView.tsx",
       "id": "frontend/src/views/TaxonomyView.tsx::default",
       "kind": "function",

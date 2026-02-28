@@ -1,10 +1,10 @@
 {
   "metadata": {
     "projectRoot": "/home/tsonu/src/svap",
-    "timestamp": "2026-02-28T09:17:19.787Z",
+    "timestamp": "2026-02-28T09:54:48.962Z",
     "unitCount": 97,
     "fileCount": 25,
-    "extractionTimeMs": 761
+    "extractionTimeMs": 1179
   },
   "units": [
     {
@@ -903,6 +903,16 @@
           "ratio": 0.4
         },
         {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePolicies",
+          "count": 2,
+          "ratio": 0.4
+        },
+        {
+          "unitId": "frontend/src/types.ts::RiskLevel",
+          "count": 2,
+          "ratio": 0.4
+        },
+        {
           "unitId": "frontend/src/types.ts::StageStatus",
           "count": 1,
           "ratio": 0.2
@@ -938,11 +948,6 @@
           "ratio": 0.2
         },
         {
-          "unitId": "frontend/src/data/pipelineStore.ts::usePipelineStore",
-          "count": 1,
-          "ratio": 0.2
-        },
-        {
           "unitId": "frontend/src/data/usePipelineSelectors.ts::useApproveStage",
           "count": 1,
           "ratio": 0.2
@@ -963,12 +968,7 @@
           "ratio": 0.2
         },
         {
-          "unitId": "frontend/src/types.ts::SourceCandidate",
-          "count": 1,
-          "ratio": 0.2
-        },
-        {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useFetchDiscovery",
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useCases",
           "count": 1,
           "ratio": 0.2
         }
@@ -1074,11 +1074,6 @@
           "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/data/pipelineStore.ts::usePipelineStore",
-          "count": 1,
-          "ratio": 0.5
-        },
-        {
           "unitId": "frontend/src/data/usePipelineSelectors.ts::useRefresh",
           "count": 1,
           "ratio": 0.5
@@ -1114,17 +1109,22 @@
           "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/types.ts::RiskLevel",
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useCases",
           "count": 1,
           "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/utils.ts::scoreLevel",
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useTaxonomy",
           "count": 1,
           "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/utils.ts::scoreColor",
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePolicies",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useThreshold",
           "count": 1,
           "ratio": 0.5
         }
@@ -1173,9 +1173,12 @@
         "frontend/src/components/SharedUI.tsx::RiskBadge",
         "frontend/src/components/SharedUI.tsx::StageDot",
         "frontend/src/components/SharedUI.tsx::ErrorBanner",
-        "frontend/src/views/DetectionView.tsx::default"
+        "frontend/src/views/DetectionView.tsx::default",
+        "frontend/src/views/DimensionRegistryView.tsx::default",
+        "frontend/src/views/DiscoveryView.tsx::default",
+        "frontend/src/views/ResearchView.tsx::default"
       ],
-      "consumerCount": 8,
+      "consumerCount": 11,
       "consumerKinds": [
         "component",
         "function"
@@ -1185,39 +1188,104 @@
       ],
       "coOccurrences": [
         {
-          "unitId": "frontend/src/types.ts::StageStatus",
-          "count": 1,
-          "ratio": 0.5
-        },
-        {
-          "unitId": "frontend/src/utils.ts::scoreLevel",
-          "count": 1,
-          "ratio": 0.5
-        },
-        {
-          "unitId": "frontend/src/utils.ts::scoreColor",
-          "count": 1,
-          "ratio": 0.5
-        },
-        {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useQuality",
-          "count": 1,
-          "ratio": 0.5
-        },
-        {
-          "unitId": "frontend/src/types.ts::DetectionPattern",
-          "count": 1,
-          "ratio": 0.5
-        },
-        {
           "unitId": "frontend/src/components/SharedUI.tsx::Badge",
-          "count": 1,
-          "ratio": 0.5
+          "count": 4,
+          "ratio": 0.8
         },
         {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useDetectionPatterns",
+          "unitId": "frontend/src/hooks.ts::useAsyncAction",
+          "count": 2,
+          "ratio": 0.4
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::ErrorBanner",
+          "count": 2,
+          "ratio": 0.4
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::QualityTags",
+          "count": 2,
+          "ratio": 0.4
+        },
+        {
+          "unitId": "frontend/src/types.ts::SourceFeed",
           "count": 1,
-          "ratio": 0.5
+          "ratio": 0.2
+        },
+        {
+          "unitId": "frontend/src/types.ts::SourceCandidate",
+          "count": 1,
+          "ratio": 0.2
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useFetchDiscovery",
+          "count": 1,
+          "ratio": 0.2
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRunDiscoveryFeeds",
+          "count": 1,
+          "ratio": 0.2
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useReviewCandidate",
+          "count": 1,
+          "ratio": 0.2
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useSourceFeeds",
+          "count": 1,
+          "ratio": 0.2
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useSourceCandidates",
+          "count": 1,
+          "ratio": 0.2
+        },
+        {
+          "unitId": "frontend/src/types.ts::TriageResult",
+          "count": 1,
+          "ratio": 0.2
+        },
+        {
+          "unitId": "frontend/src/types.ts::StructuralFinding",
+          "count": 1,
+          "ratio": 0.2
+        },
+        {
+          "unitId": "frontend/src/types.ts::QualityAssessment",
+          "count": 1,
+          "ratio": 0.2
+        },
+        {
+          "unitId": "frontend/src/types.ts::ResearchSession",
+          "count": 1,
+          "ratio": 0.2
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::QualityTag",
+          "count": 1,
+          "ratio": 0.2
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useFetchTriageResults",
+          "count": 1,
+          "ratio": 0.2
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRunTriage",
+          "count": 1,
+          "ratio": 0.2
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRunDeepResearch",
+          "count": 1,
+          "ratio": 0.2
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useFetchResearchSessions",
+          "count": 1,
+          "ratio": 0.2
         }
       ],
       "isAsync": false,
@@ -1522,12 +1590,17 @@
       ],
       "coOccurrences": [
         {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useCases",
+          "count": 4,
+          "ratio": 1
+        },
+        {
           "unitId": "frontend/src/utils.ts::formatDollars",
           "count": 3,
           "ratio": 0.75
         },
         {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useCases",
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useTaxonomy",
           "count": 3,
           "ratio": 0.75
         },
@@ -1542,12 +1615,17 @@
           "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/types.ts::Quality",
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePolicies",
           "count": 2,
           "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useTaxonomy",
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useThreshold",
+          "count": 2,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/types.ts::Quality",
           "count": 2,
           "ratio": 0.5
         },
@@ -1582,11 +1660,6 @@
           "ratio": 0.25
         },
         {
-          "unitId": "frontend/src/data/pipelineStore.ts::usePipelineStore",
-          "count": 1,
-          "ratio": 0.25
-        },
-        {
           "unitId": "frontend/src/data/usePipelineSelectors.ts::useRefresh",
           "count": 1,
           "ratio": 0.25
@@ -1613,11 +1686,6 @@
         },
         {
           "unitId": "frontend/src/data/usePipelineSelectors.ts::useApiAvailable",
-          "count": 1,
-          "ratio": 0.25
-        },
-        {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRunId",
           "count": 1,
           "ratio": 0.25
         }
@@ -1834,6 +1902,26 @@
           "ratio": 1
         },
         {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useCases",
+          "count": 2,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useTaxonomy",
+          "count": 2,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePolicies",
+          "count": 2,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useThreshold",
+          "count": 2,
+          "ratio": 1
+        },
+        {
           "unitId": "frontend/src/hooks.ts::useAsyncAction",
           "count": 1,
           "ratio": 0.5
@@ -1869,11 +1957,6 @@
           "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/data/pipelineStore.ts::usePipelineStore",
-          "count": 1,
-          "ratio": 0.5
-        },
-        {
           "unitId": "frontend/src/data/usePipelineSelectors.ts::useRefresh",
           "count": 1,
           "ratio": 0.5
@@ -1905,21 +1988,6 @@
         },
         {
           "unitId": "frontend/src/data/usePipelineSelectors.ts::useRunId",
-          "count": 1,
-          "ratio": 0.5
-        },
-        {
-          "unitId": "frontend/src/types.ts::Quality",
-          "count": 1,
-          "ratio": 0.5
-        },
-        {
-          "unitId": "frontend/src/utils.ts::scoreColor",
-          "count": 1,
-          "ratio": 0.5
-        },
-        {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useCases",
           "count": 1,
           "ratio": 0.5
         }
@@ -2469,116 +2537,6 @@
       "chainPatterns": [],
       "consumers": [
         "frontend/src/data/pipelineStore.ts::PipelineStore",
-        "frontend/src/data/pipelineStore.ts::usePipelineStore"
-      ],
-      "consumerCount": 2,
-      "consumerKinds": [
-        "constant",
-        "type"
-      ],
-      "consumerDirectories": [
-        "frontend/src"
-      ],
-      "coOccurrences": [
-        {
-          "unitId": "frontend/src/types.ts::PipelineStageStatus",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/types.ts::Counts",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/types.ts::Quality",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/types.ts::FallbackData",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/types.ts::SourceCandidate",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/types.ts::Dimension",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/types.ts::TriageResult",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/types.ts::StructuralFinding",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/types.ts::QualityAssessment",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/types.ts::ResearchSession",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/data/api.ts::apiPost",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/data/api.ts::apiGet",
-          "count": 1,
-          "ratio": 1
-        }
-      ],
-      "isAsync": false,
-      "hasErrorHandling": false,
-      "hasLoadingState": false,
-      "hasEmptyState": false,
-      "hasRetryLogic": false,
-      "rendersIteration": false,
-      "rendersConditional": false,
-      "sideEffects": false
-    },
-    {
-      "id": "frontend/src/types.ts::SourceCandidate",
-      "name": "SourceCandidate",
-      "kind": "type",
-      "filePath": "frontend/src/types.ts",
-      "lineRange": [
-        138,
-        148
-      ],
-      "sourceCode": "export interface SourceCandidate {\n  candidate_id: string;\n  feed_id: string;\n  title: string;\n  url: string;\n  status: string;\n  richness_score: number | null;\n  richness_rationale: string | null;\n  estimated_cases: number | null;\n  discovered_at: string;\n}",
-      "parameters": [],
-      "returnType": "unknown",
-      "generics": [],
-      "jsxTree": null,
-      "jsxLeafElements": [],
-      "jsxDepth": 0,
-      "hookCalls": [],
-      "customHookCalls": [],
-      "stateVariableCount": 0,
-      "imports": [],
-      "storeAccess": [],
-      "dataSourceAccess": [],
-      "callees": [],
-      "calleeSequence": {},
-      "callDepth": 0,
-      "uniqueCallees": 0,
-      "chainPatterns": [],
-      "consumers": [
-        "frontend/src/data/pipelineStore.ts::PipelineStore",
         "frontend/src/data/pipelineStore.ts::usePipelineStore",
         "frontend/src/views/DiscoveryView.tsx::default"
       ],
@@ -2593,7 +2551,17 @@
       ],
       "coOccurrences": [
         {
+          "unitId": "frontend/src/types.ts::SourceCandidate",
+          "count": 2,
+          "ratio": 1
+        },
+        {
           "unitId": "frontend/src/hooks.ts::useAsyncAction",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/types.ts::RiskLevel",
           "count": 1,
           "ratio": 0.5
         },
@@ -2653,7 +2621,154 @@
           "ratio": 0.5
         },
         {
+          "unitId": "frontend/src/types.ts::Dimension",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/types.ts::TriageResult",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/types.ts::StructuralFinding",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/types.ts::QualityAssessment",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/types.ts::ResearchSession",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/api.ts::apiPost",
+          "count": 1,
+          "ratio": 0.5
+        }
+      ],
+      "isAsync": false,
+      "hasErrorHandling": false,
+      "hasLoadingState": false,
+      "hasEmptyState": false,
+      "hasRetryLogic": false,
+      "rendersIteration": false,
+      "rendersConditional": false,
+      "sideEffects": false
+    },
+    {
+      "id": "frontend/src/types.ts::SourceCandidate",
+      "name": "SourceCandidate",
+      "kind": "type",
+      "filePath": "frontend/src/types.ts",
+      "lineRange": [
+        138,
+        148
+      ],
+      "sourceCode": "export interface SourceCandidate {\n  candidate_id: string;\n  feed_id: string;\n  title: string;\n  url: string;\n  status: string;\n  richness_score: number | null;\n  richness_rationale: string | null;\n  estimated_cases: number | null;\n  discovered_at: string;\n}",
+      "parameters": [],
+      "returnType": "unknown",
+      "generics": [],
+      "jsxTree": null,
+      "jsxLeafElements": [],
+      "jsxDepth": 0,
+      "hookCalls": [],
+      "customHookCalls": [],
+      "stateVariableCount": 0,
+      "imports": [],
+      "storeAccess": [],
+      "dataSourceAccess": [],
+      "callees": [],
+      "calleeSequence": {},
+      "callDepth": 0,
+      "uniqueCallees": 0,
+      "chainPatterns": [],
+      "consumers": [
+        "frontend/src/data/pipelineStore.ts::PipelineStore",
+        "frontend/src/data/pipelineStore.ts::usePipelineStore",
+        "frontend/src/views/DiscoveryView.tsx::default"
+      ],
+      "consumerCount": 3,
+      "consumerKinds": [
+        "constant",
+        "function",
+        "type"
+      ],
+      "consumerDirectories": [
+        "frontend/src"
+      ],
+      "coOccurrences": [
+        {
           "unitId": "frontend/src/types.ts::SourceFeed",
+          "count": 2,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/hooks.ts::useAsyncAction",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/types.ts::RiskLevel",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::Badge",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::ErrorBanner",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useFetchDiscovery",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRunDiscoveryFeeds",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useReviewCandidate",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useSourceFeeds",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useSourceCandidates",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/types.ts::PipelineStageStatus",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/types.ts::Counts",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/types.ts::Quality",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/types.ts::FallbackData",
           "count": 1,
           "ratio": 0.5
         },
@@ -2684,11 +2799,6 @@
         },
         {
           "unitId": "frontend/src/data/api.ts::apiPost",
-          "count": 1,
-          "ratio": 0.5
-        },
-        {
-          "unitId": "frontend/src/data/api.ts::apiGet",
           "count": 1,
           "ratio": 0.5
         }
@@ -2731,11 +2841,13 @@
       "chainPatterns": [],
       "consumers": [
         "frontend/src/data/pipelineStore.ts::PipelineStore",
-        "frontend/src/data/pipelineStore.ts::usePipelineStore"
+        "frontend/src/data/pipelineStore.ts::usePipelineStore",
+        "frontend/src/views/DimensionRegistryView.tsx::default"
       ],
-      "consumerCount": 2,
+      "consumerCount": 3,
       "consumerKinds": [
         "constant",
+        "function",
         "type"
       ],
       "consumerDirectories": [
@@ -2743,64 +2855,89 @@
       ],
       "coOccurrences": [
         {
+          "unitId": "frontend/src/types.ts::RiskLevel",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::Badge",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::QualityTags",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useFetchDimensions",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useDimensions",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
           "unitId": "frontend/src/types.ts::PipelineStageStatus",
           "count": 1,
-          "ratio": 1
+          "ratio": 0.5
         },
         {
           "unitId": "frontend/src/types.ts::Counts",
           "count": 1,
-          "ratio": 1
+          "ratio": 0.5
         },
         {
           "unitId": "frontend/src/types.ts::Quality",
           "count": 1,
-          "ratio": 1
+          "ratio": 0.5
         },
         {
           "unitId": "frontend/src/types.ts::FallbackData",
           "count": 1,
-          "ratio": 1
+          "ratio": 0.5
         },
         {
           "unitId": "frontend/src/types.ts::SourceFeed",
           "count": 1,
-          "ratio": 1
+          "ratio": 0.5
         },
         {
           "unitId": "frontend/src/types.ts::SourceCandidate",
           "count": 1,
-          "ratio": 1
+          "ratio": 0.5
         },
         {
           "unitId": "frontend/src/types.ts::TriageResult",
           "count": 1,
-          "ratio": 1
+          "ratio": 0.5
         },
         {
           "unitId": "frontend/src/types.ts::StructuralFinding",
           "count": 1,
-          "ratio": 1
+          "ratio": 0.5
         },
         {
           "unitId": "frontend/src/types.ts::QualityAssessment",
           "count": 1,
-          "ratio": 1
+          "ratio": 0.5
         },
         {
           "unitId": "frontend/src/types.ts::ResearchSession",
           "count": 1,
-          "ratio": 1
+          "ratio": 0.5
         },
         {
           "unitId": "frontend/src/data/api.ts::apiPost",
           "count": 1,
-          "ratio": 1
+          "ratio": 0.5
         },
         {
           "unitId": "frontend/src/data/api.ts::apiGet",
           "count": 1,
-          "ratio": 1
+          "ratio": 0.5
         }
       ],
       "isAsync": false,
@@ -2841,116 +2978,6 @@
       "chainPatterns": [],
       "consumers": [
         "frontend/src/data/pipelineStore.ts::PipelineStore",
-        "frontend/src/data/pipelineStore.ts::usePipelineStore"
-      ],
-      "consumerCount": 2,
-      "consumerKinds": [
-        "constant",
-        "type"
-      ],
-      "consumerDirectories": [
-        "frontend/src"
-      ],
-      "coOccurrences": [
-        {
-          "unitId": "frontend/src/types.ts::PipelineStageStatus",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/types.ts::Counts",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/types.ts::Quality",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/types.ts::FallbackData",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/types.ts::SourceFeed",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/types.ts::SourceCandidate",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/types.ts::Dimension",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/types.ts::StructuralFinding",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/types.ts::QualityAssessment",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/types.ts::ResearchSession",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/data/api.ts::apiPost",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/data/api.ts::apiGet",
-          "count": 1,
-          "ratio": 1
-        }
-      ],
-      "isAsync": false,
-      "hasErrorHandling": false,
-      "hasLoadingState": false,
-      "hasEmptyState": false,
-      "hasRetryLogic": false,
-      "rendersIteration": false,
-      "rendersConditional": false,
-      "sideEffects": false
-    },
-    {
-      "id": "frontend/src/types.ts::StructuralFinding",
-      "name": "StructuralFinding",
-      "kind": "type",
-      "filePath": "frontend/src/types.ts",
-      "lineRange": [
-        167,
-        176
-      ],
-      "sourceCode": "export interface StructuralFinding {\n  finding_id: string;\n  policy_id: string;\n  dimension_id: string;\n  observation: string;\n  source_type: string;\n  source_citation: string;\n  confidence: string;\n  status: string;\n}",
-      "parameters": [],
-      "returnType": "unknown",
-      "generics": [],
-      "jsxTree": null,
-      "jsxLeafElements": [],
-      "jsxDepth": 0,
-      "hookCalls": [],
-      "customHookCalls": [],
-      "stateVariableCount": 0,
-      "imports": [],
-      "storeAccess": [],
-      "dataSourceAccess": [],
-      "callees": [],
-      "calleeSequence": {},
-      "callDepth": 0,
-      "uniqueCallees": 0,
-      "chainPatterns": [],
-      "consumers": [
-        "frontend/src/data/pipelineStore.ts::PipelineStore",
         "frontend/src/data/pipelineStore.ts::usePipelineStore",
         "frontend/src/views/ResearchView.tsx::default"
       ],
@@ -2965,12 +2992,27 @@
       ],
       "coOccurrences": [
         {
+          "unitId": "frontend/src/types.ts::StructuralFinding",
+          "count": 2,
+          "ratio": 1
+        },
+        {
           "unitId": "frontend/src/types.ts::QualityAssessment",
           "count": 2,
           "ratio": 1
         },
         {
+          "unitId": "frontend/src/types.ts::ResearchSession",
+          "count": 2,
+          "ratio": 1
+        },
+        {
           "unitId": "frontend/src/hooks.ts::useAsyncAction",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/types.ts::RiskLevel",
           "count": 1,
           "ratio": 0.5
         },
@@ -3048,19 +3090,156 @@
           "unitId": "frontend/src/types.ts::Counts",
           "count": 1,
           "ratio": 0.5
+        }
+      ],
+      "isAsync": false,
+      "hasErrorHandling": false,
+      "hasLoadingState": false,
+      "hasEmptyState": false,
+      "hasRetryLogic": false,
+      "rendersIteration": false,
+      "rendersConditional": false,
+      "sideEffects": false
+    },
+    {
+      "id": "frontend/src/types.ts::StructuralFinding",
+      "name": "StructuralFinding",
+      "kind": "type",
+      "filePath": "frontend/src/types.ts",
+      "lineRange": [
+        167,
+        176
+      ],
+      "sourceCode": "export interface StructuralFinding {\n  finding_id: string;\n  policy_id: string;\n  dimension_id: string;\n  observation: string;\n  source_type: string;\n  source_citation: string;\n  confidence: string;\n  status: string;\n}",
+      "parameters": [],
+      "returnType": "unknown",
+      "generics": [],
+      "jsxTree": null,
+      "jsxLeafElements": [],
+      "jsxDepth": 0,
+      "hookCalls": [],
+      "customHookCalls": [],
+      "stateVariableCount": 0,
+      "imports": [],
+      "storeAccess": [],
+      "dataSourceAccess": [],
+      "callees": [],
+      "calleeSequence": {},
+      "callDepth": 0,
+      "uniqueCallees": 0,
+      "chainPatterns": [],
+      "consumers": [
+        "frontend/src/data/pipelineStore.ts::PipelineStore",
+        "frontend/src/data/pipelineStore.ts::usePipelineStore",
+        "frontend/src/views/ResearchView.tsx::default"
+      ],
+      "consumerCount": 3,
+      "consumerKinds": [
+        "constant",
+        "function",
+        "type"
+      ],
+      "consumerDirectories": [
+        "frontend/src"
+      ],
+      "coOccurrences": [
+        {
+          "unitId": "frontend/src/types.ts::TriageResult",
+          "count": 2,
+          "ratio": 1
         },
         {
-          "unitId": "frontend/src/types.ts::Quality",
+          "unitId": "frontend/src/types.ts::QualityAssessment",
+          "count": 2,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/types.ts::ResearchSession",
+          "count": 2,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/hooks.ts::useAsyncAction",
           "count": 1,
           "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/types.ts::FallbackData",
+          "unitId": "frontend/src/types.ts::RiskLevel",
           "count": 1,
           "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/types.ts::SourceFeed",
+          "unitId": "frontend/src/components/SharedUI.tsx::Badge",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::QualityTag",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::QualityTags",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::ErrorBanner",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useFetchTriageResults",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRunTriage",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRunDeepResearch",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useFetchResearchSessions",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useFetchFindings",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useFetchAssessments",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePolicies",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useTriageResults",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useResearchSessions",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/types.ts::PipelineStageStatus",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/types.ts::Counts",
           "count": 1,
           "ratio": 0.5
         }
@@ -3117,12 +3296,27 @@
       ],
       "coOccurrences": [
         {
+          "unitId": "frontend/src/types.ts::TriageResult",
+          "count": 2,
+          "ratio": 1
+        },
+        {
           "unitId": "frontend/src/types.ts::StructuralFinding",
           "count": 2,
           "ratio": 1
         },
         {
+          "unitId": "frontend/src/types.ts::ResearchSession",
+          "count": 2,
+          "ratio": 1
+        },
+        {
           "unitId": "frontend/src/hooks.ts::useAsyncAction",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/types.ts::RiskLevel",
           "count": 1,
           "ratio": 0.5
         },
@@ -3200,21 +3394,6 @@
           "unitId": "frontend/src/types.ts::Counts",
           "count": 1,
           "ratio": 0.5
-        },
-        {
-          "unitId": "frontend/src/types.ts::Quality",
-          "count": 1,
-          "ratio": 0.5
-        },
-        {
-          "unitId": "frontend/src/types.ts::FallbackData",
-          "count": 1,
-          "ratio": 0.5
-        },
-        {
-          "unitId": "frontend/src/types.ts::SourceFeed",
-          "count": 1,
-          "ratio": 0.5
         }
       ],
       "isAsync": false,
@@ -3255,11 +3434,13 @@
       "chainPatterns": [],
       "consumers": [
         "frontend/src/data/pipelineStore.ts::PipelineStore",
-        "frontend/src/data/pipelineStore.ts::usePipelineStore"
+        "frontend/src/data/pipelineStore.ts::usePipelineStore",
+        "frontend/src/views/ResearchView.tsx::default"
       ],
-      "consumerCount": 2,
+      "consumerCount": 3,
       "consumerKinds": [
         "constant",
+        "function",
         "type"
       ],
       "consumerDirectories": [
@@ -3267,64 +3448,104 @@
       ],
       "coOccurrences": [
         {
-          "unitId": "frontend/src/types.ts::PipelineStageStatus",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/types.ts::Counts",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/types.ts::Quality",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/types.ts::FallbackData",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/types.ts::SourceFeed",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/types.ts::SourceCandidate",
-          "count": 1,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/types.ts::Dimension",
-          "count": 1,
-          "ratio": 1
-        },
-        {
           "unitId": "frontend/src/types.ts::TriageResult",
-          "count": 1,
+          "count": 2,
           "ratio": 1
         },
         {
           "unitId": "frontend/src/types.ts::StructuralFinding",
-          "count": 1,
+          "count": 2,
           "ratio": 1
         },
         {
           "unitId": "frontend/src/types.ts::QualityAssessment",
-          "count": 1,
+          "count": 2,
           "ratio": 1
         },
         {
-          "unitId": "frontend/src/data/api.ts::apiPost",
+          "unitId": "frontend/src/hooks.ts::useAsyncAction",
           "count": 1,
-          "ratio": 1
+          "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/data/api.ts::apiGet",
+          "unitId": "frontend/src/types.ts::RiskLevel",
           "count": 1,
-          "ratio": 1
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::Badge",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::QualityTag",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::QualityTags",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::ErrorBanner",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useFetchTriageResults",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRunTriage",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRunDeepResearch",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useFetchResearchSessions",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useFetchFindings",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useFetchAssessments",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePolicies",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useTriageResults",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useResearchSessions",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/types.ts::PipelineStageStatus",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/types.ts::Counts",
+          "count": 1,
+          "ratio": 0.5
         }
       ],
       "isAsync": false,
@@ -3619,6 +3840,11 @@
           "ratio": 1
         },
         {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useCases",
+          "count": 3,
+          "ratio": 1
+        },
+        {
           "unitId": "frontend/src/types.ts::Policy",
           "count": 2,
           "ratio": 0.6666666666666666
@@ -3629,7 +3855,17 @@
           "ratio": 0.6666666666666666
         },
         {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useCases",
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useTaxonomy",
+          "count": 2,
+          "ratio": 0.6666666666666666
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePolicies",
+          "count": 2,
+          "ratio": 0.6666666666666666
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useThreshold",
           "count": 2,
           "ratio": 0.6666666666666666
         },
@@ -3660,11 +3896,6 @@
         },
         {
           "unitId": "frontend/src/components/SharedUI.tsx::ErrorBanner",
-          "count": 1,
-          "ratio": 0.3333333333333333
-        },
-        {
-          "unitId": "frontend/src/data/pipelineStore.ts::usePipelineStore",
           "count": 1,
           "ratio": 0.3333333333333333
         },
@@ -3700,16 +3931,6 @@
         },
         {
           "unitId": "frontend/src/data/usePipelineSelectors.ts::useRunId",
-          "count": 1,
-          "ratio": 0.3333333333333333
-        },
-        {
-          "unitId": "frontend/src/types.ts::EnforcementSource",
-          "count": 1,
-          "ratio": 0.3333333333333333
-        },
-        {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useEnforcementSources",
           "count": 1,
           "ratio": 0.3333333333333333
         }
@@ -3811,6 +4032,11 @@
       ],
       "coOccurrences": [
         {
+          "unitId": "frontend/src/types.ts::RiskLevel",
+          "count": 4,
+          "ratio": 0.6666666666666666
+        },
+        {
           "unitId": "frontend/src/hooks.ts::useAsyncAction",
           "count": 3,
           "ratio": 0.5
@@ -3824,6 +4050,11 @@
           "unitId": "frontend/src/components/SharedUI.tsx::QualityTags",
           "count": 3,
           "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/types.ts::SourceFeed",
+          "count": 1,
+          "ratio": 0.16666666666666666
         },
         {
           "unitId": "frontend/src/types.ts::SourceCandidate",
@@ -3881,6 +4112,11 @@
           "ratio": 0.16666666666666666
         },
         {
+          "unitId": "frontend/src/types.ts::TriageResult",
+          "count": 1,
+          "ratio": 0.16666666666666666
+        },
+        {
           "unitId": "frontend/src/types.ts::StructuralFinding",
           "count": 1,
           "ratio": 0.16666666666666666
@@ -3891,22 +4127,7 @@
           "ratio": 0.16666666666666666
         },
         {
-          "unitId": "frontend/src/components/SharedUI.tsx::QualityTag",
-          "count": 1,
-          "ratio": 0.16666666666666666
-        },
-        {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useFetchTriageResults",
-          "count": 1,
-          "ratio": 0.16666666666666666
-        },
-        {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRunTriage",
-          "count": 1,
-          "ratio": 0.16666666666666666
-        },
-        {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRunDeepResearch",
+          "unitId": "frontend/src/types.ts::ResearchSession",
           "count": 1,
           "ratio": 0.16666666666666666
         }
@@ -4055,6 +4276,16 @@
           "ratio": 0.6666666666666666
         },
         {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePolicies",
+          "count": 2,
+          "ratio": 0.6666666666666666
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useThreshold",
+          "count": 2,
+          "ratio": 0.6666666666666666
+        },
+        {
           "unitId": "frontend/src/hooks.ts::useAsyncAction",
           "count": 1,
           "ratio": 0.3333333333333333
@@ -4086,11 +4317,6 @@
         },
         {
           "unitId": "frontend/src/components/SharedUI.tsx::ErrorBanner",
-          "count": 1,
-          "ratio": 0.3333333333333333
-        },
-        {
-          "unitId": "frontend/src/data/pipelineStore.ts::usePipelineStore",
           "count": 1,
           "ratio": 0.3333333333333333
         },
@@ -4130,17 +4356,12 @@
           "ratio": 0.3333333333333333
         },
         {
-          "unitId": "frontend/src/types.ts::ExploitationStep",
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useCases",
           "count": 1,
           "ratio": 0.3333333333333333
         },
         {
-          "unitId": "frontend/src/types.ts::ExploitationTree",
-          "count": 1,
-          "ratio": 0.3333333333333333
-        },
-        {
-          "unitId": "frontend/src/components/SharedUI.tsx::Badge",
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useTaxonomy",
           "count": 1,
           "ratio": 0.3333333333333333
         }
@@ -4258,12 +4479,27 @@
           "ratio": 1
         },
         {
+          "unitId": "frontend/src/types.ts::RiskLevel",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/types.ts::TriageResult",
+          "count": 1,
+          "ratio": 1
+        },
+        {
           "unitId": "frontend/src/types.ts::StructuralFinding",
           "count": 1,
           "ratio": 1
         },
         {
           "unitId": "frontend/src/types.ts::QualityAssessment",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/types.ts::ResearchSession",
           "count": 1,
           "ratio": 1
         },
@@ -4446,6 +4682,11 @@
           "ratio": 0.5
         },
         {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePolicies",
+          "count": 3,
+          "ratio": 0.5
+        },
+        {
           "unitId": "frontend/src/components/SharedUI.tsx::Badge",
           "count": 3,
           "ratio": 0.5
@@ -4476,7 +4717,17 @@
           "ratio": 0.3333333333333333
         },
         {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePolicies",
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useCases",
+          "count": 2,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useThreshold",
+          "count": 2,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "unitId": "frontend/src/types.ts::RiskLevel",
           "count": 2,
           "ratio": 0.3333333333333333
         },
@@ -4492,11 +4743,6 @@
         },
         {
           "unitId": "frontend/src/components/SharedUI.tsx::StageDot",
-          "count": 1,
-          "ratio": 0.16666666666666666
-        },
-        {
-          "unitId": "frontend/src/data/pipelineStore.ts::usePipelineStore",
           "count": 1,
           "ratio": 0.16666666666666666
         },
@@ -4527,16 +4773,6 @@
         },
         {
           "unitId": "frontend/src/data/usePipelineSelectors.ts::useApiAvailable",
-          "count": 1,
-          "ratio": 0.16666666666666666
-        },
-        {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRunId",
-          "count": 1,
-          "ratio": 0.16666666666666666
-        },
-        {
-          "unitId": "frontend/src/types.ts::StructuralFinding",
           "count": 1,
           "ratio": 0.16666666666666666
         }
@@ -4644,6 +4880,16 @@
           "ratio": 1
         },
         {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePolicies",
+          "count": 2,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useThreshold",
+          "count": 2,
+          "ratio": 1
+        },
+        {
           "unitId": "frontend/src/hooks.ts::useAsyncAction",
           "count": 1,
           "ratio": 0.5
@@ -4675,11 +4921,6 @@
         },
         {
           "unitId": "frontend/src/components/SharedUI.tsx::ErrorBanner",
-          "count": 1,
-          "ratio": 0.5
-        },
-        {
-          "unitId": "frontend/src/data/pipelineStore.ts::usePipelineStore",
           "count": 1,
           "ratio": 0.5
         },
@@ -4719,17 +4960,12 @@
           "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePolicies",
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useCases",
           "count": 1,
           "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useThreshold",
-          "count": 1,
-          "ratio": 0.5
-        },
-        {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePolicyCatalog",
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useTaxonomy",
           "count": 1,
           "ratio": 0.5
         }
@@ -4877,11 +5113,6 @@
           "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/data/pipelineStore.ts::usePipelineStore",
-          "count": 1,
-          "ratio": 0.5
-        },
-        {
           "unitId": "frontend/src/data/usePipelineSelectors.ts::useRefresh",
           "count": 1,
           "ratio": 0.5
@@ -4912,12 +5143,22 @@
           "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/types.ts::Counts",
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useCases",
           "count": 1,
           "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useCounts",
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useTaxonomy",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePolicies",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useThreshold",
           "count": 1,
           "ratio": 0.5
         }
@@ -4940,7 +5181,7 @@
         83,
         97
       ],
-      "sourceCode": "export function ErrorBanner({ error, onDismiss }: { error: string | null; onDismiss?: () => void }) {\n  if (!error) return null;\n  return (\n    <div className=\"error-banner panel stagger-in\">\n      <div className=\"panel-body\">\n        {error}\n        {onDismiss && (\n          <button className=\"btn btn-sm\" onClick={onDismiss} style={{ marginLeft: \"auto\" }}>\n            Dismiss\n          </button>\n        )}\n      </div>\n    </div>\n  );\n}",
+      "sourceCode": "export function ErrorBanner({ error, onDismiss }: { error: string | null; onDismiss?: () => void }) {\n  if (!error) return null;\n  return (\n    <div className=\"error-banner panel stagger-in\">\n      <div className=\"panel-body\">\n        {error}\n        {onDismiss && (\n          <button className=\"btn btn-sm error-banner-dismiss\" onClick={onDismiss}>\n            Dismiss\n          </button>\n        )}\n      </div>\n    </div>\n  );\n}",
       "parameters": [
         {
           "name": "{ error, onDismiss }",
@@ -5062,6 +5303,16 @@
           "ratio": 0.4
         },
         {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePolicies",
+          "count": 2,
+          "ratio": 0.4
+        },
+        {
+          "unitId": "frontend/src/types.ts::RiskLevel",
+          "count": 2,
+          "ratio": 0.4
+        },
+        {
           "unitId": "frontend/src/types.ts::StageStatus",
           "count": 1,
           "ratio": 0.2
@@ -5097,11 +5348,6 @@
           "ratio": 0.2
         },
         {
-          "unitId": "frontend/src/data/pipelineStore.ts::usePipelineStore",
-          "count": 1,
-          "ratio": 0.2
-        },
-        {
           "unitId": "frontend/src/data/usePipelineSelectors.ts::useApproveStage",
           "count": 1,
           "ratio": 0.2
@@ -5122,12 +5368,7 @@
           "ratio": 0.2
         },
         {
-          "unitId": "frontend/src/types.ts::SourceCandidate",
-          "count": 1,
-          "ratio": 0.2
-        },
-        {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useFetchDiscovery",
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useCases",
           "count": 1,
           "ratio": 0.2
         }
@@ -5147,10 +5388,10 @@
       "kind": "function",
       "filePath": "frontend/src/components/Sidebar.tsx",
       "lineRange": [
-        77,
-        133
+        80,
+        136
       ],
-      "sourceCode": "export default function Sidebar({ onSignOut, username }: SidebarProps) {\n  const pipeline_status = usePipelineStatus();\n  const counts = useCounts();\n\n  return (\n    <aside className=\"sidebar\">\n      <div className=\"sidebar-header\">\n        <h1>SVAP</h1>\n      </div>\n\n      <nav className=\"sidebar-nav\">\n        {NAV_ITEMS.map((item, i) => {\n          if (isSection(item)) {\n            return (\n              <div key={i} className=\"nav-section-label\">\n                {item.section}\n              </div>\n            );\n          }\n          const Icon = item.icon;\n          return (\n            <NavLink\n              key={item.path}\n              to={item.path}\n              end={item.path === \"/\"}\n              className={({ isActive }) => `nav-item ${isActive ? \"active\" : \"\"}`}\n            >\n              <Icon />\n              <span>{item.label}</span>\n              {item.countKey && counts?.[item.countKey] > 0 && (\n                <span className=\"nav-badge\">{counts[item.countKey]}</span>\n              )}\n            </NavLink>\n          );\n        })}\n      </nav>\n\n      <div className=\"pipeline-status\">\n        <div className=\"nav-section-label pipeline-status-label\">\n          Pipeline Status\n        </div>\n        {(pipeline_status || []).map((s) => (\n          <div key={s.stage} className=\"stage-row\">\n            <StageDot status={s.status} />\n            <span className=\"stage-row-text\">\n              {s.stage}. {STAGE_NAMES[s.stage] || `Stage ${s.stage}`}\n            </span>\n          </div>\n        ))}\n      </div>\n      <div className=\"sidebar-user\">\n        <span className=\"sidebar-user-name\">{username}</span>\n        <button className=\"btn\" onClick={onSignOut}>Sign out</button>\n      </div>\n    </aside>\n  );\n}",
+      "sourceCode": "export default function Sidebar({ onSignOut, username }: SidebarProps) {\n  const pipeline_status = usePipelineStatus();\n  const counts = useCounts();\n\n  return (\n    <aside className=\"sidebar\">\n      <div className=\"sidebar-header\">\n        <h1>SVAP</h1>\n      </div>\n\n      <nav className=\"sidebar-nav\">\n        {NAV_ITEMS.map((item, i) => {\n          if (isSection(item)) {\n            return (\n              <div key={i} className=\"nav-section-label\">\n                {item.section}\n              </div>\n            );\n          }\n          const Icon = item.icon;\n          return (\n            <NavLink\n              key={item.path}\n              to={item.path}\n              end={item.path === \"/\"}\n              className={navLinkClass}\n            >\n              <Icon />\n              <span>{item.label}</span>\n              {item.countKey && counts?.[item.countKey] > 0 && (\n                <span className=\"nav-badge\">{counts[item.countKey]}</span>\n              )}\n            </NavLink>\n          );\n        })}\n      </nav>\n\n      <div className=\"pipeline-status\">\n        <div className=\"nav-section-label pipeline-status-label\">\n          Pipeline Status\n        </div>\n        {(pipeline_status || []).map((s) => (\n          <div key={s.stage} className=\"stage-row\">\n            <StageDot status={s.status} />\n            <span className=\"stage-row-text\">\n              {s.stage}. {STAGE_NAMES[s.stage] || `Stage ${s.stage}`}\n            </span>\n          </div>\n        ))}\n      </div>\n      <div className=\"sidebar-user\">\n        <span className=\"sidebar-user-name\">{username}</span>\n        <button className=\"btn\" onClick={onSignOut}>Sign out</button>\n      </div>\n    </aside>\n  );\n}",
       "parameters": [
         {
           "name": "{ onSignOut, username }",
@@ -5849,10 +6090,10 @@
       "kind": "constant",
       "filePath": "frontend/src/data/pipelineStore.ts",
       "lineRange": [
-        127,
-        361
+        285,
+        349
       ],
-      "sourceCode": "usePipelineStore = create<PipelineStore>((set, get) => {\n  // ── Internal fetch functions ─────────────────────────────────────────\n\n  const fetchDashboard = async () => {\n    set({ loading: true, error: null });\n    try {\n      const res = await apiGet(\"/dashboard\", { signal: AbortSignal.timeout(10000) });\n      if (!res.ok) throw new Error(`API returned ${res.status}`);\n      const apiData: FallbackData = await res.json();\n      const pipeline_status = deduplicatePipelineStatus(apiData.pipeline_status || []);\n      const taxonomy = apiData.taxonomy || [];\n\n      // Build incoming data, then only set slices that actually changed\n      const incoming = {\n        run_id: apiData.run_id,\n        source: \"api\" as const,\n        pipeline_status,\n        counts: apiData.counts,\n        calibration: apiData.calibration,\n        cases: apiData.cases || [],\n        taxonomy,\n        policies: apiData.policies || [],\n        exploitation_trees: apiData.exploitation_trees || [],\n        detection_patterns: apiData.detection_patterns || [],\n        case_convergence: apiData.case_convergence || [],\n        policy_convergence: apiData.policy_convergence || [],\n        policy_catalog: apiData.policy_catalog || {},\n        enforcement_sources: apiData.enforcement_sources || [],\n        data_sources: apiData.data_sources || {},\n        scanned_programs: apiData.scanned_programs || [],\n        threshold: apiData.calibration?.threshold ?? 3,\n        qualityMap: buildQualityMap(taxonomy),\n      };\n      const diff = changedSlices(get(), incoming);\n      // Always set status flags; only set data slices if something changed\n      set({ apiAvailable: true, loading: false, ...(diff || {}) });\n    } catch (err) {\n      const message = (err as Error).message || \"Unknown error\";\n      console.error(\"SVAP API unreachable:\", message);\n      set({\n        error: `Unable to reach the SVAP API. ${message}`,\n        apiAvailable: false,\n        loading: false,\n      });\n    }\n  };\n\n  const refreshSources = async () => {\n    const res = await apiGet(\"/enforcement-sources\");\n    if (!res.ok) return;\n    const sources = await res.json();\n    set({ enforcement_sources: sources });\n  };\n\n  // ── Public store ─────────────────────────────────────────────────────\n\n  return {\n    // Data — empty defaults\n    run_id: \"\",\n    source: \"api\",\n    pipeline_status: [],\n    counts: { cases: 0, taxonomy_qualities: 0, policies: 0, exploitation_trees: 0, detection_patterns: 0 },\n    calibration: { threshold: 3 },\n    cases: [],\n    taxonomy: [],\n    policies: [],\n    exploitation_trees: [],\n    detection_patterns: [],\n    case_convergence: [],\n    policy_convergence: [],\n    policy_catalog: {},\n    enforcement_sources: [],\n    data_sources: {},\n    scanned_programs: [],\n\n    // Discovery & research — empty defaults\n    source_feeds: [],\n    source_candidates: [],\n    dimensions: [],\n    triage_results: [],\n    research_sessions: [],\n\n    // Derived\n    threshold: 3,\n    qualityMap: {},\n\n    // Status\n    loading: true,\n    error: null,\n    apiAvailable: false,\n\n    // Internal\n    _token: \"\",\n\n    // Actions\n    _setToken: (token: string) => {\n      set({ _token: token });\n      fetchDashboard();\n    },\n\n    refresh: fetchDashboard,\n\n    updatePipelineStatus: (stages: PipelineStageStatus[]) => {\n      const incoming = deduplicatePipelineStatus(stages);\n      if (JSON.stringify(get().pipeline_status) !== JSON.stringify(incoming)) {\n        set({ pipeline_status: incoming });\n      }\n    },\n\n    runPipeline: async () => {\n      if (!get().apiAvailable) throw new Error(\"API not available\");\n      const result = (await apiPost(\"/pipeline/run\", {})) as { run_id?: string };\n      if (result.run_id) {\n        set({ run_id: result.run_id, pipeline_status: [] });\n      }\n      return result;\n    },\n\n    approveStage: async (stage: number) => {\n      if (!get().apiAvailable) throw new Error(\"API not available\");\n      const result = await apiPost(\"/pipeline/approve\", { stage });\n      await fetchDashboard();\n      return result;\n    },\n\n    seedPipeline: async () => {\n      if (!get().apiAvailable) throw new Error(\"API not available\");\n      const result = await apiPost(\"/pipeline/seed\");\n      await fetchDashboard();\n      return result;\n    },\n\n    uploadSourceDocument: async (sourceId: string, file: File) => {\n      if (!get().apiAvailable) throw new Error(\"API not available\");\n      const buffer = await file.arrayBuffer();\n      const bytes = new Uint8Array(buffer);\n      let binary = \"\";\n      for (let i = 0; i < bytes.byteLength; i++) {\n        binary += String.fromCharCode(bytes[i]);\n      }\n      const result = await apiPost(\n        \"/enforcement-sources/upload\",\n        { source_id: sourceId, filename: file.name, content: btoa(binary) },\n      );\n      await refreshSources();\n      return result;\n    },\n\n    createSource: async (source: { name: string; url?: string; description?: string }) => {\n      if (!get().apiAvailable) throw new Error(\"API not available\");\n      const result = await apiPost(\"/enforcement-sources\", source);\n      await refreshSources();\n      return result;\n    },\n\n    deleteSource: async (sourceId: string) => {\n      if (!get().apiAvailable) throw new Error(\"API not available\");\n      const result = await apiPost(\"/enforcement-sources/delete\", { source_id: sourceId });\n      await refreshSources();\n      return result;\n    },\n\n    // ── Discovery & Research actions ────────────────────────────────────\n\n    fetchDiscovery: async () => {\n      const [feedsRes, candidatesRes] = await Promise.all([\n        apiGet(\"/discovery/feeds\"),\n        apiGet(\"/discovery/candidates\"),\n      ]);\n      if (feedsRes.ok && candidatesRes.ok) {\n        set({\n          source_feeds: await feedsRes.json(),\n          source_candidates: await candidatesRes.json(),\n        });\n      }\n    },\n\n    runDiscoveryFeeds: async () => {\n      const result = await apiPost(\"/discovery/run-feeds\", {});\n      await get().fetchDiscovery();\n      return result;\n    },\n\n    reviewCandidate: async (candidateId: string, action: \"accept\" | \"reject\") => {\n      const result = await apiPost(\n        \"/discovery/candidates/review\",\n        { candidate_id: candidateId, action },\n      );\n      await get().fetchDiscovery();\n      return result;\n    },\n\n    fetchDimensions: async () => {\n      const res = await apiGet(\"/dimensions\");\n      if (res.ok) set({ dimensions: await res.json() });\n    },\n\n    fetchTriageResults: async () => {\n      const res = await apiGet(\"/research/triage\");\n      if (res.ok) set({ triage_results: await res.json() });\n    },\n\n    runTriage: async () => {\n      const result = await apiPost(\"/research/triage\", {});\n      await get().fetchTriageResults();\n      return result;\n    },\n\n    runDeepResearch: async (policyIds?: string[]) => {\n      const body = policyIds ? { policy_ids: policyIds } : {};\n      const result = await apiPost(\"/research/deep\", body);\n      await get().fetchResearchSessions();\n      return result;\n    },\n\n    fetchResearchSessions: async () => {\n      const res = await apiGet(\"/research/sessions\");\n      if (res.ok) set({ research_sessions: await res.json() });\n    },\n\n    fetchFindings: async (policyId: string) => {\n      const res = await apiGet(`/research/findings/${policyId}`);\n      if (!res.ok) return [];\n      const data = await res.json();\n      return data.findings || [];\n    },\n\n    fetchAssessments: async (policyId: string) => {\n      const res = await apiGet(`/research/assessments/${policyId}`);\n      if (!res.ok) return [];\n      const data = await res.json();\n      return data.assessments || [];\n    },\n  };\n})",
+      "sourceCode": "usePipelineStore = create<PipelineStore>((set, get) => {\n  const fetchDashboard = async () => {\n    set({ loading: true, error: null });\n    try {\n      const res = await apiGet(\"/dashboard\", { signal: AbortSignal.timeout(10000) });\n      if (!res.ok) throw new Error(`API returned ${res.status}`);\n      const incoming = buildIncomingData(await res.json());\n      const diff = changedSlices(get(), incoming);\n      set({ apiAvailable: true, loading: false, ...(diff || {}) });\n    } catch (err) {\n      const message = (err as Error).message || \"Unknown error\";\n      console.error(\"SVAP API unreachable:\", message);\n      set({ error: `Unable to reach the SVAP API. ${message}`, apiAvailable: false, loading: false });\n    }\n  };\n\n  const refreshSources = async () => {\n    const res = await apiGet(\"/enforcement-sources\");\n    if (res.ok) set({ enforcement_sources: await res.json() });\n  };\n\n  return {\n    ...INITIAL_STATE,\n\n    _setToken: (token: string) => {\n      set({ _token: token });\n      fetchDashboard();\n    },\n\n    refresh: fetchDashboard,\n\n    updatePipelineStatus: (stages: PipelineStageStatus[]) => {\n      const incoming = deduplicatePipelineStatus(stages);\n      if (JSON.stringify(get().pipeline_status) !== JSON.stringify(incoming)) {\n        set({ pipeline_status: incoming });\n      }\n    },\n\n    runPipeline: async () => {\n      if (!get().apiAvailable) throw new Error(\"API not available\");\n      const result = (await apiPost(\"/pipeline/run\", {})) as { run_id?: string };\n      if (result.run_id) {\n        set({ run_id: result.run_id, pipeline_status: [] });\n      }\n      return result;\n    },\n\n    approveStage: async (stage: number) => {\n      if (!get().apiAvailable) throw new Error(\"API not available\");\n      const result = await apiPost(\"/pipeline/approve\", { stage });\n      await fetchDashboard();\n      return result;\n    },\n\n    seedPipeline: async () => {\n      if (!get().apiAvailable) throw new Error(\"API not available\");\n      const result = await apiPost(\"/pipeline/seed\");\n      await fetchDashboard();\n      return result;\n    },\n\n    ...createSourceActions(set, get, refreshSources),\n    ...createDiscoveryActions(set, get),\n  };\n})",
       "parameters": [],
       "returnType": "unknown",
       "generics": [],
@@ -5945,10 +6186,9 @@
         "frontend/src/data/usePipelineSelectors.ts::usePolicyCatalog",
         "frontend/src/data/usePipelineSelectors.ts::useScannedPrograms",
         "frontend/src/data/usePipelineSelectors.ts::useDataSources",
-        "frontend/src/data/useStatusSubscription.ts::useStatusSubscription",
-        "frontend/src/views/Dashboard.tsx::default"
+        "frontend/src/data/useStatusSubscription.ts::useStatusSubscription"
       ],
-      "consumerCount": 43,
+      "consumerCount": 42,
       "consumerKinds": [
         "function",
         "hook"
@@ -5958,104 +6198,54 @@
       ],
       "coOccurrences": [
         {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRefresh",
-          "count": 2,
-          "ratio": 0.5
-        },
-        {
           "unitId": "frontend/src/auth.ts::signIn",
           "count": 1,
-          "ratio": 0.25
+          "ratio": 0.3333333333333333
         },
         {
           "unitId": "frontend/src/auth.ts::signOut",
           "count": 1,
-          "ratio": 0.25
+          "ratio": 0.3333333333333333
         },
         {
           "unitId": "frontend/src/auth.ts::getSession",
           "count": 1,
-          "ratio": 0.25
+          "ratio": 0.3333333333333333
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRefresh",
+          "count": 1,
+          "ratio": 0.3333333333333333
         },
         {
           "unitId": "frontend/src/data/usePipelineSelectors.ts::useLoading",
           "count": 1,
-          "ratio": 0.25
+          "ratio": 0.3333333333333333
         },
         {
           "unitId": "frontend/src/data/usePipelineSelectors.ts::useError",
           "count": 1,
-          "ratio": 0.25
+          "ratio": 0.3333333333333333
         },
         {
           "unitId": "frontend/src/data/useStatusSubscription.ts::useStatusSubscription",
           "count": 1,
-          "ratio": 0.25
+          "ratio": 0.3333333333333333
         },
         {
-          "unitId": "frontend/src/hooks.ts::useAsyncAction",
+          "unitId": "frontend/src/types.ts::PipelineStageStatus",
           "count": 1,
-          "ratio": 0.25
+          "ratio": 0.3333333333333333
         },
         {
-          "unitId": "frontend/src/types.ts::StageStatus",
+          "unitId": "frontend/src/types.ts::Counts",
           "count": 1,
-          "ratio": 0.25
+          "ratio": 0.3333333333333333
         },
         {
-          "unitId": "frontend/src/types.ts::Case",
+          "unitId": "frontend/src/data/api.ts::apiGet",
           "count": 1,
-          "ratio": 0.25
-        },
-        {
-          "unitId": "frontend/src/types.ts::Policy",
-          "count": 1,
-          "ratio": 0.25
-        },
-        {
-          "unitId": "frontend/src/utils.ts::formatDollars",
-          "count": 1,
-          "ratio": 0.25
-        },
-        {
-          "unitId": "frontend/src/components/SharedUI.tsx::ScoreBar",
-          "count": 1,
-          "ratio": 0.25
-        },
-        {
-          "unitId": "frontend/src/components/SharedUI.tsx::QualityTags",
-          "count": 1,
-          "ratio": 0.25
-        },
-        {
-          "unitId": "frontend/src/components/SharedUI.tsx::RiskBadge",
-          "count": 1,
-          "ratio": 0.25
-        },
-        {
-          "unitId": "frontend/src/components/SharedUI.tsx::StageDot",
-          "count": 1,
-          "ratio": 0.25
-        },
-        {
-          "unitId": "frontend/src/components/SharedUI.tsx::ErrorBanner",
-          "count": 1,
-          "ratio": 0.25
-        },
-        {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRunPipeline",
-          "count": 1,
-          "ratio": 0.25
-        },
-        {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useApproveStage",
-          "count": 1,
-          "ratio": 0.25
-        },
-        {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline",
-          "count": 1,
-          "ratio": 0.25
+          "ratio": 0.3333333333333333
         }
       ],
       "isAsync": false,
@@ -6125,11 +6315,6 @@
       ],
       "coOccurrences": [
         {
-          "unitId": "frontend/src/data/pipelineStore.ts::usePipelineStore",
-          "count": 2,
-          "ratio": 0.6666666666666666
-        },
-        {
           "unitId": "frontend/src/hooks.ts::useAsyncAction",
           "count": 2,
           "ratio": 0.6666666666666666
@@ -6161,6 +6346,11 @@
         },
         {
           "unitId": "frontend/src/auth.ts::getSession",
+          "count": 1,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "unitId": "frontend/src/data/pipelineStore.ts::usePipelineStore",
           "count": 1,
           "ratio": 0.3333333333333333
         },
@@ -6351,11 +6541,6 @@
           "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/data/pipelineStore.ts::usePipelineStore",
-          "count": 1,
-          "ratio": 0.5
-        },
-        {
           "unitId": "frontend/src/data/usePipelineSelectors.ts::useApproveStage",
           "count": 1,
           "ratio": 0.5
@@ -6376,17 +6561,22 @@
           "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/components/SharedUI.tsx::Badge",
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useCases",
           "count": 1,
           "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/data/api.ts::apiPost",
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useTaxonomy",
           "count": 1,
           "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/data/api.ts::apiGet",
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePolicies",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useThreshold",
           "count": 1,
           "ratio": 0.5
         }
@@ -6506,11 +6696,6 @@
           "ratio": 1
         },
         {
-          "unitId": "frontend/src/data/pipelineStore.ts::usePipelineStore",
-          "count": 1,
-          "ratio": 1
-        },
-        {
           "unitId": "frontend/src/data/usePipelineSelectors.ts::useRefresh",
           "count": 1,
           "ratio": 1
@@ -6537,6 +6722,26 @@
         },
         {
           "unitId": "frontend/src/data/usePipelineSelectors.ts::useRunId",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useCases",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useTaxonomy",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePolicies",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useThreshold",
           "count": 1,
           "ratio": 1
         }
@@ -6667,11 +6872,6 @@
           "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/data/pipelineStore.ts::usePipelineStore",
-          "count": 1,
-          "ratio": 0.5
-        },
-        {
           "unitId": "frontend/src/data/usePipelineSelectors.ts::useApproveStage",
           "count": 1,
           "ratio": 0.5
@@ -6692,17 +6892,22 @@
           "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/components/SharedUI.tsx::Badge",
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useCases",
           "count": 1,
           "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/data/api.ts::apiPost",
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useTaxonomy",
           "count": 1,
           "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/data/api.ts::apiGet",
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePolicies",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useThreshold",
           "count": 1,
           "ratio": 0.5
         }
@@ -7077,6 +7282,16 @@
           "ratio": 1
         },
         {
+          "unitId": "frontend/src/types.ts::RiskLevel",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/types.ts::SourceFeed",
+          "count": 1,
+          "ratio": 1
+        },
+        {
           "unitId": "frontend/src/types.ts::SourceCandidate",
           "count": 1,
           "ratio": 1
@@ -7178,6 +7393,16 @@
       "coOccurrences": [
         {
           "unitId": "frontend/src/hooks.ts::useAsyncAction",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/types.ts::RiskLevel",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/types.ts::SourceFeed",
           "count": 1,
           "ratio": 1
         },
@@ -7287,6 +7512,16 @@
           "ratio": 1
         },
         {
+          "unitId": "frontend/src/types.ts::RiskLevel",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/types.ts::SourceFeed",
+          "count": 1,
+          "ratio": 1
+        },
+        {
           "unitId": "frontend/src/types.ts::SourceCandidate",
           "count": 1,
           "ratio": 1
@@ -7387,6 +7622,16 @@
       ],
       "coOccurrences": [
         {
+          "unitId": "frontend/src/types.ts::RiskLevel",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/types.ts::Dimension",
+          "count": 1,
+          "ratio": 1
+        },
+        {
           "unitId": "frontend/src/components/SharedUI.tsx::Badge",
           "count": 1,
           "ratio": 1
@@ -7472,12 +7717,27 @@
           "ratio": 1
         },
         {
+          "unitId": "frontend/src/types.ts::RiskLevel",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/types.ts::TriageResult",
+          "count": 1,
+          "ratio": 1
+        },
+        {
           "unitId": "frontend/src/types.ts::StructuralFinding",
           "count": 1,
           "ratio": 1
         },
         {
           "unitId": "frontend/src/types.ts::QualityAssessment",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/types.ts::ResearchSession",
           "count": 1,
           "ratio": 1
         },
@@ -7612,12 +7872,27 @@
           "ratio": 1
         },
         {
+          "unitId": "frontend/src/types.ts::RiskLevel",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/types.ts::TriageResult",
+          "count": 1,
+          "ratio": 1
+        },
+        {
           "unitId": "frontend/src/types.ts::StructuralFinding",
           "count": 1,
           "ratio": 1
         },
         {
           "unitId": "frontend/src/types.ts::QualityAssessment",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/types.ts::ResearchSession",
           "count": 1,
           "ratio": 1
         },
@@ -7752,12 +8027,27 @@
           "ratio": 1
         },
         {
+          "unitId": "frontend/src/types.ts::RiskLevel",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/types.ts::TriageResult",
+          "count": 1,
+          "ratio": 1
+        },
+        {
           "unitId": "frontend/src/types.ts::StructuralFinding",
           "count": 1,
           "ratio": 1
         },
         {
           "unitId": "frontend/src/types.ts::QualityAssessment",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/types.ts::ResearchSession",
           "count": 1,
           "ratio": 1
         },
@@ -7892,12 +8182,27 @@
           "ratio": 1
         },
         {
+          "unitId": "frontend/src/types.ts::RiskLevel",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/types.ts::TriageResult",
+          "count": 1,
+          "ratio": 1
+        },
+        {
           "unitId": "frontend/src/types.ts::StructuralFinding",
           "count": 1,
           "ratio": 1
         },
         {
           "unitId": "frontend/src/types.ts::QualityAssessment",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/types.ts::ResearchSession",
           "count": 1,
           "ratio": 1
         },
@@ -8032,12 +8337,27 @@
           "ratio": 1
         },
         {
+          "unitId": "frontend/src/types.ts::RiskLevel",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/types.ts::TriageResult",
+          "count": 1,
+          "ratio": 1
+        },
+        {
           "unitId": "frontend/src/types.ts::StructuralFinding",
           "count": 1,
           "ratio": 1
         },
         {
           "unitId": "frontend/src/types.ts::QualityAssessment",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/types.ts::ResearchSession",
           "count": 1,
           "ratio": 1
         },
@@ -8172,12 +8492,27 @@
           "ratio": 1
         },
         {
+          "unitId": "frontend/src/types.ts::RiskLevel",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/types.ts::TriageResult",
+          "count": 1,
+          "ratio": 1
+        },
+        {
           "unitId": "frontend/src/types.ts::StructuralFinding",
           "count": 1,
           "ratio": 1
         },
         {
           "unitId": "frontend/src/types.ts::QualityAssessment",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/types.ts::ResearchSession",
           "count": 1,
           "ratio": 1
         },
@@ -8513,11 +8848,6 @@
           "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/data/pipelineStore.ts::usePipelineStore",
-          "count": 1,
-          "ratio": 0.5
-        },
-        {
           "unitId": "frontend/src/data/usePipelineSelectors.ts::useRefresh",
           "count": 1,
           "ratio": 0.5
@@ -8548,12 +8878,22 @@
           "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/types.ts::Counts",
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useCases",
           "count": 1,
           "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useCounts",
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useTaxonomy",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePolicies",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useThreshold",
           "count": 1,
           "ratio": 0.5
         }
@@ -8953,11 +9293,6 @@
           "ratio": 1
         },
         {
-          "unitId": "frontend/src/data/pipelineStore.ts::usePipelineStore",
-          "count": 1,
-          "ratio": 1
-        },
-        {
           "unitId": "frontend/src/data/usePipelineSelectors.ts::useRefresh",
           "count": 1,
           "ratio": 1
@@ -8984,6 +9319,26 @@
         },
         {
           "unitId": "frontend/src/data/usePipelineSelectors.ts::useRunId",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useCases",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useTaxonomy",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePolicies",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useThreshold",
           "count": 1,
           "ratio": 1
         }
@@ -9103,11 +9458,6 @@
           "ratio": 1
         },
         {
-          "unitId": "frontend/src/data/pipelineStore.ts::usePipelineStore",
-          "count": 1,
-          "ratio": 1
-        },
-        {
           "unitId": "frontend/src/data/usePipelineSelectors.ts::useRefresh",
           "count": 1,
           "ratio": 1
@@ -9134,6 +9484,26 @@
         },
         {
           "unitId": "frontend/src/data/usePipelineSelectors.ts::useApiAvailable",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useCases",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useTaxonomy",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePolicies",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useThreshold",
           "count": 1,
           "ratio": 1
         }
@@ -9194,9 +9564,10 @@
       "consumers": [
         "frontend/src/views/CaseSourcing.tsx::default",
         "frontend/src/views/ConvergenceMatrix.tsx::default",
+        "frontend/src/views/Dashboard.tsx::default",
         "frontend/src/views/TaxonomyView.tsx::default"
       ],
-      "consumerCount": 3,
+      "consumerCount": 4,
       "consumerKinds": [
         "function"
       ],
@@ -9206,58 +9577,103 @@
       "coOccurrences": [
         {
           "unitId": "frontend/src/types.ts::Case",
-          "count": 3,
+          "count": 4,
           "ratio": 1
         },
         {
           "unitId": "frontend/src/utils.ts::formatDollars",
+          "count": 3,
+          "ratio": 0.75
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useTaxonomy",
+          "count": 3,
+          "ratio": 0.75
+        },
+        {
+          "unitId": "frontend/src/types.ts::Policy",
           "count": 2,
-          "ratio": 0.6666666666666666
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::QualityTags",
+          "count": 2,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePolicies",
+          "count": 2,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useThreshold",
+          "count": 2,
+          "ratio": 0.5
         },
         {
           "unitId": "frontend/src/types.ts::Quality",
           "count": 2,
-          "ratio": 0.6666666666666666
+          "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useTaxonomy",
-          "count": 2,
-          "ratio": 0.6666666666666666
-        },
-        {
-          "unitId": "frontend/src/types.ts::EnforcementSource",
+          "unitId": "frontend/src/hooks.ts::useAsyncAction",
           "count": 1,
-          "ratio": 0.3333333333333333
+          "ratio": 0.25
         },
         {
-          "unitId": "frontend/src/components/SharedUI.tsx::QualityTags",
+          "unitId": "frontend/src/types.ts::StageStatus",
           "count": 1,
-          "ratio": 0.3333333333333333
+          "ratio": 0.25
         },
         {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useEnforcementSources",
+          "unitId": "frontend/src/components/SharedUI.tsx::ScoreBar",
           "count": 1,
-          "ratio": 0.3333333333333333
+          "ratio": 0.25
         },
         {
-          "unitId": "frontend/src/types.ts::Policy",
+          "unitId": "frontend/src/components/SharedUI.tsx::RiskBadge",
           "count": 1,
-          "ratio": 0.3333333333333333
+          "ratio": 0.25
         },
         {
-          "unitId": "frontend/src/utils.ts::scoreColor",
+          "unitId": "frontend/src/components/SharedUI.tsx::StageDot",
           "count": 1,
-          "ratio": 0.3333333333333333
+          "ratio": 0.25
         },
         {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePolicies",
+          "unitId": "frontend/src/components/SharedUI.tsx::ErrorBanner",
           "count": 1,
-          "ratio": 0.3333333333333333
+          "ratio": 0.25
         },
         {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useThreshold",
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRefresh",
           "count": 1,
-          "ratio": 0.3333333333333333
+          "ratio": 0.25
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRunPipeline",
+          "count": 1,
+          "ratio": 0.25
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useApproveStage",
+          "count": 1,
+          "ratio": 0.25
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline",
+          "count": 1,
+          "ratio": 0.25
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePipelineStatus",
+          "count": 1,
+          "ratio": 0.25
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useApiAvailable",
+          "count": 1,
+          "ratio": 0.25
         }
       ],
       "isAsync": false,
@@ -9315,9 +9731,10 @@
       "chainPatterns": [],
       "consumers": [
         "frontend/src/views/ConvergenceMatrix.tsx::default",
+        "frontend/src/views/Dashboard.tsx::default",
         "frontend/src/views/TaxonomyView.tsx::default"
       ],
-      "consumerCount": 2,
+      "consumerCount": 3,
       "consumerKinds": [
         "function"
       ],
@@ -9327,43 +9744,103 @@
       "coOccurrences": [
         {
           "unitId": "frontend/src/types.ts::Case",
-          "count": 2,
-          "ratio": 1
-        },
-        {
-          "unitId": "frontend/src/types.ts::Quality",
-          "count": 2,
+          "count": 3,
           "ratio": 1
         },
         {
           "unitId": "frontend/src/data/usePipelineSelectors.ts::useCases",
-          "count": 2,
+          "count": 3,
           "ratio": 1
         },
         {
           "unitId": "frontend/src/types.ts::Policy",
-          "count": 1,
-          "ratio": 0.5
-        },
-        {
-          "unitId": "frontend/src/utils.ts::scoreColor",
-          "count": 1,
-          "ratio": 0.5
+          "count": 2,
+          "ratio": 0.6666666666666666
         },
         {
           "unitId": "frontend/src/utils.ts::formatDollars",
-          "count": 1,
-          "ratio": 0.5
+          "count": 2,
+          "ratio": 0.6666666666666666
         },
         {
           "unitId": "frontend/src/data/usePipelineSelectors.ts::usePolicies",
-          "count": 1,
-          "ratio": 0.5
+          "count": 2,
+          "ratio": 0.6666666666666666
         },
         {
           "unitId": "frontend/src/data/usePipelineSelectors.ts::useThreshold",
+          "count": 2,
+          "ratio": 0.6666666666666666
+        },
+        {
+          "unitId": "frontend/src/types.ts::Quality",
+          "count": 2,
+          "ratio": 0.6666666666666666
+        },
+        {
+          "unitId": "frontend/src/hooks.ts::useAsyncAction",
           "count": 1,
-          "ratio": 0.5
+          "ratio": 0.3333333333333333
+        },
+        {
+          "unitId": "frontend/src/types.ts::StageStatus",
+          "count": 1,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::ScoreBar",
+          "count": 1,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::QualityTags",
+          "count": 1,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::RiskBadge",
+          "count": 1,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::StageDot",
+          "count": 1,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::ErrorBanner",
+          "count": 1,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRefresh",
+          "count": 1,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRunPipeline",
+          "count": 1,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useApproveStage",
+          "count": 1,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline",
+          "count": 1,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePipelineStatus",
+          "count": 1,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useApiAvailable",
+          "count": 1,
+          "ratio": 0.3333333333333333
         }
       ],
       "isAsync": false,
@@ -9421,10 +9898,11 @@
       "chainPatterns": [],
       "consumers": [
         "frontend/src/views/ConvergenceMatrix.tsx::default",
+        "frontend/src/views/Dashboard.tsx::default",
         "frontend/src/views/PolicyExplorer.tsx::default",
         "frontend/src/views/ResearchView.tsx::default"
       ],
-      "consumerCount": 3,
+      "consumerCount": 4,
       "consumerKinds": [
         "function"
       ],
@@ -9434,103 +9912,103 @@
       "coOccurrences": [
         {
           "unitId": "frontend/src/components/SharedUI.tsx::QualityTags",
-          "count": 2,
-          "ratio": 0.6666666666666666
+          "count": 3,
+          "ratio": 0.75
         },
         {
           "unitId": "frontend/src/data/usePipelineSelectors.ts::useThreshold",
-          "count": 2,
-          "ratio": 0.6666666666666666
+          "count": 3,
+          "ratio": 0.75
         },
         {
           "unitId": "frontend/src/hooks.ts::useAsyncAction",
-          "count": 1,
-          "ratio": 0.3333333333333333
-        },
-        {
-          "unitId": "frontend/src/types.ts::StructuralFinding",
-          "count": 1,
-          "ratio": 0.3333333333333333
-        },
-        {
-          "unitId": "frontend/src/types.ts::QualityAssessment",
-          "count": 1,
-          "ratio": 0.3333333333333333
-        },
-        {
-          "unitId": "frontend/src/components/SharedUI.tsx::Badge",
-          "count": 1,
-          "ratio": 0.3333333333333333
-        },
-        {
-          "unitId": "frontend/src/components/SharedUI.tsx::QualityTag",
-          "count": 1,
-          "ratio": 0.3333333333333333
-        },
-        {
-          "unitId": "frontend/src/components/SharedUI.tsx::ErrorBanner",
-          "count": 1,
-          "ratio": 0.3333333333333333
-        },
-        {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useFetchTriageResults",
-          "count": 1,
-          "ratio": 0.3333333333333333
-        },
-        {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRunTriage",
-          "count": 1,
-          "ratio": 0.3333333333333333
-        },
-        {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRunDeepResearch",
-          "count": 1,
-          "ratio": 0.3333333333333333
-        },
-        {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useFetchResearchSessions",
-          "count": 1,
-          "ratio": 0.3333333333333333
-        },
-        {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useFetchFindings",
-          "count": 1,
-          "ratio": 0.3333333333333333
-        },
-        {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useFetchAssessments",
-          "count": 1,
-          "ratio": 0.3333333333333333
-        },
-        {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useTriageResults",
-          "count": 1,
-          "ratio": 0.3333333333333333
-        },
-        {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useResearchSessions",
-          "count": 1,
-          "ratio": 0.3333333333333333
+          "count": 2,
+          "ratio": 0.5
         },
         {
           "unitId": "frontend/src/types.ts::Case",
-          "count": 1,
-          "ratio": 0.3333333333333333
-        },
-        {
-          "unitId": "frontend/src/types.ts::Quality",
-          "count": 1,
-          "ratio": 0.3333333333333333
+          "count": 2,
+          "ratio": 0.5
         },
         {
           "unitId": "frontend/src/types.ts::Policy",
-          "count": 1,
-          "ratio": 0.3333333333333333
+          "count": 2,
+          "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/utils.ts::scoreColor",
+          "unitId": "frontend/src/utils.ts::formatDollars",
+          "count": 2,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::ScoreBar",
+          "count": 2,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::RiskBadge",
+          "count": 2,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::ErrorBanner",
+          "count": 2,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useCases",
+          "count": 2,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useTaxonomy",
+          "count": 2,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/types.ts::StageStatus",
           "count": 1,
-          "ratio": 0.3333333333333333
+          "ratio": 0.25
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::StageDot",
+          "count": 1,
+          "ratio": 0.25
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRefresh",
+          "count": 1,
+          "ratio": 0.25
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRunPipeline",
+          "count": 1,
+          "ratio": 0.25
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useApproveStage",
+          "count": 1,
+          "ratio": 0.25
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline",
+          "count": 1,
+          "ratio": 0.25
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePipelineStatus",
+          "count": 1,
+          "ratio": 0.25
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useApiAvailable",
+          "count": 1,
+          "ratio": 0.25
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRunId",
+          "count": 1,
+          "ratio": 0.25
         }
       ],
       "isAsync": false,
@@ -9588,9 +10066,10 @@
       "chainPatterns": [],
       "consumers": [
         "frontend/src/views/ConvergenceMatrix.tsx::default",
+        "frontend/src/views/Dashboard.tsx::default",
         "frontend/src/views/PolicyExplorer.tsx::default"
       ],
-      "consumerCount": 2,
+      "consumerCount": 3,
       "consumerKinds": [
         "function"
       ],
@@ -9600,73 +10079,103 @@
       "coOccurrences": [
         {
           "unitId": "frontend/src/data/usePipelineSelectors.ts::usePolicies",
-          "count": 2,
+          "count": 3,
           "ratio": 1
         },
         {
           "unitId": "frontend/src/types.ts::Case",
-          "count": 1,
-          "ratio": 0.5
-        },
-        {
-          "unitId": "frontend/src/types.ts::Quality",
-          "count": 1,
-          "ratio": 0.5
+          "count": 2,
+          "ratio": 0.6666666666666666
         },
         {
           "unitId": "frontend/src/types.ts::Policy",
-          "count": 1,
-          "ratio": 0.5
-        },
-        {
-          "unitId": "frontend/src/utils.ts::scoreColor",
-          "count": 1,
-          "ratio": 0.5
+          "count": 2,
+          "ratio": 0.6666666666666666
         },
         {
           "unitId": "frontend/src/utils.ts::formatDollars",
-          "count": 1,
-          "ratio": 0.5
-        },
-        {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useCases",
-          "count": 1,
-          "ratio": 0.5
-        },
-        {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useTaxonomy",
-          "count": 1,
-          "ratio": 0.5
+          "count": 2,
+          "ratio": 0.6666666666666666
         },
         {
           "unitId": "frontend/src/components/SharedUI.tsx::ScoreBar",
-          "count": 1,
-          "ratio": 0.5
+          "count": 2,
+          "ratio": 0.6666666666666666
         },
         {
           "unitId": "frontend/src/components/SharedUI.tsx::QualityTags",
-          "count": 1,
-          "ratio": 0.5
+          "count": 2,
+          "ratio": 0.6666666666666666
         },
         {
           "unitId": "frontend/src/components/SharedUI.tsx::RiskBadge",
-          "count": 1,
-          "ratio": 0.5
+          "count": 2,
+          "ratio": 0.6666666666666666
         },
         {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePolicyCatalog",
-          "count": 1,
-          "ratio": 0.5
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useCases",
+          "count": 2,
+          "ratio": 0.6666666666666666
         },
         {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useScannedPrograms",
-          "count": 1,
-          "ratio": 0.5
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useTaxonomy",
+          "count": 2,
+          "ratio": 0.6666666666666666
         },
         {
-          "unitId": "frontend/src/data/usePipelineSelectors.ts::useDataSources",
+          "unitId": "frontend/src/hooks.ts::useAsyncAction",
           "count": 1,
-          "ratio": 0.5
+          "ratio": 0.3333333333333333
+        },
+        {
+          "unitId": "frontend/src/types.ts::StageStatus",
+          "count": 1,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::StageDot",
+          "count": 1,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::ErrorBanner",
+          "count": 1,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRefresh",
+          "count": 1,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRunPipeline",
+          "count": 1,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useApproveStage",
+          "count": 1,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline",
+          "count": 1,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePipelineStatus",
+          "count": 1,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useApiAvailable",
+          "count": 1,
+          "ratio": 0.3333333333333333
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRunId",
+          "count": 1,
+          "ratio": 0.3333333333333333
         }
       ],
       "isAsync": false,
@@ -9813,9 +10322,10 @@
       "uniqueCallees": 0,
       "chainPatterns": [],
       "consumers": [
+        "frontend/src/views/Dashboard.tsx::default",
         "frontend/src/views/DetectionView.tsx::default"
       ],
-      "consumerCount": 1,
+      "consumerCount": 2,
       "consumerKinds": [
         "function"
       ],
@@ -9824,19 +10334,104 @@
       ],
       "coOccurrences": [
         {
-          "unitId": "frontend/src/types.ts::RiskLevel",
+          "unitId": "frontend/src/hooks.ts::useAsyncAction",
           "count": 1,
-          "ratio": 1
+          "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/types.ts::DetectionPattern",
+          "unitId": "frontend/src/types.ts::StageStatus",
           "count": 1,
-          "ratio": 1
+          "ratio": 0.5
         },
         {
-          "unitId": "frontend/src/components/SharedUI.tsx::Badge",
+          "unitId": "frontend/src/types.ts::Case",
           "count": 1,
-          "ratio": 1
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/types.ts::Policy",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/utils.ts::formatDollars",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::ScoreBar",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::QualityTags",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::RiskBadge",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::StageDot",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/components/SharedUI.tsx::ErrorBanner",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRefresh",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRunPipeline",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useApproveStage",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useSeedPipeline",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePipelineStatus",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useApiAvailable",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useRunId",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useCases",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::useTaxonomy",
+          "count": 1,
+          "ratio": 0.5
+        },
+        {
+          "unitId": "frontend/src/data/usePipelineSelectors.ts::usePolicies",
+          "count": 1,
+          "ratio": 0.5
         }
       ],
       "isAsync": false,
@@ -10030,6 +10625,16 @@
           "ratio": 1
         },
         {
+          "unitId": "frontend/src/types.ts::RiskLevel",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/types.ts::SourceFeed",
+          "count": 1,
+          "ratio": 1
+        },
+        {
           "unitId": "frontend/src/types.ts::SourceCandidate",
           "count": 1,
           "ratio": 1
@@ -10135,6 +10740,16 @@
           "ratio": 1
         },
         {
+          "unitId": "frontend/src/types.ts::RiskLevel",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/types.ts::SourceFeed",
+          "count": 1,
+          "ratio": 1
+        },
+        {
           "unitId": "frontend/src/types.ts::SourceCandidate",
           "count": 1,
           "ratio": 1
@@ -10235,6 +10850,16 @@
       ],
       "coOccurrences": [
         {
+          "unitId": "frontend/src/types.ts::RiskLevel",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/types.ts::Dimension",
+          "count": 1,
+          "ratio": 1
+        },
+        {
           "unitId": "frontend/src/components/SharedUI.tsx::Badge",
           "count": 1,
           "ratio": 1
@@ -10320,12 +10945,27 @@
           "ratio": 1
         },
         {
+          "unitId": "frontend/src/types.ts::RiskLevel",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/types.ts::TriageResult",
+          "count": 1,
+          "ratio": 1
+        },
+        {
           "unitId": "frontend/src/types.ts::StructuralFinding",
           "count": 1,
           "ratio": 1
         },
         {
           "unitId": "frontend/src/types.ts::QualityAssessment",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/types.ts::ResearchSession",
           "count": 1,
           "ratio": 1
         },
@@ -10460,12 +11100,27 @@
           "ratio": 1
         },
         {
+          "unitId": "frontend/src/types.ts::RiskLevel",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/types.ts::TriageResult",
+          "count": 1,
+          "ratio": 1
+        },
+        {
           "unitId": "frontend/src/types.ts::StructuralFinding",
           "count": 1,
           "ratio": 1
         },
         {
           "unitId": "frontend/src/types.ts::QualityAssessment",
+          "count": 1,
+          "ratio": 1
+        },
+        {
+          "unitId": "frontend/src/types.ts::ResearchSession",
           "count": 1,
           "ratio": 1
         },
@@ -10846,9 +11501,9 @@
       "filePath": "frontend/src/data/useStatusSubscription.ts",
       "lineRange": [
         35,
-        95
+        88
       ],
-      "sourceCode": "export function useStatusSubscription() {\n  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);\n  const activeRef = useRef(true);\n  const wasRunningRef = useRef(false);\n\n  useEffect(() => {\n    activeRef.current = true;\n\n    const poll = async () => {\n      if (!activeRef.current) return;\n\n      try {\n        const res = await apiGet(\"/status\", {\n          signal: AbortSignal.timeout(8000),\n        });\n\n        if (!res.ok) {\n          schedule(SLOW_MS);\n          return;\n        }\n\n        const data = await res.json();\n        const stages: PipelineStageStatus[] = data.stages || [];\n        const counts: Counts = data.counts || {};\n\n        // Update pipeline status (store skips no-ops internally)\n        usePipelineStore.getState().updatePipelineStatus(stages);\n\n        const isRunning = hasRunningStage(stages);\n        const storeCounts = usePipelineStore.getState().counts;\n\n        // Detect running→stopped transition or count mismatch → full refresh\n        const justStopped = wasRunningRef.current && !isRunning && stages.length > 0;\n        const countsChanged = !countsEqual(storeCounts, counts as Counts);\n\n        if (justStopped || countsChanged) {\n          await usePipelineStore.getState().refresh();\n        }\n\n        wasRunningRef.current = isRunning;\n        schedule(isRunning ? FAST_MS : SLOW_MS);\n      } catch {\n        // Network error — retry at slow rate\n        schedule(SLOW_MS);\n      }\n    };\n\n    const schedule = (ms: number) => {\n      if (!activeRef.current) return;\n      timerRef.current = setTimeout(poll, ms);\n    };\n\n    // Start first poll immediately\n    poll();\n\n    return () => {\n      activeRef.current = false;\n      if (timerRef.current) clearTimeout(timerRef.current);\n    };\n  }, []);\n}",
+      "sourceCode": "export function useStatusSubscription() {\n  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);\n  const activeRef = useRef(true);\n  const wasRunningRef = useRef(false);\n\n  useEffect(() => {\n    activeRef.current = true;\n\n    const handlePollResponse = async (data: { stages?: PipelineStageStatus[]; counts?: Counts }) => {\n      const stages: PipelineStageStatus[] = data.stages || [];\n      const counts: Counts = data.counts || ({} as Counts);\n\n      usePipelineStore.getState().updatePipelineStatus(stages);\n\n      const isRunning = hasRunningStage(stages);\n      const justStopped = wasRunningRef.current && !isRunning && stages.length > 0;\n      const countsChanged = !countsEqual(usePipelineStore.getState().counts, counts);\n\n      if (justStopped || countsChanged) {\n        await usePipelineStore.getState().refresh();\n      }\n\n      wasRunningRef.current = isRunning;\n      return isRunning;\n    };\n\n    const poll = async () => {\n      if (!activeRef.current) return;\n\n      try {\n        const res = await apiGet(\"/status\", { signal: AbortSignal.timeout(8000) });\n        if (!res.ok) { schedule(SLOW_MS); return; }\n\n        const isRunning = await handlePollResponse(await res.json());\n        schedule(isRunning ? FAST_MS : SLOW_MS);\n      } catch {\n        schedule(SLOW_MS);\n      }\n    };\n\n    const schedule = (ms: number) => {\n      if (!activeRef.current) return;\n      timerRef.current = setTimeout(poll, ms);\n    };\n\n    // Start first poll immediately\n    poll();\n\n    return () => {\n      activeRef.current = false;\n      if (timerRef.current) clearTimeout(timerRef.current);\n    };\n  }, []);\n}",
       "parameters": [],
       "returnType": "void",
       "generics": [],
@@ -11250,10 +11905,10 @@
       "kind": "function",
       "filePath": "frontend/src/views/Dashboard.tsx",
       "lineRange": [
-        229,
-        288
+        228,
+        283
       ],
-      "sourceCode": "export default function Dashboard() {\n  const { cases, taxonomy, policies, detection_patterns, threshold } = usePipelineStore(\n    useShallow((s) => ({\n      cases: s.cases,\n      taxonomy: s.taxonomy,\n      policies: s.policies,\n      detection_patterns: s.detection_patterns,\n      threshold: s.threshold,\n    })),\n  );\n  const criticalPolicies = policies.filter((p) => p.risk_level === \"critical\").length;\n  const totalFraudDollars = cases.reduce((sum, c) => sum + (c.scale_dollars || 0), 0);\n  const criticalPatterns = detection_patterns.filter((p) => p.priority === \"critical\").length;\n\n  return (\n    <div>\n      <div className=\"view-header stagger-in\">\n        <h2>Structural Vulnerability Analysis</h2>\n        <div className=\"view-desc\">\n          HHS OIG fraud detection pipeline — convergence threshold: {\"\\u2265\"}{threshold} qualities = high exploitation\n          risk\n        </div>\n      </div>\n\n      <PipelineControls />\n\n      <MetricsRow\n        cases={cases.length}\n        taxonomy={taxonomy.length}\n        policies={policies.length}\n        detectionPatterns={detection_patterns.length}\n        threshold={threshold}\n        totalFraudDollars={totalFraudDollars}\n        criticalPolicies={criticalPolicies}\n        criticalPatterns={criticalPatterns}\n      />\n\n      <div className=\"split-view\">\n        <HighRiskTable policies={policies} threshold={threshold} />\n        <TopCasesTable cases={cases} />\n      </div>\n\n      <div className=\"panel stagger-in\">\n        <div className=\"panel-header\">\n          <h3>Key Calibration Finding</h3>\n        </div>\n        <div className=\"panel-body calibration-text\">\n          <strong className=\"calibration-highlight\">\n            Every enforcement case exceeding $500M in intended losses scored {\"\\u2265\"}3 vulnerability qualities.\n          </strong>{\" \"}\n          The most common qualities in large-scale schemes are Payment Precedes Verification and Expansion\n          Outpaces Oversight, appearing in 75%+ of major cases. The pay-before-verify + self-attesting payment basis\n          combination appeared together in every $1B+ scheme. Three policies currently score {\"\\u2265\"}5:\n          HCBS, PACE, and Hospital-at-Home — all share the characteristic of services delivered outside institutional\n          settings with minimal verification infrastructure.\n        </div>\n      </div>\n    </div>\n  );\n}",
+      "sourceCode": "export default function Dashboard() {\n  const cases = useCases();\n  const taxonomy = useTaxonomy();\n  const policies = usePolicies();\n  const detection_patterns = useDetectionPatterns();\n  const threshold = useThreshold();\n  const criticalPolicies = policies.filter((p) => p.risk_level === \"critical\").length;\n  const totalFraudDollars = cases.reduce((sum, c) => sum + (c.scale_dollars || 0), 0);\n  const criticalPatterns = detection_patterns.filter((p) => p.priority === \"critical\").length;\n\n  return (\n    <div>\n      <div className=\"view-header stagger-in\">\n        <h2>Structural Vulnerability Analysis</h2>\n        <div className=\"view-desc\">\n          HHS OIG fraud detection pipeline — convergence threshold: {\"\\u2265\"}{threshold} qualities = high exploitation\n          risk\n        </div>\n      </div>\n\n      <PipelineControls />\n\n      <MetricsRow\n        cases={cases.length}\n        taxonomy={taxonomy.length}\n        policies={policies.length}\n        detectionPatterns={detection_patterns.length}\n        threshold={threshold}\n        totalFraudDollars={totalFraudDollars}\n        criticalPolicies={criticalPolicies}\n        criticalPatterns={criticalPatterns}\n      />\n\n      <div className=\"split-view\">\n        <HighRiskTable policies={policies} threshold={threshold} />\n        <TopCasesTable cases={cases} />\n      </div>\n\n      <div className=\"panel stagger-in\">\n        <div className=\"panel-header\">\n          <h3>Key Calibration Finding</h3>\n        </div>\n        <div className=\"panel-body calibration-text\">\n          <strong className=\"calibration-highlight\">\n            Every enforcement case exceeding $500M in intended losses scored {\"\\u2265\"}3 vulnerability qualities.\n          </strong>{\" \"}\n          The most common qualities in large-scale schemes are Payment Precedes Verification and Expansion\n          Outpaces Oversight, appearing in 75%+ of major cases. The pay-before-verify + self-attesting payment basis\n          combination appeared together in every $1B+ scheme. Three policies currently score {\"\\u2265\"}5:\n          HCBS, PACE, and Hospital-at-Home — all share the characteristic of services delivered outside institutional\n          settings with minimal verification infrastructure.\n        </div>\n      </div>\n    </div>\n  );\n}",
       "parameters": [],
       "returnType": "import(\"/home/tsonu/src/svap/frontend/node_modules/@types/react/jsx-runtime\").JSX.Element",
       "generics": [],
@@ -11279,20 +11934,6 @@
           "category": "external"
         },
         {
-          "source": "zustand/shallow",
-          "specifiers": [
-            "useShallow"
-          ],
-          "category": "framework"
-        },
-        {
-          "source": "../data/pipelineStore",
-          "specifiers": [
-            "usePipelineStore"
-          ],
-          "category": "internal"
-        },
-        {
           "source": "../data/usePipelineSelectors",
           "specifiers": [
             "usePipelineStatus",
@@ -11301,7 +11942,12 @@
             "useRunPipeline",
             "useApproveStage",
             "useSeedPipeline",
-            "useRefresh"
+            "useRefresh",
+            "useCases",
+            "useTaxonomy",
+            "usePolicies",
+            "useDetectionPatterns",
+            "useThreshold"
           ],
           "category": "internal"
         },
@@ -11340,17 +11986,27 @@
           "category": "internal"
         }
       ],
-      "storeAccess": [
-        "usePipelineStore"
-      ],
+      "storeAccess": [],
       "dataSourceAccess": [],
       "callees": [
         {
-          "target": "usePipelineStore",
+          "target": "useCases",
           "context": "init"
         },
         {
-          "target": "useShallow",
+          "target": "useTaxonomy",
+          "context": "init"
+        },
+        {
+          "target": "usePolicies",
+          "context": "init"
+        },
+        {
+          "target": "useDetectionPatterns",
+          "context": "init"
+        },
+        {
+          "target": "useThreshold",
           "context": "init"
         },
         {
@@ -11368,15 +12024,18 @@
       ],
       "calleeSequence": {
         "init": [
-          "usePipelineStore",
-          "useShallow",
+          "useCases",
+          "useTaxonomy",
+          "usePolicies",
+          "useDetectionPatterns",
+          "useThreshold",
           "policies.filter",
           "cases.reduce",
           "detection_patterns.filter"
         ]
       },
       "callDepth": 1,
-      "uniqueCallees": 5,
+      "uniqueCallees": 8,
       "chainPatterns": [],
       "consumers": [],
       "consumerCount": 0,
@@ -11643,10 +12302,10 @@
       "kind": "function",
       "filePath": "frontend/src/views/DimensionRegistryView.tsx",
       "lineRange": [
-        12,
-        131
+        87,
+        150
       ],
-      "sourceCode": "export default function DimensionRegistryView() {\n  const dimensions = useDimensions();\n  const fetchDimensions = useFetchDimensions();\n\n  const [expandedId, setExpandedId] = useState<string | null>(null);\n\n  useEffect(() => {\n    fetchDimensions();\n  }, [fetchDimensions]);\n\n  const toggleId = useCallback(\n    (id: string) => setExpandedId((prev) => (prev === id ? null : id)),\n    [],\n  );\n\n  return (\n    <div>\n      <div className=\"view-header stagger-in\">\n        <h2>Dimension Registry</h2>\n        <div className=\"view-desc\">\n          Structural properties that bridge cases and policies. Each dimension describes a mechanical\n          aspect of how a policy operates.\n        </div>\n      </div>\n\n      <div className=\"metrics-row\">\n        <div className=\"metric-card stagger-in\">\n          <div className=\"metric-label\">Dimensions</div>\n          <div className=\"metric-value\">{dimensions.length}</div>\n          <div className=\"metric-sub\">registered</div>\n        </div>\n        <div className=\"metric-card stagger-in\">\n          <div className=\"metric-label\">Seed</div>\n          <div className=\"metric-value\">{dimensions.filter((d) => d.origin === \"seed\").length}</div>\n          <div className=\"metric-sub\">built-in</div>\n        </div>\n        <div className=\"metric-card stagger-in\">\n          <div className=\"metric-label\">Derived</div>\n          <div className=\"metric-value\">\n            {dimensions.filter((d) => d.origin === \"case_derived\" || d.origin === \"policy_derived\").length}\n          </div>\n          <div className=\"metric-sub\">from analysis</div>\n        </div>\n      </div>\n\n      <div className=\"quality-grid\">\n        {dimensions.length === 0 ? (\n          <div className=\"empty-state stagger-in\">\n            No dimensions registered. Run the pipeline to seed initial dimensions.\n          </div>\n        ) : (\n          dimensions.map((dim) => (\n            <div key={dim.dimension_id} className=\"quality-card stagger-in\">\n              <div\n                className=\"quality-card-header clickable cursor-pointer\"\n                onClick={() => toggleId(dim.dimension_id)}\n                onKeyDown={(e) => {\n                  if (e.key === \"Enter\" || e.key === \" \") {\n                    e.preventDefault();\n                    toggleId(dim.dimension_id);\n                  }\n                }}\n                role=\"button\"\n                tabIndex={0}\n              >\n                <div className=\"flex-row\">\n                  {expandedId === dim.dimension_id ? (\n                    <ChevronDown size={16} />\n                  ) : (\n                    <ChevronRight size={16} />\n                  )}\n                  <span className=\"quality-card-name\">{dim.name}</span>\n                </div>\n                <div className=\"flex-row\">\n                  {originBadge(dim.origin)}\n                  <span className=\"text-secondary\">\n                    {dim.dimension_id}\n                  </span>\n                </div>\n              </div>\n\n              <div className=\"quality-card-def\">{dim.definition}</div>\n\n              {expandedId === dim.dimension_id && (\n                <div className=\"panel-expand-body\">\n                  <div className=\"detail-grid\">\n                    <div>\n                      <div className=\"detail-label\">Probing Questions</div>\n                      <div className=\"detail-text\">\n                        {dim.probing_questions && dim.probing_questions.length > 0 ? (\n                          <ul className=\"list-compact\">\n                            {dim.probing_questions.map((q, i) => (\n                              <li key={i}>{q}</li>\n                            ))}\n                          </ul>\n                        ) : (\n                          \"None defined\"\n                        )}\n                      </div>\n                    </div>\n                    <div>\n                      <div className=\"detail-label\">Related Qualities</div>\n                      <div className=\"detail-text\">\n                        {dim.related_quality_ids && dim.related_quality_ids.length > 0 ? (\n                          <QualityTags ids={dim.related_quality_ids} />\n                        ) : (\n                          \"None linked\"\n                        )}\n                      </div>\n                    </div>\n                  </div>\n                </div>\n              )}\n            </div>\n          ))\n        )}\n      </div>\n    </div>\n  );\n}",
+      "sourceCode": "export default function DimensionRegistryView() {\n  const dimensions = useDimensions();\n  const fetchDimensions = useFetchDimensions();\n\n  const [expandedId, setExpandedId] = useState<string | null>(null);\n\n  useEffect(() => {\n    fetchDimensions();\n  }, [fetchDimensions]);\n\n  const toggleId = useCallback(\n    (id: string) => setExpandedId((prev) => (prev === id ? null : id)),\n    [],\n  );\n\n  return (\n    <div>\n      <div className=\"view-header stagger-in\">\n        <h2>Dimension Registry</h2>\n        <div className=\"view-desc\">\n          Structural properties that bridge cases and policies. Each dimension describes a mechanical\n          aspect of how a policy operates.\n        </div>\n      </div>\n\n      <div className=\"metrics-row\">\n        <div className=\"metric-card stagger-in\">\n          <div className=\"metric-label\">Dimensions</div>\n          <div className=\"metric-value\">{dimensions.length}</div>\n          <div className=\"metric-sub\">registered</div>\n        </div>\n        <div className=\"metric-card stagger-in\">\n          <div className=\"metric-label\">Seed</div>\n          <div className=\"metric-value\">{dimensions.filter((d) => d.origin === \"seed\").length}</div>\n          <div className=\"metric-sub\">built-in</div>\n        </div>\n        <div className=\"metric-card stagger-in\">\n          <div className=\"metric-label\">Derived</div>\n          <div className=\"metric-value\">\n            {dimensions.filter((d) => d.origin === \"case_derived\" || d.origin === \"policy_derived\").length}\n          </div>\n          <div className=\"metric-sub\">from analysis</div>\n        </div>\n      </div>\n\n      <div className=\"quality-grid\">\n        {dimensions.length === 0 ? (\n          <div className=\"empty-state stagger-in\">\n            No dimensions registered. Run the pipeline to seed initial dimensions.\n          </div>\n        ) : (\n          dimensions.map((dim) => (\n            <DimensionCard\n              key={dim.dimension_id}\n              dim={dim}\n              isExpanded={expandedId === dim.dimension_id}\n              onToggle={toggleId}\n            />\n          ))\n        )}\n      </div>\n    </div>\n  );\n}",
       "parameters": [],
       "returnType": "import(\"/home/tsonu/src/svap/frontend/node_modules/@types/react/jsx-runtime\").JSX.Element",
       "generics": [],
@@ -11679,6 +12338,14 @@
           "specifiers": [
             "Badge",
             "QualityTags"
+          ],
+          "category": "internal"
+        },
+        {
+          "source": "../types",
+          "specifiers": [
+            "Dimension",
+            "RiskLevel"
           ],
           "category": "internal"
         },
@@ -11733,14 +12400,6 @@
         {
           "target": "dimensions.map",
           "context": "conditional"
-        },
-        {
-          "target": "originBadge",
-          "context": "render"
-        },
-        {
-          "target": "dim.probing_questions.map",
-          "context": "render"
         }
       ],
       "calleeSequence": {
@@ -11757,16 +12416,14 @@
         ],
         "render": [
           "dimensions.filter",
-          "dimensions.filter",
-          "originBadge",
-          "dim.probing_questions.map"
+          "dimensions.filter"
         ],
         "conditional": [
           "dimensions.map"
         ]
       },
       "callDepth": 1,
-      "uniqueCallees": 11,
+      "uniqueCallees": 9,
       "chainPatterns": [],
       "consumers": [],
       "consumerCount": 0,
@@ -11788,10 +12445,10 @@
       "kind": "function",
       "filePath": "frontend/src/views/DiscoveryView.tsx",
       "lineRange": [
-        31,
-        190
+        61,
+        136
       ],
-      "sourceCode": "export default function DiscoveryView() {\n  const source_feeds = useSourceFeeds();\n  const source_candidates = useSourceCandidates();\n  const fetchDiscovery = useFetchDiscovery();\n  const runDiscoveryFeeds = useRunDiscoveryFeeds();\n  const reviewCandidate = useReviewCandidate();\n\n  const { busy, error, run, clearError } = useAsyncAction();\n  const [expandedFeed, setExpandedFeed] = useState<string | null>(null);\n  const [filter, setFilter] = useState<string | null>(null);\n\n  useEffect(() => {\n    fetchDiscovery();\n  }, [fetchDiscovery]);\n\n  const handleRunFeeds = useCallback(\n    () => run(\"feeds\", runDiscoveryFeeds),\n    [run, runDiscoveryFeeds],\n  );\n\n  const handleReview = useCallback(\n    (candidateId: string, action: \"accept\" | \"reject\") =>\n      run(\"review\", () => reviewCandidate(candidateId, action)),\n    [run, reviewCandidate],\n  );\n\n  const needsReview = source_candidates.filter((c) => c.status === \"scored\");\n  const filtered = filter\n    ? source_candidates.filter((c) => c.status === filter)\n    : source_candidates;\n\n  return (\n    <div>\n      <ErrorBanner error={error} onDismiss={clearError} />\n      <div className=\"view-header stagger-in\">\n        <h2>Case Discovery</h2>\n        <div className=\"view-desc\">\n          Automated monitoring of government enforcement feeds for new case sources.\n        </div>\n      </div>\n\n      <div className=\"metrics-row\">\n        <div className=\"metric-card stagger-in\">\n          <div className=\"metric-label\">Feeds</div>\n          <div className=\"metric-value\">{source_feeds.length}</div>\n          <div className=\"metric-sub\">configured</div>\n        </div>\n        <div className=\"metric-card stagger-in\">\n          <div className=\"metric-label\">Candidates</div>\n          <div className=\"metric-value\">{source_candidates.length}</div>\n          <div className=\"metric-sub\">discovered</div>\n        </div>\n        <div className=\"metric-card stagger-in\">\n          <div className=\"metric-label\">Review Queue</div>\n          <div className=\"metric-value\" style={{ color: needsReview.length > 0 ? \"var(--high)\" : undefined }}>\n            {needsReview.length}\n          </div>\n          <div className=\"metric-sub\">pending</div>\n        </div>\n        <div className=\"metric-card stagger-in\">\n          <div className=\"metric-label\">Accepted</div>\n          <div className=\"metric-value\">\n            {source_candidates.filter((c) => c.status === \"accepted\" || c.status === \"ingested\").length}\n          </div>\n          <div className=\"metric-sub\">sources</div>\n        </div>\n      </div>\n\n      {/* Feeds panel */}\n      <div className=\"panel stagger-in\">\n        <div className=\"panel-header\">\n          <h3>Source Feeds</h3>\n          <button className=\"btn btn-accent\" onClick={handleRunFeeds} disabled={!!busy}>\n            {busy === \"feeds\" ? \"Checking...\" : \"Check All Feeds\"}\n          </button>\n        </div>\n        <div className=\"panel-body dense\">\n          {source_feeds.length === 0 ? (\n            <div className=\"empty-state\">No feeds configured.</div>\n          ) : (\n            <table className=\"data-table\">\n              <thead>\n                <tr>\n                  <th>Feed</th>\n                  <th>Type</th>\n                  <th>Last Checked</th>\n                  <th>Status</th>\n                </tr>\n              </thead>\n              <tbody>\n                {source_feeds.map((feed) => (\n                  <tr\n                    key={feed.feed_id}\n                    className=\"clickable\"\n                    onClick={() => setExpandedFeed(expandedFeed === feed.feed_id ? null : feed.feed_id)}\n                    tabIndex={0}\n                    onKeyDown={(e) => { if (e.key === \"Enter\" || e.key === \" \") { e.preventDefault(); setExpandedFeed(expandedFeed === feed.feed_id ? null : feed.feed_id); } }}\n                  >\n                    <td className=\"td-name\">\n                      {expandedFeed === feed.feed_id ? <ChevronDown size={14} /> : <ChevronRight size={14} />}\n                      {\" \"}{feed.name}\n                    </td>\n                    <td>{feed.content_type}</td>\n                    <td>{feed.last_checked_at ? new Date(feed.last_checked_at).toLocaleDateString() : \"Never\"}</td>\n                    <td>{feed.enabled ? <Badge level=\"low\">Active</Badge> : <Badge level=\"medium\">Disabled</Badge>}</td>\n                  </tr>\n                ))}\n              </tbody>\n            </table>\n          )}\n        </div>\n      </div>\n\n      {/* Candidates panel */}\n      <div className=\"panel stagger-in\">\n        <div className=\"panel-header\">\n          <h3>Discovered Candidates</h3>\n        </div>\n\n        <div className=\"filter-bar filter-bar-mb\">\n          <button className={`btn ${!filter ? \"btn-accent\" : \"\"}`} onClick={() => setFilter(null)}>\n            All ({source_candidates.length})\n          </button>\n          <button className={`btn ${filter === \"scored\" ? \"btn-accent\" : \"\"}`} onClick={() => setFilter(\"scored\")}>\n            Review ({needsReview.length})\n          </button>\n          <button className={`btn ${filter === \"accepted\" ? \"btn-accent\" : \"\"}`} onClick={() => setFilter(\"accepted\")}>\n            Accepted\n          </button>\n          <button className={`btn ${filter === \"rejected\" ? \"btn-accent\" : \"\"}`} onClick={() => setFilter(\"rejected\")}>\n            Rejected\n          </button>\n        </div>\n\n        <div className=\"panel-body dense\">\n          {filtered.length === 0 ? (\n            <div className=\"empty-state\">No candidates found. Run feed checks to discover new sources.</div>\n          ) : (\n            <table className=\"data-table\">\n              <thead>\n                <tr>\n                  <th>Title</th>\n                  <th>Richness</th>\n                  <th>Est. Cases</th>\n                  <th>Status</th>\n                  <th className=\"hide-on-mobile\">Actions</th>\n                </tr>\n              </thead>\n              <tbody>\n                {filtered.map((c) => (\n                  <CandidateRow key={c.candidate_id} candidate={c} onReview={handleReview} />\n                ))}\n              </tbody>\n            </table>\n          )}\n        </div>\n      </div>\n    </div>\n  );\n}",
+      "sourceCode": "export default function DiscoveryView() {\n  const source_feeds = useSourceFeeds();\n  const source_candidates = useSourceCandidates();\n  const fetchDiscovery = useFetchDiscovery();\n  const runDiscoveryFeeds = useRunDiscoveryFeeds();\n  const reviewCandidate = useReviewCandidate();\n\n  const { busy, error, run, clearError } = useAsyncAction();\n  const [expandedFeed, setExpandedFeed] = useState<string | null>(null);\n  const toggleFeed = useCallback(\n    (id: string) => setExpandedFeed((prev) => (prev === id ? null : id)),\n    [],\n  );\n  const [filter, setFilter] = useState<string | null>(null);\n\n  useEffect(() => {\n    fetchDiscovery();\n  }, [fetchDiscovery]);\n\n  const handleRunFeeds = useCallback(\n    () => run(\"feeds\", runDiscoveryFeeds),\n    [run, runDiscoveryFeeds],\n  );\n\n  const handleReview = useCallback(\n    (candidateId: string, action: \"accept\" | \"reject\") =>\n      run(\"review\", () => reviewCandidate(candidateId, action)),\n    [run, reviewCandidate],\n  );\n\n  const needsReview = source_candidates.filter((c) => c.status === \"scored\");\n\n  return (\n    <div>\n      <ErrorBanner error={error} onDismiss={clearError} />\n      <div className=\"view-header stagger-in\">\n        <h2>Case Discovery</h2>\n        <div className=\"view-desc\">\n          Automated monitoring of government enforcement feeds for new case sources.\n        </div>\n      </div>\n\n      <DiscoveryMetrics\n        feedCount={source_feeds.length}\n        candidateCount={source_candidates.length}\n        reviewCount={needsReview.length}\n        acceptedCount={source_candidates.filter((c) => c.status === \"accepted\" || c.status === \"ingested\").length}\n      />\n\n      {/* Feeds panel */}\n      <div className=\"panel stagger-in\">\n        <div className=\"panel-header\">\n          <h3>Source Feeds</h3>\n          <button className=\"btn btn-accent\" onClick={handleRunFeeds} disabled={!!busy}>\n            {busy === \"feeds\" ? \"Checking...\" : \"Check All Feeds\"}\n          </button>\n        </div>\n        <div className=\"panel-body dense\">\n          <FeedsTable\n            feeds={source_feeds}\n            expandedFeed={expandedFeed}\n            onToggleFeed={toggleFeed}\n          />\n        </div>\n      </div>\n\n      <CandidatesPanel\n        candidates={source_candidates}\n        needsReview={needsReview}\n        filter={filter}\n        setFilter={setFilter}\n        onReview={handleReview}\n      />\n    </div>\n  );\n}",
       "parameters": [],
       "returnType": "import(\"/home/tsonu/src/svap/frontend/node_modules/@types/react/jsx-runtime\").JSX.Element",
       "generics": [],
@@ -11805,6 +12462,7 @@
         {
           "source": "react",
           "specifiers": [
+            "React",
             "useState",
             "useEffect",
             "useCallback"
@@ -11855,7 +12513,9 @@
         {
           "source": "../types",
           "specifiers": [
-            "SourceCandidate"
+            "RiskLevel",
+            "SourceCandidate",
+            "SourceFeed"
           ],
           "category": "internal"
         }
@@ -11889,6 +12549,14 @@
         },
         {
           "target": "useState",
+          "context": "init"
+        },
+        {
+          "target": "useCallback",
+          "context": "init"
+        },
+        {
+          "target": "setExpandedFeed",
           "context": "init"
         },
         {
@@ -11929,22 +12597,6 @@
         },
         {
           "target": "source_candidates.filter",
-          "context": "conditional"
-        },
-        {
-          "target": "source_candidates.filter",
-          "context": "render"
-        },
-        {
-          "target": "source_feeds.map",
-          "context": "render"
-        },
-        {
-          "target": "<expr>.toLocaleDateString",
-          "context": "conditional"
-        },
-        {
-          "target": "filtered.map",
           "context": "render"
         }
       ],
@@ -11957,6 +12609,8 @@
           "useReviewCandidate",
           "useAsyncAction",
           "useState",
+          "useCallback",
+          "setExpandedFeed",
           "useState",
           "useEffect",
           "useCallback",
@@ -11971,18 +12625,12 @@
           "run",
           "reviewCandidate"
         ],
-        "conditional": [
-          "source_candidates.filter",
-          "<expr>.toLocaleDateString"
-        ],
         "render": [
-          "source_candidates.filter",
-          "source_feeds.map",
-          "filtered.map"
+          "source_candidates.filter"
         ]
       },
       "callDepth": 1,
-      "uniqueCallees": 16,
+      "uniqueCallees": 14,
       "chainPatterns": [],
       "consumers": [],
       "consumerCount": 0,
@@ -11992,9 +12640,9 @@
       "isAsync": false,
       "hasErrorHandling": false,
       "hasLoadingState": false,
-      "hasEmptyState": true,
+      "hasEmptyState": false,
       "hasRetryLogic": false,
-      "rendersIteration": true,
+      "rendersIteration": false,
       "rendersConditional": true,
       "sideEffects": true
     },
@@ -12004,10 +12652,10 @@
       "kind": "function",
       "filePath": "frontend/src/views/ManagementView.tsx",
       "lineRange": [
-        78,
-        306
+        234,
+        310
       ],
-      "sourceCode": "// ── Component ────────────────────────────────────────────────────────────\n\nexport default function ManagementView() {\n  const runPipeline = useRunPipeline();\n  const seedPipeline = useSeedPipeline();\n  const refresh = useRefresh();\n\n  const [executions, setExecutions] = useState<Execution[]>([]);\n  const [runs, setRuns] = useState<PipelineRun[]>([]);\n  const { busy, error, run, clearError } = useAsyncAction();\n\n  const fetchExecutions = useCallback(async () => {\n    const res = await apiGet(\"/management/executions\");\n    if (!res.ok) throw new Error(`${res.status}`);\n    setExecutions(await res.json());\n  }, []);\n\n  const fetchRuns = useCallback(async () => {\n    const res = await apiGet(\"/management/runs\");\n    if (!res.ok) throw new Error(`${res.status}`);\n    setRuns(await res.json());\n  }, []);\n\n  const refreshAll = useCallback(async () => {\n    await run(\"refresh\", async () => {\n      await Promise.all([fetchExecutions(), fetchRuns()]);\n    });\n  }, [fetchExecutions, fetchRuns, run]);\n\n  useEffect(() => {\n    refreshAll();\n  }, [refreshAll]);\n\n  const stopExecution = async (arn: string, name: string) => {\n    if (!window.confirm(`Stop execution \"${name}\"?`)) return;\n    await run(arn, async () => {\n      await apiPost(\"/management/executions/stop\", { execution_arn: arn });\n      await Promise.all([fetchExecutions(), fetchRuns()]);\n    });\n  };\n\n  const deleteRun = async (runId: string) => {\n    if (!window.confirm(`Delete run \"${runId}\" and all its data?`)) return;\n    await run(runId, async () => {\n      await apiPost(\"/management/runs/delete\", { run_id: runId });\n      await Promise.all([fetchExecutions(), fetchRuns(), refresh()]);\n    });\n  };\n\n  const handleNewRun = async () => {\n    await run(\"new-run\", async () => {\n      await runPipeline();\n      await Promise.all([fetchExecutions(), fetchRuns()]);\n    });\n  };\n\n  const handleSeed = async () => {\n    if (!window.confirm(\"Reset corpus and load seed data?\")) return;\n    await run(\"seed\", async () => {\n      await seedPipeline();\n      await Promise.all([fetchExecutions(), fetchRuns()]);\n    });\n  };\n\n  const runningCount = executions.filter((e) => e.status === \"RUNNING\").length;\n\n  return (\n    <div>\n      <div className=\"view-header stagger-in\">\n        <h2>Pipeline Management</h2>\n        <div className=\"view-desc\">\n          Manage Step Functions executions and pipeline runs\n        </div>\n      </div>\n\n      <ErrorBanner error={error} onDismiss={clearError} />\n\n      <div className=\"metrics-row\">\n        <div className=\"metric-card stagger-in\">\n          <div className=\"metric-label\">Running</div>\n          <div className=\"metric-value\">{runningCount}</div>\n          <div className=\"metric-sub\">executions</div>\n        </div>\n        <div className=\"metric-card stagger-in\">\n          <div className=\"metric-label\">Total Runs</div>\n          <div className=\"metric-value\">{runs.length}</div>\n          <div className=\"metric-sub\">in database</div>\n        </div>\n      </div>\n\n      {/* ── Step Functions Executions ───────────────────────────────────── */}\n      <div className=\"panel stagger-in\">\n        <div className=\"panel-header\">\n          <h3>Step Functions Executions</h3>\n          <button\n            className=\"btn\"\n            onClick={refreshAll}\n            disabled={busy === \"refresh\"}\n          >\n            {busy === \"refresh\" ? \"Refreshing...\" : \"Refresh\"}\n          </button>\n        </div>\n        <div className=\"panel-body dense\">\n          {executions.length === 0 ? (\n            <div className=\"empty-state\">No executions found</div>\n          ) : (\n            <table className=\"data-table\">\n              <thead>\n                <tr>\n                  <th>Execution</th>\n                  <th>Status</th>\n                  <th>Started</th>\n                  <th>Duration</th>\n                  <th></th>\n                </tr>\n              </thead>\n              <tbody>\n                {executions.map((ex) => (\n                  <tr key={ex.execution_arn}>\n                    <td className=\"td-mono\">{ex.name}</td>\n                    <td>\n                      <Badge level={executionStatusLevel(ex.status)}>\n                        {ex.status}\n                      </Badge>\n                    </td>\n                    <td>{timeAgo(ex.start_date)}</td>\n                    <td>\n                      {ex.stop_date\n                        ? `${Math.round((new Date(ex.stop_date).getTime() - new Date(ex.start_date).getTime()) / 1000)}s`\n                        : \"—\"}\n                    </td>\n                    <td>\n                      {ex.status === \"RUNNING\" && (\n                        <button\n                          className=\"btn btn-danger btn-sm\"\n                          onClick={() => stopExecution(ex.execution_arn, ex.name)}\n                          disabled={busy === ex.execution_arn}\n                        >\n                          {busy === ex.execution_arn ? \"Stopping...\" : \"Stop\"}\n                        </button>\n                      )}\n                    </td>\n                  </tr>\n                ))}\n              </tbody>\n            </table>\n          )}\n        </div>\n      </div>\n\n      {/* ── Pipeline Runs ──────────────────────────────────────────────── */}\n      <div className=\"panel stagger-in\">\n        <div className=\"panel-header\">\n          <h3>Pipeline Runs</h3>\n          <div className=\"flex-row\">\n            <button\n              className=\"btn btn-accent\"\n              onClick={handleNewRun}\n              disabled={busy === \"new-run\"}\n            >\n              {busy === \"new-run\" ? \"Starting...\" : \"New Run\"}\n            </button>\n            <button\n              className=\"btn\"\n              onClick={handleSeed}\n              disabled={busy === \"seed\"}\n            >\n              {busy === \"seed\" ? \"Seeding...\" : \"Seed\"}\n            </button>\n          </div>\n        </div>\n        <div className=\"panel-body dense\">\n          {runs.length === 0 ? (\n            <div className=\"empty-state\">No pipeline runs found</div>\n          ) : (\n            <table className=\"data-table\">\n              <thead>\n                <tr>\n                  <th>Run ID</th>\n                  <th>Created</th>\n                  <th>Stages</th>\n                  <th>Notes</th>\n                  <th></th>\n                </tr>\n              </thead>\n              <tbody>\n                {runs.map((r) => {\n                  const stageMap = new Map(\n                    r.stages.map((s) => [s.stage, s.status]),\n                  );\n                  return (\n                    <tr key={r.run_id}>\n                      <td className=\"td-mono\">{r.run_id}</td>\n                      <td>{timeAgo(r.created_at)}</td>\n                      <td>\n                        <div className=\"stage-chips\">\n                          {STAGE_ORDER.map((n) => {\n                            const status = stageMap.get(n);\n                            return (\n                              <span\n                                key={n}\n                                className={status ? stageStatusClass(status) : \"stage-chip idle\"}\n                                title={`Stage ${n}: ${status || \"not started\"}`}\n                              >\n                                {n}\n                              </span>\n                            );\n                          })}\n                        </div>\n                      </td>\n                      <td className=\"td-muted\">{r.notes || \"—\"}</td>\n                      <td>\n                        <button\n                          className=\"btn btn-danger btn-sm\"\n                          onClick={() => deleteRun(r.run_id)}\n                          disabled={busy === r.run_id}\n                        >\n                          {busy === r.run_id ? \"...\" : \"Delete\"}\n                        </button>\n                      </td>\n                    </tr>\n                  );\n                })}\n              </tbody>\n            </table>\n          )}\n        </div>\n      </div>\n    </div>\n  );\n}",
+      "sourceCode": "// ── Component ────────────────────────────────────────────────────────────\n\nexport default function ManagementView() {\n  const runPipeline = useRunPipeline();\n  const seedPipeline = useSeedPipeline();\n  const refresh = useRefresh();\n\n  const [executions, setExecutions] = useState<Execution[]>([]);\n  const [runs, setRuns] = useState<PipelineRun[]>([]);\n  const { busy, error, run, clearError } = useAsyncAction();\n\n  const fetchExecutions = useCallback(async () => {\n    const res = await apiGet(\"/management/executions\");\n    if (!res.ok) throw new Error(`${res.status}`);\n    setExecutions(await res.json());\n  }, []);\n\n  const fetchRuns = useCallback(async () => {\n    const res = await apiGet(\"/management/runs\");\n    if (!res.ok) throw new Error(`${res.status}`);\n    setRuns(await res.json());\n  }, []);\n\n  const refreshAll = useCallback(async () => {\n    await run(\"refresh\", async () => {\n      await Promise.all([fetchExecutions(), fetchRuns()]);\n    });\n  }, [fetchExecutions, fetchRuns, run]);\n\n  useEffect(() => {\n    refreshAll();\n  }, [refreshAll]);\n\n  const stopExecution = useCallback(async (arn: string, name: string) => {\n    if (!window.confirm(`Stop execution \"${name}\"?`)) return;\n    await run(arn, async () => {\n      await apiPost(\"/management/executions/stop\", { execution_arn: arn });\n      await Promise.all([fetchExecutions(), fetchRuns()]);\n    });\n  }, [run, fetchExecutions, fetchRuns]);\n\n  const deleteRun = useCallback(async (runId: string) => {\n    if (!window.confirm(`Delete run \"${runId}\" and all its data?`)) return;\n    await run(runId, async () => {\n      await apiPost(\"/management/runs/delete\", { run_id: runId });\n      await Promise.all([fetchExecutions(), fetchRuns(), refresh()]);\n    });\n  }, [run, fetchExecutions, fetchRuns, refresh]);\n\n  const handleNewRun = useCallback(async () => {\n    await run(\"new-run\", async () => {\n      await runPipeline();\n      await Promise.all([fetchExecutions(), fetchRuns()]);\n    });\n  }, [run, runPipeline, fetchExecutions, fetchRuns]);\n\n  const handleSeed = useCallback(async () => {\n    if (!window.confirm(\"Reset corpus and load seed data?\")) return;\n    await run(\"seed\", async () => {\n      await seedPipeline();\n      await Promise.all([fetchExecutions(), fetchRuns()]);\n    });\n  }, [run, seedPipeline, fetchExecutions, fetchRuns]);\n\n  const runningCount = executions.filter((e) => e.status === \"RUNNING\").length;\n\n  return (\n    <div>\n      <div className=\"view-header stagger-in\">\n        <h2>Pipeline Management</h2>\n        <div className=\"view-desc\">Manage Step Functions executions and pipeline runs</div>\n      </div>\n      <ErrorBanner error={error} onDismiss={clearError} />\n      <ManagementMetrics runningCount={runningCount} totalRuns={runs.length} />\n      <ExecutionsPanel executions={executions} busy={busy} onRefresh={refreshAll} onStop={stopExecution} />\n      <RunsPanel runs={runs} busy={busy} onNewRun={handleNewRun} onSeed={handleSeed} onDelete={deleteRun} />\n    </div>\n  );\n}",
       "parameters": [],
       "returnType": "import(\"/home/tsonu/src/svap/frontend/node_modules/@types/react/jsx-runtime\").JSX.Element",
       "generics": [],
@@ -12148,6 +12796,18 @@
           "context": "effect"
         },
         {
+          "target": "useCallback",
+          "context": "init"
+        },
+        {
+          "target": "window.confirm",
+          "context": "conditional"
+        },
+        {
+          "target": "run",
+          "context": "init"
+        },
+        {
           "target": "apiPost",
           "context": "init"
         },
@@ -12161,6 +12821,18 @@
         },
         {
           "target": "fetchRuns",
+          "context": "init"
+        },
+        {
+          "target": "useCallback",
+          "context": "init"
+        },
+        {
+          "target": "window.confirm",
+          "context": "conditional"
+        },
+        {
+          "target": "run",
           "context": "init"
         },
         {
@@ -12184,6 +12856,14 @@
           "context": "init"
         },
         {
+          "target": "useCallback",
+          "context": "init"
+        },
+        {
+          "target": "run",
+          "context": "handler"
+        },
+        {
           "target": "runPipeline",
           "context": "handler"
         },
@@ -12197,6 +12877,18 @@
         },
         {
           "target": "fetchRuns",
+          "context": "handler"
+        },
+        {
+          "target": "useCallback",
+          "context": "init"
+        },
+        {
+          "target": "window.confirm",
+          "context": "conditional"
+        },
+        {
+          "target": "run",
           "context": "handler"
         },
         {
@@ -12218,54 +12910,6 @@
         {
           "target": "executions.filter",
           "context": "init"
-        },
-        {
-          "target": "executions.map",
-          "context": "render"
-        },
-        {
-          "target": "executionStatusLevel",
-          "context": "render"
-        },
-        {
-          "target": "timeAgo",
-          "context": "render"
-        },
-        {
-          "target": "Math.round",
-          "context": "conditional"
-        },
-        {
-          "target": "<expr>.getTime",
-          "context": "conditional"
-        },
-        {
-          "target": "<expr>.getTime",
-          "context": "conditional"
-        },
-        {
-          "target": "runs.map",
-          "context": "render"
-        },
-        {
-          "target": "r.stages.map",
-          "context": "render"
-        },
-        {
-          "target": "timeAgo",
-          "context": "render"
-        },
-        {
-          "target": "STAGE_ORDER.map",
-          "context": "render"
-        },
-        {
-          "target": "stageMap.get",
-          "context": "render"
-        },
-        {
-          "target": "stageStatusClass",
-          "context": "conditional"
         }
       ],
       "calleeSequence": {
@@ -12290,49 +12934,46 @@
           "fetchExecutions",
           "fetchRuns",
           "useEffect",
+          "useCallback",
+          "run",
           "apiPost",
           "Promise.all",
           "fetchExecutions",
           "fetchRuns",
+          "useCallback",
+          "run",
           "apiPost",
           "Promise.all",
           "fetchExecutions",
           "fetchRuns",
           "refresh",
+          "useCallback",
+          "useCallback",
           "executions.filter"
         ],
         "effect": [
           "refreshAll"
         ],
+        "conditional": [
+          "window.confirm",
+          "window.confirm",
+          "window.confirm"
+        ],
         "handler": [
+          "run",
           "runPipeline",
           "Promise.all",
           "fetchExecutions",
           "fetchRuns",
+          "run",
           "seedPipeline",
           "Promise.all",
           "fetchExecutions",
           "fetchRuns"
-        ],
-        "render": [
-          "executions.map",
-          "executionStatusLevel",
-          "timeAgo",
-          "runs.map",
-          "r.stages.map",
-          "timeAgo",
-          "STAGE_ORDER.map",
-          "stageMap.get"
-        ],
-        "conditional": [
-          "Math.round",
-          "<expr>.getTime",
-          "<expr>.getTime",
-          "stageStatusClass"
         ]
       },
       "callDepth": 1,
-      "uniqueCallees": 31,
+      "uniqueCallees": 22,
       "chainPatterns": [],
       "consumers": [],
       "consumerCount": 0,
@@ -12342,10 +12983,10 @@
       "isAsync": false,
       "hasErrorHandling": false,
       "hasLoadingState": false,
-      "hasEmptyState": true,
+      "hasEmptyState": false,
       "hasRetryLogic": false,
-      "rendersIteration": true,
-      "rendersConditional": true,
+      "rendersIteration": false,
+      "rendersConditional": false,
       "sideEffects": true
     },
     {
@@ -12465,8 +13106,8 @@
       "kind": "function",
       "filePath": "frontend/src/views/PredictionView.tsx",
       "lineRange": [
-        162,
-        190
+        179,
+        207
       ],
       "sourceCode": "export default function PredictionView() {\n  const trees = useExploitationTrees();\n  const [expandedTree, setExpandedTree] = useState<string | null>(null);\n  const toggle = useCallback(\n    (id: string) => setExpandedTree((prev) => (prev === id ? null : id)),\n    [],\n  );\n\n  return (\n    <div>\n      <div className=\"view-header stagger-in\">\n        <h2>Exploitation Trees</h2>\n        <div className=\"view-desc\">\n          {trees.length} exploitation trees — each models a branching attack pathway for a\n          high-risk policy, with steps linked to enabling qualities\n        </div>\n      </div>\n\n      {trees.map((tree) => (\n        <TreeCard\n          key={tree.tree_id}\n          tree={tree}\n          isExpanded={expandedTree === tree.tree_id}\n          onToggle={toggle}\n        />\n      ))}\n    </div>\n  );\n}",
       "parameters": [],
@@ -12580,10 +13221,10 @@
       "kind": "function",
       "filePath": "frontend/src/views/ResearchView.tsx",
       "lineRange": [
-        23,
-        284
+        263,
+        322
       ],
-      "sourceCode": "export default function ResearchView() {\n  const triage_results = useTriageResults();\n  const research_sessions = useResearchSessions();\n  const policies = usePolicies();\n  const fetchTriageResults = useFetchTriageResults();\n  const fetchResearchSessions = useFetchResearchSessions();\n  const runTriage = useRunTriage();\n  const runDeepResearch = useRunDeepResearch();\n  const fetchFindings = useFetchFindings();\n  const fetchAssessments = useFetchAssessments();\n\n  const { busy, error, run, clearError } = useAsyncAction();\n  const [expandedPolicy, setExpandedPolicy] = useState<string | null>(null);\n  const [findings, setFindings] = useState<StructuralFinding[]>([]);\n  const [assessments, setAssessments] = useState<QualityAssessment[]>([]);\n\n  useEffect(() => {\n    fetchTriageResults();\n    fetchResearchSessions();\n  }, [fetchTriageResults, fetchResearchSessions]);\n\n  const policyName = useCallback(\n    (policyId: string) => {\n      const p = policies.find((p) => p.policy_id === policyId);\n      return p?.name || policyId;\n    },\n    [policies],\n  );\n\n  const handleRunTriage = useCallback(\n    () => run(\"triage\", runTriage),\n    [run, runTriage],\n  );\n\n  const handleRunResearch = useCallback(\n    () => run(\"research\", runDeepResearch),\n    [run, runDeepResearch],\n  );\n\n  const handleExpand = useCallback(\n    async (policyId: string) => {\n      if (expandedPolicy === policyId) {\n        setExpandedPolicy(null);\n        return;\n      }\n      setExpandedPolicy(policyId);\n      const [f, a] = await Promise.all([fetchFindings(policyId), fetchAssessments(policyId)]);\n      setFindings(f);\n      setAssessments(a);\n    },\n    [expandedPolicy, fetchFindings, fetchAssessments],\n  );\n\n  const completedSessions = research_sessions.filter(\n    (s) => s.status === \"findings_complete\" || s.status === \"assessment_complete\",\n  );\n\n  return (\n    <div>\n      <ErrorBanner error={error} onDismiss={clearError} />\n      <div className=\"view-header stagger-in\">\n        <h2>Policy Research</h2>\n        <div className=\"view-desc\">\n          Three-pass structural vulnerability analysis: triage, deep regulatory research, and quality assessment.\n        </div>\n      </div>\n\n      <div className=\"metrics-row\">\n        <div className=\"metric-card stagger-in\">\n          <div className=\"metric-label\">Triaged</div>\n          <div className=\"metric-value\">{triage_results.length}</div>\n          <div className=\"metric-sub\">policies ranked</div>\n        </div>\n        <div className=\"metric-card stagger-in\">\n          <div className=\"metric-label\">Researched</div>\n          <div className=\"metric-value\">{completedSessions.length}</div>\n          <div className=\"metric-sub\">deep research</div>\n        </div>\n        <div className=\"metric-card stagger-in\">\n          <div className=\"metric-label\">In Progress</div>\n          <div className=\"metric-value\">\n            {research_sessions.filter((s) => s.status === \"researching\").length}\n          </div>\n          <div className=\"metric-sub\">sessions</div>\n        </div>\n      </div>\n\n      {/* Actions bar */}\n      <div className=\"filter-bar filter-bar-mb stagger-in\">\n        <button className=\"btn btn-accent\" onClick={handleRunTriage} disabled={!!busy}>\n          {busy === \"triage\" ? \"Running Triage...\" : \"Run Triage\"}\n        </button>\n        <button className=\"btn btn-accent\" onClick={handleRunResearch} disabled={!!busy}>\n          {busy === \"research\" ? \"Researching...\" : \"Run Deep Research\"}\n        </button>\n      </div>\n\n      {/* Triage rankings */}\n      <div className=\"panel stagger-in\">\n        <div className=\"panel-header\">\n          <h3>Triage Rankings</h3>\n        </div>\n        <div className=\"panel-body dense\">\n          {triage_results.length === 0 ? (\n            <div className=\"empty-state\">No triage results yet. Run triage to rank policies by vulnerability.</div>\n          ) : (\n            <table className=\"data-table\">\n              <thead>\n                <tr>\n                  <th>#</th>\n                  <th>Policy</th>\n                  <th>Score</th>\n                  <th className=\"hide-on-mobile\">Rationale</th>\n                  <th>Uncertainty</th>\n                </tr>\n              </thead>\n              <tbody>\n                {triage_results.map((t) => (\n                  <tr key={t.policy_id}>\n                    <td>{t.priority_rank}</td>\n                    <td className=\"td-name\">{policyName(t.policy_id)}</td>\n                    <td>\n                      <span\n                        style={{\n                          color: t.triage_score >= 0.7 ? \"var(--critical)\" : t.triage_score >= 0.4 ? \"var(--high)\" : undefined,\n                          fontWeight: 600,\n                        }}\n                      >\n                        {t.triage_score.toFixed(2)}\n                      </span>\n                    </td>\n                    <td className=\"hide-on-mobile\">{t.rationale.slice(0, 120)}{t.rationale.length > 120 ? \"...\" : \"\"}</td>\n                    <td>{t.uncertainty || \"—\"}</td>\n                  </tr>\n                ))}\n              </tbody>\n            </table>\n          )}\n        </div>\n      </div>\n\n      {/* Research sessions — expandable */}\n      <div className=\"panel stagger-in\">\n        <div className=\"panel-header\">\n          <h3>Research Sessions</h3>\n        </div>\n        <div className=\"panel-body\">\n          {research_sessions.length === 0 ? (\n            <div className=\"empty-state\">No research sessions. Run deep research after triage.</div>\n          ) : (\n            research_sessions.map((session) => (\n              <div key={session.session_id} className=\"panel mb-2\">\n                <div\n                  className=\"panel-header clickable\"\n                  onClick={() => handleExpand(session.policy_id)}\n                  onKeyDown={(e) => {\n                    if (e.key === \"Enter\" || e.key === \" \") {\n                      e.preventDefault();\n                      handleExpand(session.policy_id);\n                    }\n                  }}\n                  role=\"button\"\n                  tabIndex={0}\n                >\n                  {expandedPolicy === session.policy_id ? (\n                    <ChevronDown size={16} />\n                  ) : (\n                    <ChevronRight size={16} />\n                  )}\n                  <span className=\"font-semibold\" style={{ marginLeft: \"0.5rem\" }}>\n                    {policyName(session.policy_id)}\n                  </span>\n                  <span className=\"ml-auto\">\n                    <Badge\n                      level={\n                        session.status === \"assessment_complete\"\n                          ? \"low\"\n                          : session.status === \"failed\"\n                            ? \"critical\"\n                            : \"medium\"\n                      }\n                    >\n                      {session.status}\n                    </Badge>\n                  </span>\n                </div>\n\n                {expandedPolicy === session.policy_id && (\n                  <div className=\"panel-body panel-body-bordered\">\n                    {/* Findings */}\n                    <h4 className=\"mb-2\">\n                      Structural Findings ({findings.length})\n                    </h4>\n                    {findings.length === 0 ? (\n                      <div className=\"empty-state\">No findings yet.</div>\n                    ) : (\n                      <table className=\"data-table mb-3\">\n                        <thead>\n                          <tr>\n                            <th>Dimension</th>\n                            <th>Observation</th>\n                            <th>Source</th>\n                            <th>Confidence</th>\n                          </tr>\n                        </thead>\n                        <tbody>\n                          {findings.map((f) => (\n                            <tr key={f.finding_id}>\n                              <td>{f.dimension_id}</td>\n                              <td>{f.observation.slice(0, 150)}{f.observation.length > 150 ? \"...\" : \"\"}</td>\n                              <td className=\"text-sm\">{f.source_citation || f.source_type}</td>\n                              <td>{confidenceBadge(f.confidence)}</td>\n                            </tr>\n                          ))}\n                        </tbody>\n                      </table>\n                    )}\n\n                    {/* Assessments */}\n                    <h4 className=\"mb-2\">\n                      Quality Assessments ({assessments.length})\n                    </h4>\n                    {assessments.length === 0 ? (\n                      <div className=\"empty-state\">No assessments yet.</div>\n                    ) : (\n                      <table className=\"data-table\">\n                        <thead>\n                          <tr>\n                            <th>Quality</th>\n                            <th>Present</th>\n                            <th>Confidence</th>\n                            <th className=\"hide-on-mobile\">Rationale</th>\n                            <th>Evidence</th>\n                          </tr>\n                        </thead>\n                        <tbody>\n                          {assessments.map((a) => (\n                            <tr key={a.assessment_id}>\n                              <td><QualityTag id={a.quality_id} /></td>\n                              <td>{presentBadge(a.present)}</td>\n                              <td>{confidenceBadge(a.confidence)}</td>\n                              <td className=\"hide-on-mobile\">\n                                {a.rationale.slice(0, 100)}{a.rationale.length > 100 ? \"...\" : \"\"}\n                              </td>\n                              <td>\n                                <QualityTags ids={a.evidence_finding_ids} />\n                              </td>\n                            </tr>\n                          ))}\n                        </tbody>\n                      </table>\n                    )}\n                  </div>\n                )}\n              </div>\n            ))\n          )}\n        </div>\n      </div>\n    </div>\n  );\n}",
+      "sourceCode": "export default function ResearchView() {\n  const triage_results = useTriageResults();\n  const research_sessions = useResearchSessions();\n  const policies = usePolicies();\n  const fetchTriageResults = useFetchTriageResults();\n  const fetchResearchSessions = useFetchResearchSessions();\n  const runTriage = useRunTriage();\n  const runDeepResearch = useRunDeepResearch();\n\n  const { busy, error, run, clearError } = useAsyncAction();\n\n  useEffect(() => {\n    fetchTriageResults();\n    fetchResearchSessions();\n  }, [fetchTriageResults, fetchResearchSessions]);\n\n  const policyName = useCallback(\n    (policyId: string) => {\n      const p = policies.find((p) => p.policy_id === policyId);\n      return p?.name || policyId;\n    },\n    [policies],\n  );\n\n  const handleRunTriage = useCallback(() => run(\"triage\", runTriage), [run, runTriage]);\n  const handleRunResearch = useCallback(() => run(\"research\", runDeepResearch), [run, runDeepResearch]);\n\n  const completedCount = research_sessions.filter(\n    (s) => s.status === \"findings_complete\" || s.status === \"assessment_complete\",\n  ).length;\n  const inProgressCount = research_sessions.filter((s) => s.status === \"researching\").length;\n\n  return (\n    <div>\n      <ErrorBanner error={error} onDismiss={clearError} />\n      <div className=\"view-header stagger-in\">\n        <h2>Policy Research</h2>\n        <div className=\"view-desc\">\n          Three-pass structural vulnerability analysis: triage, deep regulatory research, and quality assessment.\n        </div>\n      </div>\n      <ResearchMetrics triageCount={triage_results.length} completedCount={completedCount} inProgressCount={inProgressCount} />\n      <div className=\"filter-bar filter-bar-mb stagger-in\">\n        <button className=\"btn btn-accent\" onClick={handleRunTriage} disabled={!!busy}>\n          {busy === \"triage\" ? \"Running Triage...\" : \"Run Triage\"}\n        </button>\n        <button className=\"btn btn-accent\" onClick={handleRunResearch} disabled={!!busy}>\n          {busy === \"research\" ? \"Researching...\" : \"Run Deep Research\"}\n        </button>\n      </div>\n      <div className=\"panel stagger-in\">\n        <div className=\"panel-header\"><h3>Triage Rankings</h3></div>\n        <div className=\"panel-body dense\">\n          <TriageTable results={triage_results} policyName={policyName} />\n        </div>\n      </div>\n      <SessionsPanel sessions={research_sessions} policyName={policyName} />\n    </div>\n  );\n}",
       "parameters": [],
       "returnType": "import(\"/home/tsonu/src/svap/frontend/node_modules/@types/react/jsx-runtime\").JSX.Element",
       "generics": [],
@@ -12597,6 +13238,7 @@
         {
           "source": "react",
           "specifiers": [
+            "React",
             "useState",
             "useEffect",
             "useCallback"
@@ -12652,6 +13294,9 @@
         {
           "source": "../types",
           "specifiers": [
+            "RiskLevel",
+            "TriageResult",
+            "ResearchSession",
             "StructuralFinding",
             "QualityAssessment"
           ],
@@ -12690,27 +13335,7 @@
           "context": "init"
         },
         {
-          "target": "useFetchFindings",
-          "context": "init"
-        },
-        {
-          "target": "useFetchAssessments",
-          "context": "init"
-        },
-        {
           "target": "useAsyncAction",
-          "context": "init"
-        },
-        {
-          "target": "useState",
-          "context": "init"
-        },
-        {
-          "target": "useState",
-          "context": "init"
-        },
-        {
-          "target": "useState",
           "context": "init"
         },
         {
@@ -12750,96 +13375,12 @@
           "context": "handler"
         },
         {
-          "target": "useCallback",
-          "context": "init"
-        },
-        {
-          "target": "setExpandedPolicy",
-          "context": "conditional"
-        },
-        {
-          "target": "setExpandedPolicy",
-          "context": "handler"
-        },
-        {
-          "target": "Promise.all",
-          "context": "handler"
-        },
-        {
-          "target": "fetchFindings",
-          "context": "handler"
-        },
-        {
-          "target": "fetchAssessments",
-          "context": "handler"
-        },
-        {
-          "target": "setFindings",
-          "context": "handler"
-        },
-        {
-          "target": "setAssessments",
-          "context": "handler"
-        },
-        {
           "target": "research_sessions.filter",
           "context": "init"
         },
         {
           "target": "research_sessions.filter",
-          "context": "render"
-        },
-        {
-          "target": "triage_results.map",
-          "context": "render"
-        },
-        {
-          "target": "policyName",
-          "context": "render"
-        },
-        {
-          "target": "t.triage_score.toFixed",
-          "context": "render"
-        },
-        {
-          "target": "t.rationale.slice",
-          "context": "render"
-        },
-        {
-          "target": "research_sessions.map",
-          "context": "conditional"
-        },
-        {
-          "target": "policyName",
-          "context": "render"
-        },
-        {
-          "target": "findings.map",
-          "context": "render"
-        },
-        {
-          "target": "f.observation.slice",
-          "context": "render"
-        },
-        {
-          "target": "confidenceBadge",
-          "context": "render"
-        },
-        {
-          "target": "assessments.map",
-          "context": "render"
-        },
-        {
-          "target": "presentBadge",
-          "context": "render"
-        },
-        {
-          "target": "confidenceBadge",
-          "context": "render"
-        },
-        {
-          "target": "a.rationale.slice",
-          "context": "render"
+          "context": "init"
         }
       ],
       "calleeSequence": {
@@ -12851,18 +13392,13 @@
           "useFetchResearchSessions",
           "useRunTriage",
           "useRunDeepResearch",
-          "useFetchFindings",
-          "useFetchAssessments",
           "useAsyncAction",
-          "useState",
-          "useState",
-          "useState",
           "useEffect",
           "useCallback",
           "policies.find",
           "useCallback",
           "useCallback",
-          "useCallback",
+          "research_sessions.filter",
           "research_sessions.filter"
         ],
         "effect": [
@@ -12871,36 +13407,11 @@
         ],
         "handler": [
           "run",
-          "run",
-          "setExpandedPolicy",
-          "Promise.all",
-          "fetchFindings",
-          "fetchAssessments",
-          "setFindings",
-          "setAssessments"
-        ],
-        "conditional": [
-          "setExpandedPolicy",
-          "research_sessions.map"
-        ],
-        "render": [
-          "research_sessions.filter",
-          "triage_results.map",
-          "policyName",
-          "t.triage_score.toFixed",
-          "t.rationale.slice",
-          "policyName",
-          "findings.map",
-          "f.observation.slice",
-          "confidenceBadge",
-          "assessments.map",
-          "presentBadge",
-          "confidenceBadge",
-          "a.rationale.slice"
+          "run"
         ]
       },
       "callDepth": 1,
-      "uniqueCallees": 35,
+      "uniqueCallees": 15,
       "chainPatterns": [],
       "consumers": [],
       "consumerCount": 0,
@@ -12910,9 +13421,9 @@
       "isAsync": false,
       "hasErrorHandling": false,
       "hasLoadingState": false,
-      "hasEmptyState": true,
+      "hasEmptyState": false,
       "hasRetryLogic": false,
-      "rendersIteration": true,
+      "rendersIteration": false,
       "rendersConditional": true,
       "sideEffects": true
     },
@@ -12922,10 +13433,10 @@
       "kind": "function",
       "filePath": "frontend/src/views/SourcesView.tsx",
       "lineRange": [
-        215,
-        290
+        202,
+        278
       ],
-      "sourceCode": "export default function SourcesView() {\n  const enforcement_sources = useEnforcementSources();\n  const [showAddForm, setShowAddForm] = useState(false);\n\n  const withDoc = enforcement_sources.filter((s) => s.has_document).length;\n  const validated = enforcement_sources.filter((s) => s.validation_status === \"valid\").length;\n\n  return (\n    <div>\n      <div className=\"view-header stagger-in\">\n        <h2>Enforcement Sources</h2>\n        <div className=\"view-desc\">\n          Manage enforcement source documents. Upload files manually or let the pipeline fetch from\n          URLs. Documents are validated during Stage 0.\n        </div>\n      </div>\n\n      <div className=\"metrics-row\">\n        <div className=\"metric-card stagger-in\">\n          <div className=\"metric-label\">Total Sources</div>\n          <div className=\"metric-value\">{enforcement_sources.length}</div>\n        </div>\n        <div className=\"metric-card stagger-in\">\n          <div className=\"metric-label\">With Documents</div>\n          <div className=\"metric-value\">{withDoc}</div>\n          <div className=\"metric-sub\">{enforcement_sources.length - withDoc} pending fetch</div>\n        </div>\n        <div className=\"metric-card stagger-in\">\n          <div className=\"metric-label\">Validated</div>\n          <div className=\"metric-value\">{validated}</div>\n          <div className=\"metric-sub\">confirmed by LLM</div>\n        </div>\n      </div>\n\n      {showAddForm && <AddSourceForm onClose={() => setShowAddForm(false)} />}\n\n      <div className=\"panel stagger-in\">\n        <div className=\"panel-header\">\n          <h3>Source Registry</h3>\n          <div className=\"pipeline-header-actions\">\n            <button className=\"btn btn-accent\" onClick={() => setShowAddForm(!showAddForm)}>\n              <Plus size={14} />\n              Add Source\n            </button>\n          </div>\n        </div>\n        <div className=\"panel-body dense\">\n          <table className=\"data-table\">\n            <thead>\n              <tr>\n                <th style={{ width: 30 }}></th>\n                <th>Source</th>\n                <th>Type</th>\n                <th>Status</th>\n                <th style={{ width: 40 }}>Link</th>\n                <th>Actions</th>\n              </tr>\n            </thead>\n            <tbody>\n              {enforcement_sources.map((src) => (\n                <SourceRow key={src.source_id} source={src} />\n              ))}\n              {enforcement_sources.length === 0 && (\n                <tr>\n                  <td colSpan={6} className=\"empty-state\">\n                    No enforcement sources configured. Add a source to get started.\n                  </td>\n                </tr>\n              )}\n            </tbody>\n          </table>\n        </div>\n      </div>\n    </div>\n  );\n}",
+      "sourceCode": "export default function SourcesView() {\n  const enforcement_sources = useEnforcementSources();\n  const [showAddForm, setShowAddForm] = useState(false);\n  const hideAddForm = useCallback(() => setShowAddForm(false), []);\n\n  const withDoc = enforcement_sources.filter((s) => s.has_document).length;\n  const validated = enforcement_sources.filter((s) => s.validation_status === \"valid\").length;\n\n  return (\n    <div>\n      <div className=\"view-header stagger-in\">\n        <h2>Enforcement Sources</h2>\n        <div className=\"view-desc\">\n          Manage enforcement source documents. Upload files manually or let the pipeline fetch from\n          URLs. Documents are validated during Stage 0.\n        </div>\n      </div>\n\n      <div className=\"metrics-row\">\n        <div className=\"metric-card stagger-in\">\n          <div className=\"metric-label\">Total Sources</div>\n          <div className=\"metric-value\">{enforcement_sources.length}</div>\n        </div>\n        <div className=\"metric-card stagger-in\">\n          <div className=\"metric-label\">With Documents</div>\n          <div className=\"metric-value\">{withDoc}</div>\n          <div className=\"metric-sub\">{enforcement_sources.length - withDoc} pending fetch</div>\n        </div>\n        <div className=\"metric-card stagger-in\">\n          <div className=\"metric-label\">Validated</div>\n          <div className=\"metric-value\">{validated}</div>\n          <div className=\"metric-sub\">confirmed by LLM</div>\n        </div>\n      </div>\n\n      {showAddForm && <AddSourceForm onClose={hideAddForm} />}\n\n      <div className=\"panel stagger-in\">\n        <div className=\"panel-header\">\n          <h3>Source Registry</h3>\n          <div className=\"pipeline-header-actions\">\n            <button className=\"btn btn-accent\" onClick={() => setShowAddForm(!showAddForm)}>\n              <Plus size={14} />\n              Add Source\n            </button>\n          </div>\n        </div>\n        <div className=\"panel-body dense\">\n          <table className=\"data-table\">\n            <thead>\n              <tr>\n                <th className=\"th-toggle\"></th>\n                <th>Source</th>\n                <th>Type</th>\n                <th>Status</th>\n                <th className=\"th-icon\">Link</th>\n                <th>Actions</th>\n              </tr>\n            </thead>\n            <tbody>\n              {enforcement_sources.map((src) => (\n                <SourceRow key={src.source_id} source={src} />\n              ))}\n              {enforcement_sources.length === 0 && (\n                <tr>\n                  <td colSpan={6} className=\"empty-state\">\n                    No enforcement sources configured. Add a source to get started.\n                  </td>\n                </tr>\n              )}\n            </tbody>\n          </table>\n        </div>\n      </div>\n    </div>\n  );\n}",
       "parameters": [],
       "returnType": "import(\"/home/tsonu/src/svap/frontend/node_modules/@types/react/jsx-runtime\").JSX.Element",
       "generics": [],
@@ -13007,6 +13518,14 @@
           "context": "init"
         },
         {
+          "target": "useCallback",
+          "context": "init"
+        },
+        {
+          "target": "setShowAddForm",
+          "context": "init"
+        },
+        {
           "target": "enforcement_sources.filter",
           "context": "init"
         },
@@ -13023,6 +13542,8 @@
         "init": [
           "useEnforcementSources",
           "useState",
+          "useCallback",
+          "setShowAddForm",
           "enforcement_sources.filter",
           "enforcement_sources.filter"
         ],
@@ -13031,7 +13552,7 @@
         ]
       },
       "callDepth": 1,
-      "uniqueCallees": 4,
+      "uniqueCallees": 6,
       "chainPatterns": [],
       "consumers": [],
       "consumerCount": 0,

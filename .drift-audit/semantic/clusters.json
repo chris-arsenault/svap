@@ -1,75 +1,77 @@
 [
   {
-    "avgSimilarity": 0.4005,
+    "avgSimilarity": 0.4218,
     "consumerOverlap": 0.0,
     "directorySpread": 1,
     "id": "cluster-001",
     "kindMix": {
-      "function": 7
+      "function": 5
     },
-    "memberCount": 7,
+    "memberCount": 5,
     "members": [
-      "frontend/src/App.tsx::default",
-      "frontend/src/views/DetectionView.tsx::default",
-      "frontend/src/views/DimensionRegistryView.tsx::default",
+      "frontend/src/views/Dashboard.tsx::default",
       "frontend/src/views/DiscoveryView.tsx::default",
       "frontend/src/views/ManagementView.tsx::default",
       "frontend/src/views/ResearchView.tsx::default",
-      "frontend/src/views/TaxonomyView.tsx::default"
+      "frontend/src/views/SourcesView.tsx::default"
     ],
-    "rankScore": 2.8035,
+    "rankScore": 2.109,
     "sharedCallees": [
+      "run",
+      "useAsyncAction",
       "useCallback",
       "useEffect",
       "useState"
     ],
     "signalBreakdown": {
-      "behavior": 0.8603,
-      "callSequence": 0.2241,
-      "calleeSet": 0.1009,
+      "behavior": 0.8438,
+      "callSequence": 0.1688,
+      "calleeSet": 0.1592,
       "coOccurrence": 0.0,
       "consumerSet": 0.0,
       "dataAccess": 0.0,
-      "imports": 0.5494,
+      "imports": 0.7526,
       "neighborhood": 1.0,
+      "semantic": 0.4428,
       "typeSignature": 1.0
     }
   },
   {
-    "avgSimilarity": 0.3966,
+    "avgSimilarity": 0.4052,
     "consumerOverlap": 0.0,
     "directorySpread": 1,
     "id": "cluster-002",
     "kindMix": {
-      "function": 6
+      "function": 4
     },
-    "memberCount": 6,
+    "memberCount": 4,
     "members": [
       "frontend/src/views/CaseSourcing.tsx::default",
       "frontend/src/views/ConvergenceMatrix.tsx::default",
-      "frontend/src/views/Dashboard.tsx::default",
-      "frontend/src/views/PolicyExplorer.tsx::default",
-      "frontend/src/views/PredictionView.tsx::default",
-      "frontend/src/views/SourcesView.tsx::default"
+      "frontend/src/views/DimensionRegistryView.tsx::default",
+      "frontend/src/views/TaxonomyView.tsx::default"
     ],
-    "rankScore": 2.3796,
+    "rankScore": 1.6208,
     "sharedCallees": [
+      "useCallback",
+      "useCases",
       "useState"
     ],
     "signalBreakdown": {
-      "behavior": 0.8167,
-      "callSequence": 0.25,
-      "calleeSet": 0.0556,
+      "behavior": 0.9,
+      "callSequence": 0.215,
+      "calleeSet": 0.1407,
       "coOccurrence": 0.0,
       "consumerSet": 0.0,
       "dataAccess": 0.0,
-      "imports": 0.5549,
+      "imports": 0.7026,
       "neighborhood": 1.0,
+      "semantic": 0.3678,
       "typeSignature": 1.0
     }
   },
   {
-    "avgSimilarity": 0.4607,
+    "avgSimilarity": 0.3826,
     "consumerOverlap": 1.0,
     "directorySpread": 1,
     "id": "cluster-003",
@@ -83,7 +85,7 @@
       "frontend/src/data/usePipelineSelectors.ts::useError",
       "frontend/src/data/usePipelineSelectors.ts::useLoading"
     ],
-    "rankScore": 1.6585,
+    "rankScore": 1.3774,
     "sharedCallees": [],
     "signalBreakdown": {
       "behavior": 0.9375,
@@ -94,14 +96,47 @@
       "dataAccess": 0.0,
       "imports": 0.0,
       "neighborhood": 1.0,
+      "semantic": 0.1052,
       "typeSignature": 0.7
     }
   },
   {
-    "avgSimilarity": 0.5424,
-    "consumerOverlap": 1.0,
+    "avgSimilarity": 0.4263,
+    "consumerOverlap": 0.0,
     "directorySpread": 1,
     "id": "cluster-004",
+    "kindMix": {
+      "function": 3
+    },
+    "memberCount": 3,
+    "members": [
+      "frontend/src/views/DetectionView.tsx::default",
+      "frontend/src/views/PolicyExplorer.tsx::default",
+      "frontend/src/views/PredictionView.tsx::default"
+    ],
+    "rankScore": 1.2789,
+    "sharedCallees": [
+      "useCallback",
+      "useState"
+    ],
+    "signalBreakdown": {
+      "behavior": 0.9375,
+      "callSequence": 0.25,
+      "calleeSet": 0.0755,
+      "coOccurrence": 0.0,
+      "consumerSet": 0.0,
+      "dataAccess": 0.0,
+      "imports": 0.8671,
+      "neighborhood": 1.0,
+      "semantic": 0.4243,
+      "typeSignature": 1.0
+    }
+  },
+  {
+    "avgSimilarity": 0.4146,
+    "consumerOverlap": 1.0,
+    "directorySpread": 1,
+    "id": "cluster-005",
     "kindMix": {
       "function": 1,
       "hook": 1
@@ -111,7 +146,7 @@
       "frontend/src/auth.ts::signOut",
       "frontend/src/data/useStatusSubscription.ts::useStatusSubscription"
     ],
-    "rankScore": 1.3018,
+    "rankScore": 0.995,
     "sharedCallees": [],
     "signalBreakdown": {
       "behavior": 0.75,
@@ -122,6 +157,7 @@
       "dataAccess": 0.0,
       "imports": 0.0,
       "neighborhood": 1.0,
+      "semantic": 0.0,
       "typeSignature": 1.0
     }
   }

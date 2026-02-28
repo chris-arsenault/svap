@@ -1,5 +1,7 @@
-import React, { useCallback, useState } from "react";
+import React from "react";
 import { useTaxonomy, useCases } from "../data/usePipelineSelectors";
+import { useExpandSingle, expandableProps } from "../hooks";
+import { ViewHeader } from "../components/SharedUI";
 import type { Case, Quality } from "../types";
 
 function QualityCard({
@@ -14,16 +16,8 @@ function QualityCard({
   return (
     <div
       className={`stagger-in quality-card ${isSelected ? "selected" : ""}`}
-      role="button"
-      tabIndex={0}
-      onClick={() => onSelectId(quality.quality_id)}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          onSelectId(quality.quality_id);
-        }
-      }}
-       
+      {...expandableProps(() => onSelectId(quality.quality_id))}
+
       style={{ "--q-color": quality.color } as React.CSSProperties}
     >
       <div className="quality-card-header">
@@ -82,20 +76,17 @@ function QualityDetail({ quality, matchingCases }: { quality: Quality; matchingC
 export default function TaxonomyView() {
   const taxonomy = useTaxonomy();
   const cases = useCases();
-  const [selectedQuality, setSelectedQuality] = useState<string | null>(null);
-  const toggleQuality = useCallback((id: string) => setSelectedQuality((prev) => (prev === id ? null : id)), []);
+  const { expandedId: selectedQuality, toggle: toggleQuality } = useExpandSingle();
 
   const selectedData = selectedQuality ? taxonomy.find((q) => q.quality_id === selectedQuality) : null;
   const matchingCases = selectedQuality ? cases.filter((c) => c.qualities.includes(selectedQuality)) : [];
 
   return (
     <div>
-      <div className="view-header stagger-in">
-        <h2>Vulnerability Taxonomy</h2>
-        <div className="view-desc">
-          {taxonomy.length} structural qualities extracted from enforcement cases — click any quality for details
-        </div>
-      </div>
+      <ViewHeader
+        title="Vulnerability Taxonomy"
+        description={<>{taxonomy.length} structural qualities extracted from enforcement cases — click any quality for details</>}
+      />
 
       <div className="quality-grid">
         {taxonomy.map((q) => (

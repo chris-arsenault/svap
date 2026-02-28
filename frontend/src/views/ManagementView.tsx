@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRunPipeline, useSeedPipeline, useRefresh } from "../data/usePipelineSelectors";
 import { apiGet, apiPost } from "../data/api";
 import { useAsyncAction } from "../hooks";
-import { ErrorBanner, Badge } from "../components/SharedUI";
+import { ErrorBanner, Badge, ViewHeader, MetricCard } from "../components/SharedUI";
 
 // ── Types ────────────────────────────────────────────────────────────────
 
@@ -215,16 +215,8 @@ function RunsPanel({
 function ManagementMetrics({ runningCount, totalRuns }: { runningCount: number; totalRuns: number }) {
   return (
     <div className="metrics-row">
-      <div className="metric-card stagger-in">
-        <div className="metric-label">Running</div>
-        <div className="metric-value">{runningCount}</div>
-        <div className="metric-sub">executions</div>
-      </div>
-      <div className="metric-card stagger-in">
-        <div className="metric-label">Total Runs</div>
-        <div className="metric-value">{totalRuns}</div>
-        <div className="metric-sub">in database</div>
-      </div>
+      <MetricCard label="Running" value={runningCount} sub="executions" />
+      <MetricCard label="Total Runs" value={totalRuns} sub="in database" />
     </div>
   );
 }
@@ -297,10 +289,7 @@ export default function ManagementView() {
 
   return (
     <div>
-      <div className="view-header stagger-in">
-        <h2>Pipeline Management</h2>
-        <div className="view-desc">Manage Step Functions executions and pipeline runs</div>
-      </div>
+      <ViewHeader title="Pipeline Management" description="Manage Step Functions executions and pipeline runs" />
       <ErrorBanner error={error} onDismiss={clearError} />
       <ManagementMetrics runningCount={runningCount} totalRuns={runs.length} />
       <ExecutionsPanel executions={executions} busy={busy} onRefresh={refreshAll} onStop={stopExecution} />

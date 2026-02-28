@@ -1,7 +1,8 @@
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useDetectionPatterns } from "../data/usePipelineSelectors";
-import { Badge } from "../components/SharedUI";
+import { useExpandSet, expandableProps } from "../hooks";
+import { Badge, ViewHeader } from "../components/SharedUI";
 import type { DetectionPattern, RiskLevel } from "../types";
 
 const PRIORITY_ORDER: RiskLevel[] = ["critical", "high", "medium", "low"];
@@ -95,12 +96,7 @@ function PatternBlock({
   return (
     <div
       className={`detection-pattern${isExpanded ? " expanded" : ""}`}
-      role="button"
-      tabIndex={0}
-      onClick={() => onToggle(pat.pattern_id)}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onToggle(pat.pattern_id); }
-      }}
+      {...expandableProps(() => onToggle(pat.pattern_id))}
     >
       <div className="detection-pattern-header">
         <Badge level={pat.priority}>{pat.priority}</Badge>
@@ -164,12 +160,7 @@ function StepRow({
     <div className="detection-step">
       <div
         className="detection-step-content"
-        role="button"
-        tabIndex={0}
-        onClick={() => onToggle(step.step_id)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onToggle(step.step_id); }
-        }}
+        {...expandableProps(() => onToggle(step.step_id))}
       >
         <div className="detection-step-header">
           {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
@@ -219,12 +210,7 @@ function TreePanel({
     <div className="panel stagger-in">
       <div
         className="panel-header clickable"
-        role="button"
-        tabIndex={0}
-        onClick={() => onToggle(group.tree_id)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onToggle(group.tree_id); }
-        }}
+        {...expandableProps(() => onToggle(group.tree_id))}
       >
         <div className="detection-header-left">
           {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
@@ -271,23 +257,12 @@ function TreePanel({
 
 // ── Root ──────────────────────────────────────────────────────────────────
 
-function toggleSet(prev: Set<string>, id: string): Set<string> {
-  const next = new Set(prev);
-  if (next.has(id)) next.delete(id);
-  else next.add(id);
-  return next;
-}
-
 export default function DetectionView() {
   const detection_patterns = useDetectionPatterns();
-  const [filterPriority, setFilterPriority] = useState<RiskLevel | null>(null);
-  const [expandedTrees, setExpandedTrees] = useState<Set<string>>(new Set());
-  const [expandedSteps, setExpandedSteps] = useState<Set<string>>(new Set());
-  const [expandedPatterns, setExpandedPatterns] = useState<Set<string>>(new Set());
-
-  const toggleTree = useCallback((id: string) => setExpandedTrees((p) => toggleSet(p, id)), []);
-  const toggleStep = useCallback((id: string) => setExpandedSteps((p) => toggleSet(p, id)), []);
-  const togglePattern = useCallback((id: string) => setExpandedPatterns((p) => toggleSet(p, id)), []);
+  const [filterPriority, setFilterPriority] = React.useState<RiskLevel | null>(null);
+  const { expanded: expandedTrees, toggle: toggleTree, set: setExpandedTrees } = useExpandSet();
+  const { expanded: expandedSteps, toggle: toggleStep, set: setExpandedSteps } = useExpandSet();
+  const { expanded: expandedPatterns, toggle: togglePattern, reset: resetPatterns } = useExpandSet();
 
   const filtered = filterPriority
     ? detection_patterns.filter((p) => p.priority === filterPriority)
@@ -301,26 +276,23 @@ export default function DetectionView() {
     counts[p.priority] = (counts[p.priority] || 0) + 1;
   });
 
-  const expandAll = useCallback(() => {
+  const expandAll = React.useCallback(() => {
     setExpandedTrees(new Set(treeGroups.map((g) => g.tree_id)));
     setExpandedSteps(new Set(treeGroups.flatMap((g) => g.steps.map((s) => s.step_id))));
-  }, [treeGroups]);
+  }, [treeGroups, setExpandedTrees, setExpandedSteps]);
 
-  const collapseAll = useCallback(() => {
+  const collapseAll = React.useCallback(() => {
     setExpandedTrees(new Set());
     setExpandedSteps(new Set());
-    setExpandedPatterns(new Set());
-  }, []);
+    resetPatterns();
+  }, [setExpandedTrees, setExpandedSteps, resetPatterns]);
 
   return (
     <div>
-      <div className="view-header stagger-in">
-        <h2>Detection Patterns</h2>
-        <div className="view-desc">
-          {detection_patterns.length} anomaly signals across {treeGroups.length} polic
-          {treeGroups.length === 1 ? "y" : "ies"}
-        </div>
-      </div>
+      <ViewHeader
+        title="Detection Patterns"
+        description={<>{detection_patterns.length} anomaly signals across {treeGroups.length} polic{treeGroups.length === 1 ? "y" : "ies"}</>}
+      />
 
       <div className="filter-bar filter-bar-mb stagger-in">
         <button

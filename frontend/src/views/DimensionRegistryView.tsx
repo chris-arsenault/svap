@@ -1,6 +1,7 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect } from "react";
 import { useDimensions, useFetchDimensions } from "../data/usePipelineSelectors";
-import { Badge, QualityTags } from "../components/SharedUI";
+import { Badge, QualityTags, ViewHeader, MetricCard } from "../components/SharedUI";
+import { useExpandSingle, expandableProps } from "../hooks";
 import type { Dimension, RiskLevel } from "../types";
 import { ChevronDown, ChevronRight } from "lucide-react";
 
@@ -28,15 +29,7 @@ function DimensionCard({
     <div className="quality-card stagger-in">
       <div
         className="quality-card-header clickable cursor-pointer"
-        onClick={() => onToggle(dim.dimension_id)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            onToggle(dim.dimension_id);
-          }
-        }}
-        role="button"
-        tabIndex={0}
+        {...expandableProps(() => onToggle(dim.dimension_id))}
       >
         <div className="flex-row">
           {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
@@ -88,45 +81,23 @@ export default function DimensionRegistryView() {
   const dimensions = useDimensions();
   const fetchDimensions = useFetchDimensions();
 
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const { expandedId, toggle: toggleId } = useExpandSingle();
 
   useEffect(() => {
     fetchDimensions();
   }, [fetchDimensions]);
 
-  const toggleId = useCallback(
-    (id: string) => setExpandedId((prev) => (prev === id ? null : id)),
-    [],
-  );
-
   return (
     <div>
-      <div className="view-header stagger-in">
-        <h2>Dimension Registry</h2>
-        <div className="view-desc">
-          Structural properties that bridge cases and policies. Each dimension describes a mechanical
-          aspect of how a policy operates.
-        </div>
-      </div>
+      <ViewHeader
+        title="Dimension Registry"
+        description="Structural properties that bridge cases and policies. Each dimension describes a mechanical aspect of how a policy operates."
+      />
 
       <div className="metrics-row">
-        <div className="metric-card stagger-in">
-          <div className="metric-label">Dimensions</div>
-          <div className="metric-value">{dimensions.length}</div>
-          <div className="metric-sub">registered</div>
-        </div>
-        <div className="metric-card stagger-in">
-          <div className="metric-label">Seed</div>
-          <div className="metric-value">{dimensions.filter((d) => d.origin === "seed").length}</div>
-          <div className="metric-sub">built-in</div>
-        </div>
-        <div className="metric-card stagger-in">
-          <div className="metric-label">Derived</div>
-          <div className="metric-value">
-            {dimensions.filter((d) => d.origin === "case_derived" || d.origin === "policy_derived").length}
-          </div>
-          <div className="metric-sub">from analysis</div>
-        </div>
+        <MetricCard label="Dimensions" value={dimensions.length} sub="registered" />
+        <MetricCard label="Seed" value={dimensions.filter((d) => d.origin === "seed").length} sub="built-in" />
+        <MetricCard label="Derived" value={dimensions.filter((d) => d.origin === "case_derived" || d.origin === "policy_derived").length} sub="from analysis" />
       </div>
 
       <div className="quality-grid">

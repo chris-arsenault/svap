@@ -1,6 +1,6 @@
 {
   "created": "2026-02-27T17:20:00Z",
-  "updated": "2026-02-28T09:19:24.432230+00:00",
+  "updated": "2026-02-28T10:47:34.882408+00:00",
   "merges": [
     {
       "primary": "frontend-error-loading-handling",
@@ -21,6 +21,11 @@
       "primary": "frontend-empty-state-handling",
       "absorbed": "frontend-expandable-accessibility",
       "reason": "Jaccard file overlap: 0.56"
+    },
+    {
+      "primary": "backend-config-duplication",
+      "absorbed": "backend-config-loading-duplication",
+      "reason": "Jaccard file overlap: 1.00"
     }
   ],
   "plan": [
@@ -86,7 +91,9 @@
     {
       "area_id": "backend-config-duplication",
       "rank": 6,
-      "depends_on": [],
+      "depends_on": [
+        "dead-pipeline-prototype"
+      ],
       "phase": "completed",
       "canonical_variant": "factory-function",
       "unify_summary": "Extracted to svap/defaults.py, both api.py and stage_runner.py import from it",
@@ -95,9 +102,44 @@
       ]
     },
     {
-      "area_id": "backend-logging-inconsistency",
+      "area_id": "view-scaffold-duplication",
       "rank": 7,
-      "depends_on": [],
+      "depends_on": [
+        "dead-prototype-codebase",
+        "frontend-error-loading-handling"
+      ],
+      "phase": "completed",
+      "canonical_variant": "ViewHeader-MetricCard",
+      "unify_summary": "Extracted ViewHeader and MetricCard to SharedUI.tsx. All 12 views now use ViewHeader. 5 views with metrics rows use MetricCard. Eliminated ~120 lines of duplicated scaffold markup.",
+      "guard_artifacts": [
+        "frontend/eslint-rules/no-manual-view-header.js",
+        "docs/adr/019-view-scaffold-shared-components.md",
+        "docs/patterns/view-scaffold.md"
+      ]
+    },
+    {
+      "area_id": "tree-hierarchy-duplication",
+      "rank": 8,
+      "depends_on": [
+        "frontend-error-loading-handling"
+      ],
+      "phase": "completed",
+      "canonical_variant": "useExpandSet-expandableProps",
+      "unify_summary": "Extracted useExpandSet, useExpandSingle, expandableProps to hooks.ts. DetectionView uses useExpandSet for multi-expand. PredictionView and PolicyExplorer use useExpandSingle/expandableProps. Eliminated ~60 lines of duplicated expand/collapse logic.",
+      "guard_artifacts": [
+        "frontend/eslint-rules/no-manual-expand-state.js",
+        "docs/adr/020-shared-expand-collapse-hooks.md",
+        "docs/patterns/expand-collapse.md"
+      ]
+    },
+    {
+      "area_id": "backend-logging-inconsistency",
+      "rank": 9,
+      "depends_on": [
+        "backend-config-duplication",
+        "dead-pipeline-prototype",
+        "parallel-execution-duplication"
+      ],
       "phase": "completed",
       "canonical_variant": "logging-module",
       "unify_summary": "Replaced 129 print() calls with logging module across all 11 stage files. All use logger = logging.getLogger(__name__).",
@@ -109,8 +151,11 @@
     },
     {
       "area_id": "frontend-empty-state-handling",
-      "rank": 8,
-      "depends_on": [],
+      "rank": 10,
+      "depends_on": [
+        "frontend-error-loading-handling",
+        "view-scaffold-duplication"
+      ],
       "phase": "completed",
       "canonical_variant": "div-empty-state",
       "unify_summary": "Added empty states to CaseSourcing (cases table + source registry) and TaxonomyView. Added keyboard accessibility (tabIndex + onKeyDown) to 3 table row expanders in CaseSourcing, SourcesView, DiscoveryView.",
@@ -119,9 +164,30 @@
       ]
     },
     {
+      "area_id": "backend-utility-print-statements",
+      "rank": 11,
+      "depends_on": [
+        "backend-config-duplication",
+        "backend-logging-inconsistency",
+        "dead-pipeline-prototype"
+      ],
+      "phase": "completed",
+      "canonical_variant": "logging-module",
+      "unify_summary": "Replaced 9 print() calls with logging module in parallel.py (4), storage.py (4), bedrock_client.py (1). All use logger = logging.getLogger(__name__).",
+      "guard_artifacts": [
+        "docs/adr/017-backend-structured-logging.md",
+        "docs/patterns/backend-logging.md",
+        "backend/scripts/check-no-print.sh"
+      ]
+    },
+    {
       "area_id": "frontend-auth-token-access",
-      "rank": 9,
-      "depends_on": [],
+      "rank": 12,
+      "depends_on": [
+        "dead-prototype-codebase",
+        "frontend-error-loading-handling",
+        "view-scaffold-duplication"
+      ],
       "phase": "completed",
       "canonical_variant": "shared-api-utility",
       "unify_summary": "useStatusSubscription.ts migrated from raw fetch+getToken to apiGet from data/api.ts. Zero files now bypass the shared API utility.",
@@ -132,9 +198,30 @@
       ]
     },
     {
+      "area_id": "data-display-view-duplication",
+      "rank": 13,
+      "depends_on": [
+        "frontend-empty-state-handling",
+        "frontend-error-loading-handling"
+      ],
+      "phase": "completed",
+      "canonical_variant": "useExpandSingle-expandableProps",
+      "unify_summary": "All 4 data display views migrated to useExpandSingle and expandableProps from hooks.ts. CaseSourcing, DimensionRegistryView, TaxonomyView, and DiscoveryView now share expand/collapse infrastructure.",
+      "guard_artifacts": [
+        "frontend/eslint-rules/no-manual-expand-state.js",
+        "docs/adr/020-shared-expand-collapse-hooks.md",
+        "docs/patterns/expand-collapse.md"
+      ]
+    },
+    {
       "area_id": "backend-route-error-handling",
-      "rank": 10,
-      "depends_on": [],
+      "rank": 14,
+      "depends_on": [
+        "backend-config-duplication",
+        "backend-logging-inconsistency",
+        "backend-utility-print-statements",
+        "dead-pipeline-prototype"
+      ],
       "phase": "completed",
       "canonical_variant": "path-param-helper",
       "unify_summary": "Added _path_param() helper, all routes use it for path parameter extraction",

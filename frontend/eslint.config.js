@@ -14,6 +14,8 @@ import noDirectStoreImport from "./eslint-rules/no-direct-store-import.js";
 import noDirectFetch from "./eslint-rules/no-direct-fetch.js";
 import noEscapeHatches from "./eslint-rules/no-escape-hatches.js";
 import noManualAsyncState from "./eslint-rules/no-manual-async-state.js";
+import noManualViewHeader from "./eslint-rules/no-manual-view-header.js";
+import noManualExpandState from "./eslint-rules/no-manual-expand-state.js";
 
 export default tseslint.config(
   {
@@ -47,7 +49,7 @@ export default tseslint.config(
       "react-refresh": reactRefresh,
       "react-perf": reactPerf,
       "jsx-a11y": jsxA11y,
-      local: { rules: { "max-jsx-props": maxJsxProps, "no-inline-styles": noInlineStyles, "no-direct-store-import": noDirectStoreImport, "no-direct-fetch": noDirectFetch, "no-escape-hatches": noEscapeHatches, "no-manual-async-state": noManualAsyncState } },
+      local: { rules: { "max-jsx-props": maxJsxProps, "no-inline-styles": noInlineStyles, "no-direct-store-import": noDirectStoreImport, "no-direct-fetch": noDirectFetch, "no-escape-hatches": noEscapeHatches, "no-manual-async-state": noManualAsyncState, "no-manual-view-header": noManualViewHeader, "no-manual-expand-state": noManualExpandState } },
     },
     languageOptions: {
       globals: {
@@ -82,6 +84,8 @@ export default tseslint.config(
       "local/no-direct-fetch": "warn",
       "local/no-escape-hatches": "warn",
       "local/no-manual-async-state": "warn",
+      "local/no-manual-view-header": "warn",
+      "local/no-manual-expand-state": "warn",
     },
   },
 

@@ -1,8 +1,9 @@
 import React, { useState } from "react";
+import { expandableProps } from "../hooks";
 import {
   usePolicies, usePolicyCatalog, useScannedPrograms, useDataSources, useThreshold,
 } from "../data/usePipelineSelectors";
-import { ScoreBar, QualityTags, RiskBadge } from "../components/SharedUI";
+import { ScoreBar, QualityTags, RiskBadge, ViewHeader } from "../components/SharedUI";
 
 interface CatalogNode {
   label: string;
@@ -31,6 +32,7 @@ function treeTextClass(depth: number): string {
 }
 
 function TreeNode({ node, depth = 0, scannedPrograms = EMPTY_PROGRAMS }: TreeNodeProps) {
+  // eslint-disable-next-line local/no-manual-expand-state -- per-node recursive state (ADR-020)
   const [expanded, setExpanded] = useState(depth < 2);
   const isExpandable = !!node.children || !!node.programs;
 
@@ -38,15 +40,7 @@ function TreeNode({ node, depth = 0, scannedPrograms = EMPTY_PROGRAMS }: TreeNod
     <div className={depth === 0 ? "tree-node root" : "tree-node"}>
       <div
         className="tree-label"
-        role="button"
-        tabIndex={0}
-        onClick={() => setExpanded(!expanded)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            setExpanded(!expanded);
-          }
-        }}
+        {...expandableProps(() => setExpanded(!expanded))}
       >
         <span className="tree-icon">{treeIcon(isExpandable, expanded)}</span>
         <span className={treeTextClass(depth)}>
@@ -194,13 +188,10 @@ export default function PolicyExplorer() {
 
   return (
     <div>
-      <div className="view-header stagger-in">
-        <h2>Policy Explorer</h2>
-        <div className="view-desc">
-          HHS policy catalog — <span className="scanned-indicator">{"\u25C6"} scanned policies</span> have
-          been evaluated against the vulnerability taxonomy
-        </div>
-      </div>
+      <ViewHeader
+        title="Policy Explorer"
+        description={<>HHS policy catalog — <span className="scanned-indicator">{"\u25C6"} scanned policies</span> have been evaluated against the vulnerability taxonomy</>}
+      />
 
       <div className="split-view">
         <div className="panel stagger-in">

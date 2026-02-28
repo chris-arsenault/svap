@@ -44,13 +44,13 @@
     "prefixB": "tree-step",
     "rulesA": 7,
     "rulesB": 11,
-    "score": 0.5419,
+    "score": 0.4796,
     "signals": {
       "categoryProfile": 0.8944,
       "customPropertyVocab": 0.7,
-      "propertyFrequency": 0.8566,
-      "ruleExactMatch": 0.3333,
-      "ruleSetMatch": 0.4444,
+      "propertyFrequency": 0.8507,
+      "ruleExactMatch": 0.2222,
+      "ruleSetMatch": 0.3333,
       "selectorPrefixOverlap": 0.0
     },
     "unitA": "frontend/src/index.css::detection-step",

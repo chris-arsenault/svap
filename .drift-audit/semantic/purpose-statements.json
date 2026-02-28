@@ -1,0 +1,74 @@
+[
+  {
+    "unitId": "frontend/src/views/CaseSourcing.tsx::default",
+    "purpose": "Render the case corpus table with expandable rows showing case detail (source, dollar amount, quality tags). Read-only view — no async operations."
+  },
+  {
+    "unitId": "frontend/src/views/ConvergenceMatrix.tsx::default",
+    "purpose": "Render a matrix visualization showing which qualities appear in which policies. Cross-reference view — no async operations, no expand/collapse."
+  },
+  {
+    "unitId": "frontend/src/views/Dashboard.tsx::default",
+    "purpose": "Render the main dashboard with pipeline status, metrics cards, high-risk table, and pipeline controls. Entry point view with async operations (run/seed pipeline)."
+  },
+  {
+    "unitId": "frontend/src/views/DetectionView.tsx::default",
+    "purpose": "Render detection patterns organized in a 3-level hierarchy: exploitation trees → steps → patterns. Multi-level expand/collapse with filtering by priority."
+  },
+  {
+    "unitId": "frontend/src/views/PolicyExplorer.tsx::default",
+    "purpose": "Render policy catalog as a tree with expandable policy nodes showing scored qualities and scanned programs. Split-view layout."
+  },
+  {
+    "unitId": "frontend/src/views/PredictionView.tsx::default",
+    "purpose": "Render exploitation tree predictions organized as expandable tree panels with nested step nodes and confidence scores."
+  },
+  {
+    "unitId": "frontend/src/views/SourcesView.tsx::default",
+    "purpose": "Render enforcement source registry with CRUD operations — add source form, document upload, source deletion. Async operations via useAsyncAction."
+  },
+  {
+    "unitId": "frontend/src/views/TaxonomyView.tsx::default",
+    "purpose": "Render vulnerability taxonomy as a grid of quality cards with expandable detail showing matched cases. Single-expand selection pattern."
+  },
+  {
+    "unitId": "frontend/src/App.tsx::default",
+    "purpose": "Top-level app component handling authentication flow (Cognito), API gate (initial data load), and routing via react-router-dom."
+  },
+  {
+    "unitId": "frontend/src/views/DimensionRegistryView.tsx::default",
+    "purpose": "Render dimension registry with searchable grid of dimension cards showing scores and quality associations. Read-only view with fetch-on-mount."
+  },
+  {
+    "unitId": "frontend/src/views/DiscoveryView.tsx::default",
+    "purpose": "Render source discovery workflow — feed management, candidate review, and acceptance. Async operations via useAsyncAction for running feeds and reviewing candidates."
+  },
+  {
+    "unitId": "frontend/src/views/ManagementView.tsx::default",
+    "purpose": "Render pipeline management dashboard — execution monitoring, run history, stop/delete operations. Admin view with multiple async operations."
+  },
+  {
+    "unitId": "frontend/src/views/ResearchView.tsx::default",
+    "purpose": "Render deep research workflow — triage results, research session detail with findings and quality assessments. Async expand with data fetching."
+  },
+  {
+    "unitId": "frontend/src/auth.ts::getSession",
+    "purpose": "Retrieve the current Cognito user session, returning the JWT ID token if authenticated or null if not. Used by apiGet/apiPost for Authorization headers."
+  },
+  {
+    "unitId": "frontend/src/data/usePipelineSelectors.ts::useError",
+    "purpose": "Zustand selector hook that extracts the global error state from the pipeline store. Used by ApiGate for initial load error display."
+  },
+  {
+    "unitId": "frontend/src/data/usePipelineSelectors.ts::useLoading",
+    "purpose": "Zustand selector hook that extracts the global loading state from the pipeline store. Used by ApiGate for initial load spinner."
+  },
+  {
+    "unitId": "frontend/src/auth.ts::signOut",
+    "purpose": "Sign out the current Cognito user by clearing the session and revoking tokens. Called from Sidebar's sign-out button."
+  },
+  {
+    "unitId": "frontend/src/data/useStatusSubscription.ts::useStatusSubscription",
+    "purpose": "Always-on dual-rate polling hook for pipeline status. Polls GET /api/status at fast (3s) or slow (15s) rate depending on whether stages are running. Triggers dashboard refresh on data changes."
+  }
+]

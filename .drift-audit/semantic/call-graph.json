@@ -4,9 +4,9 @@
       "loadSession": 4.574710978503383,
       "setAuth": 4.574710978503383,
       "signOut": 4.574710978503383,
-      "useCallback": 2.272125885509337,
+      "useCallback": 2.176815705705012,
       "useEffect": 2.782951509275328,
-      "useState": 4.179608657430765
+      "useState": 4.353631411410024
     },
     "chainPatternHashes": [],
     "depthProfile": [
@@ -695,8 +695,8 @@
       "fn": 4.574710978503383,
       "setBusy": 9.149421957006766,
       "setError": 13.724132935510148,
-      "useCallback": 4.544251771018674,
-      "useState": 4.179608657430765
+      "useCallback": 4.353631411410024,
+      "useState": 4.353631411410024
     },
     "chainPatternHashes": [],
     "depthProfile": [
@@ -947,10 +947,10 @@
     "calleeSetVector": {
       "cases.map": 4.574710978503383,
       "setExpandedCase": 4.574710978503383,
-      "useCallback": 2.272125885509337,
-      "useCases": 3.4760986898352733,
+      "useCallback": 2.176815705705012,
+      "useCases": 3.188416617383492,
       "useEnforcementSources": 3.8815637979434374,
-      "useState": 2.0898043287153825
+      "useState": 2.176815705705012
     },
     "chainPatternHashes": [],
     "depthProfile": [
@@ -968,11 +968,11 @@
       "<expr>.sort": 4.574710978503383,
       "qualities.map": 4.574710978503383,
       "sorted.map": 4.574710978503383,
-      "useCases": 3.4760986898352733,
-      "usePolicies": 3.4760986898352733,
-      "useState": 2.0898043287153825,
-      "useTaxonomy": 3.8815637979434374,
-      "useThreshold": 3.8815637979434374
+      "useCases": 3.188416617383492,
+      "usePolicies": 3.188416617383492,
+      "useState": 2.176815705705012,
+      "useTaxonomy": 3.4760986898352733,
+      "useThreshold": 3.4760986898352733
     },
     "chainPatternHashes": [],
     "depthProfile": [
@@ -990,17 +990,20 @@
       "cases.reduce": 4.574710978503383,
       "detection_patterns.filter": 3.8815637979434374,
       "policies.filter": 4.574710978503383,
-      "usePipelineStore": 4.574710978503383,
-      "useShallow": 4.574710978503383
+      "useCases": 3.188416617383492,
+      "useDetectionPatterns": 3.8815637979434374,
+      "usePolicies": 3.188416617383492,
+      "useTaxonomy": 3.4760986898352733,
+      "useThreshold": 3.4760986898352733
     },
     "chainPatternHashes": [],
     "depthProfile": [
-      5,
+      8,
       0,
       0
     ],
     "sequenceHashes": {
-      "init": "5ebd2f1a7018ad925580055269a65364b258fb52ad92940b9379c173377b1b7a"
+      "init": "a059f0c635c86895c91df947afa77dc9c439085876b7ff4b84f1485b5a2985a8"
     }
   },
   "frontend/src/views/DetectionView.tsx::default": {
@@ -1017,10 +1020,10 @@
       "toggleSet": 13.724132935510148,
       "treeGroups.flatMap": 4.574710978503383,
       "treeGroups.map": 9.149421957006766,
-      "useCallback": 11.360629427546684,
-      "useDetectionPatterns": 4.574710978503383,
+      "useCallback": 10.88407852852506,
+      "useDetectionPatterns": 3.8815637979434374,
       "useMemo": 4.574710978503383,
-      "useState": 8.35921731486153
+      "useState": 8.707262822820049
     },
     "chainPatternHashes": [],
     "depthProfile": [
@@ -1036,21 +1039,19 @@
   },
   "frontend/src/views/DimensionRegistryView.tsx::default": {
     "calleeSetVector": {
-      "dim.probing_questions.map": 4.574710978503383,
       "dimensions.filter": 9.149421957006766,
       "dimensions.map": 4.574710978503383,
       "fetchDimensions": 4.574710978503383,
-      "originBadge": 4.574710978503383,
       "setExpandedId": 4.574710978503383,
-      "useCallback": 2.272125885509337,
+      "useCallback": 2.176815705705012,
       "useDimensions": 4.574710978503383,
       "useEffect": 2.782951509275328,
       "useFetchDimensions": 4.574710978503383,
-      "useState": 2.0898043287153825
+      "useState": 2.176815705705012
     },
     "chainPatternHashes": [],
     "depthProfile": [
-      11,
+      9,
       0,
       0
     ],
@@ -1058,88 +1059,75 @@
       "conditional": "455a4894d4e3e0c73fa607f8fc3de04652d8587a46c0f84d9a4125740ba95c55",
       "effect": "6738e2b31180a42a3d3c0ec303f07fbe7223822460a653e04eae3bb5c1fd6757",
       "init": "303db15dbb1da059c8753b8f0091d135ab64e2ffc1aed63fc77a177952fa4268",
-      "render": "18c4eb379cede8e5fe1367f5dbe9dd0d4ea20edffcc1c905506c24ee64c6e9d5"
+      "render": "db98a2102b315418e1c9c50a1c7ea460904259dfa0b17fb42d1dcd151bae12e8"
     }
   },
   "frontend/src/views/DiscoveryView.tsx::default": {
     "calleeSetVector": {
-      "<expr>.toLocaleDateString": 4.574710978503383,
       "fetchDiscovery": 4.574710978503383,
-      "filtered.map": 4.574710978503383,
       "reviewCandidate": 4.574710978503383,
       "run": 6.9521973796705465,
-      "source_candidates.filter": 13.724132935510148,
-      "source_feeds.map": 4.574710978503383,
+      "setExpandedFeed": 4.574710978503383,
+      "source_candidates.filter": 9.149421957006766,
       "useAsyncAction": 3.4760986898352733,
-      "useCallback": 4.544251771018674,
+      "useCallback": 6.5304471171150364,
       "useEffect": 2.782951509275328,
       "useFetchDiscovery": 4.574710978503383,
       "useReviewCandidate": 4.574710978503383,
       "useRunDiscoveryFeeds": 4.574710978503383,
       "useSourceCandidates": 4.574710978503383,
       "useSourceFeeds": 4.574710978503383,
-      "useState": 4.179608657430765
+      "useState": 4.353631411410024
     },
     "chainPatternHashes": [],
     "depthProfile": [
-      16,
+      14,
       0,
       0
     ],
     "sequenceHashes": {
-      "conditional": "5296aaf5fc2af422ef6618c11e8c30cd246e4f760f4a6c4d518771724acc96bb",
       "effect": "a388237b72f6755b1ada5939486930006a416b5704c8a7cfac71f116a699d44a",
       "handler": "3fef2123402b5c116f02ba37a81d5f5224f2ded0c42c8d70f9e9f0d36bd472a9",
-      "init": "7edd740daa5b0c8c8a4577fae376bf221cc2e1d5feb5a105ddca08fe6129b347",
-      "render": "dfd9e7aae623d9edf67037974e649828d9c8322cb5ab0164d2904202be2913b6"
+      "init": "f01fd08e08a26d56b59b59a10b24e1705559343337b132bea08cd3d41bf52451",
+      "render": "a5f3855c37b42825bee4501e81a72b87bd37225e1a46d5d697e5bf51524f8fc0"
     }
   },
   "frontend/src/views/ManagementView.tsx::default": {
     "calleeSetVector": {
-      "<expr>.getTime": 9.149421957006766,
-      "Math.round": 4.574710978503383,
-      "Promise.all": 19.407818989717185,
-      "STAGE_ORDER.map": 4.574710978503383,
+      "Promise.all": 22.873554892516914,
       "apiGet": 9.149421957006766,
       "apiPost": 9.149421957006766,
-      "executionStatusLevel": 4.574710978503383,
       "executions.filter": 4.574710978503383,
-      "executions.map": 4.574710978503383,
       "fetchExecutions": 22.873554892516914,
       "fetchRuns": 22.873554892516914,
-      "r.stages.map": 4.574710978503383,
       "refresh": 4.574710978503383,
       "refreshAll": 4.574710978503383,
       "res.json": 9.149421957006766,
-      "run": 3.4760986898352733,
+      "run": 17.380493449176367,
       "runPipeline": 4.574710978503383,
-      "runs.map": 4.574710978503383,
       "seedPipeline": 4.574710978503383,
       "setExecutions": 4.574710978503383,
       "setRuns": 4.574710978503383,
-      "stageMap.get": 4.574710978503383,
-      "stageStatusClass": 4.574710978503383,
-      "timeAgo": 9.149421957006766,
       "useAsyncAction": 3.4760986898352733,
-      "useCallback": 6.816377656528011,
+      "useCallback": 15.237709939935085,
       "useEffect": 2.782951509275328,
       "useRefresh": 4.574710978503383,
       "useRunPipeline": 4.574710978503383,
       "useSeedPipeline": 4.574710978503383,
-      "useState": 4.179608657430765
+      "useState": 4.353631411410024,
+      "window.confirm": 13.724132935510148
     },
     "chainPatternHashes": [],
     "depthProfile": [
-      31,
+      22,
       0,
       0
     ],
     "sequenceHashes": {
-      "conditional": "fb8af07048fa6342510559871a9e7264717cb941a4d05e70c969cd381b586662",
+      "conditional": "94b4786dd0c626a668ab73463772d2ce5349e664d7fc4d7aca2e7c354a90072f",
       "effect": "1edcf5bd6894a61cc768860de8a2f58b2791955ef752d07fb9e4d45e24b91394",
-      "handler": "ed837e58d7c44ba2ac98d96cd39a9b8df1548f434b859c64d513cc38adf96375",
-      "init": "ea7a6ef19103cf4a417a210b523835c9c009e2d64f199480274b3fe3beba8f6d",
-      "render": "6a5f86f5205617851ff780b47036c9d157b99b23cf9a2ab47e2b93fdfbe3ccef"
+      "handler": "6a997edd7ac5ae021e598cf5897fc53036fd71ca735bfff7764fd7b5dace0a27",
+      "init": "5e0cb8bb907ead9fec70c84a5d5ed5a5b10a5d5847bc982111753f72cf16226f"
     }
   },
   "frontend/src/views/PolicyExplorer.tsx::default": {
@@ -1147,10 +1135,10 @@
       "Object.entries": 4.574710978503383,
       "Object.entries().map": 4.574710978503383,
       "useDataSources": 4.574710978503383,
-      "usePolicies": 3.4760986898352733,
+      "usePolicies": 3.188416617383492,
       "usePolicyCatalog": 4.574710978503383,
       "useScannedPrograms": 4.574710978503383,
-      "useThreshold": 3.8815637979434374
+      "useThreshold": 3.4760986898352733
     },
     "chainPatternHashes": [],
     "depthProfile": [
@@ -1167,9 +1155,9 @@
     "calleeSetVector": {
       "setExpandedTree": 4.574710978503383,
       "trees.map": 4.574710978503383,
-      "useCallback": 2.272125885509337,
+      "useCallback": 2.176815705705012,
       "useExploitationTrees": 4.574710978503383,
-      "useState": 2.0898043287153825
+      "useState": 2.176815705705012
     },
     "chainPatternHashes": [],
     "depthProfile": [
@@ -1184,71 +1172,51 @@
   },
   "frontend/src/views/ResearchView.tsx::default": {
     "calleeSetVector": {
-      "Promise.all": 3.8815637979434374,
-      "a.rationale.slice": 4.574710978503383,
-      "assessments.map": 4.574710978503383,
-      "confidenceBadge": 9.149421957006766,
-      "f.observation.slice": 4.574710978503383,
-      "fetchAssessments": 4.574710978503383,
-      "fetchFindings": 4.574710978503383,
       "fetchResearchSessions": 4.574710978503383,
       "fetchTriageResults": 4.574710978503383,
-      "findings.map": 4.574710978503383,
       "policies.find": 4.574710978503383,
-      "policyName": 9.149421957006766,
-      "presentBadge": 4.574710978503383,
       "research_sessions.filter": 9.149421957006766,
-      "research_sessions.map": 4.574710978503383,
       "run": 6.9521973796705465,
-      "setAssessments": 4.574710978503383,
-      "setExpandedPolicy": 9.149421957006766,
-      "setFindings": 4.574710978503383,
-      "t.rationale.slice": 4.574710978503383,
-      "t.triage_score.toFixed": 4.574710978503383,
-      "triage_results.map": 4.574710978503383,
       "useAsyncAction": 3.4760986898352733,
-      "useCallback": 9.088503542037348,
+      "useCallback": 6.5304471171150364,
       "useEffect": 2.782951509275328,
-      "useFetchAssessments": 4.574710978503383,
-      "useFetchFindings": 4.574710978503383,
       "useFetchResearchSessions": 4.574710978503383,
       "useFetchTriageResults": 4.574710978503383,
-      "usePolicies": 3.4760986898352733,
+      "usePolicies": 3.188416617383492,
       "useResearchSessions": 4.574710978503383,
       "useRunDeepResearch": 4.574710978503383,
       "useRunTriage": 4.574710978503383,
-      "useState": 6.269412986146147,
       "useTriageResults": 4.574710978503383
     },
     "chainPatternHashes": [],
     "depthProfile": [
-      35,
+      15,
       0,
       0
     ],
     "sequenceHashes": {
-      "conditional": "4bd948d1b48e4a4b20f7f01b5c1628a5500d046902debdd789e98f9ec15a792d",
       "effect": "91b92337b9f85b78e0cbc8c4abc8b1a277fa16aed37ae0d8dee59d26690e4d16",
-      "handler": "522efa9849e5b75ea55585518aaf9fff4df087998947380d8c3b27d4cda42c2d",
-      "init": "27b11201f11d225f89f7ac7375c679a78167880c9acccf92011661b521c9049e",
-      "render": "bcf6552768e63e8f4f2b097fdc0f2eda31d2e1ac66c4f99b6241381261e78ace"
+      "handler": "5e04ea3c82df5539e68869cfc65784b502a9a9a21de2d021663bb0cd78495542",
+      "init": "6839c7d747b94999c2306aaf63f54a4ec15a3aec1b88faeccda4888a63b63a35"
     }
   },
   "frontend/src/views/SourcesView.tsx::default": {
     "calleeSetVector": {
       "enforcement_sources.filter": 9.149421957006766,
       "enforcement_sources.map": 4.574710978503383,
+      "setShowAddForm": 4.574710978503383,
+      "useCallback": 2.176815705705012,
       "useEnforcementSources": 3.8815637979434374,
-      "useState": 2.0898043287153825
+      "useState": 2.176815705705012
     },
     "chainPatternHashes": [],
     "depthProfile": [
-      4,
+      6,
       0,
       0
     ],
     "sequenceHashes": {
-      "init": "238dfc0e7e2cf54663d1d6a241691a6163e663acc8a582fe619f2467c4df238b",
+      "init": "fd924e5b7577890608f271c32be408cc8059169e70e2619bbf5e147ce71ea41b",
       "render": "e648027c567b4fae1baa58340379a9c517b777226ce9138b1f041774c3cf8b75"
     }
   },
@@ -1259,10 +1227,10 @@
       "setSelectedQuality": 4.574710978503383,
       "taxonomy.find": 4.574710978503383,
       "taxonomy.map": 4.574710978503383,
-      "useCallback": 2.272125885509337,
-      "useCases": 3.4760986898352733,
-      "useState": 2.0898043287153825,
-      "useTaxonomy": 3.8815637979434374
+      "useCallback": 2.176815705705012,
+      "useCases": 3.188416617383492,
+      "useState": 2.176815705705012,
+      "useTaxonomy": 3.4760986898352733
     },
     "chainPatternHashes": [],
     "depthProfile": [

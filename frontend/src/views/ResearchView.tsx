@@ -4,9 +4,8 @@ import {
   useFetchTriageResults, useFetchResearchSessions,
   useRunTriage, useRunDeepResearch, useFetchFindings, useFetchAssessments,
 } from "../data/usePipelineSelectors";
-import { useAsyncAction } from "../hooks";
-import { ErrorBanner } from "../components/SharedUI";
-import { Badge, QualityTag, QualityTags } from "../components/SharedUI";
+import { useAsyncAction, useExpandSingle, expandableProps } from "../hooks";
+import { ErrorBanner, Badge, QualityTag, QualityTags, ViewHeader, MetricCard } from "../components/SharedUI";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import type { RiskLevel, TriageResult, ResearchSession, StructuralFinding, QualityAssessment } from "../types";
 
@@ -160,21 +159,9 @@ function ResearchMetrics({ triageCount, completedCount, inProgressCount }: {
 }) {
   return (
     <div className="metrics-row">
-      <div className="metric-card stagger-in">
-        <div className="metric-label">Triaged</div>
-        <div className="metric-value">{triageCount}</div>
-        <div className="metric-sub">policies ranked</div>
-      </div>
-      <div className="metric-card stagger-in">
-        <div className="metric-label">Researched</div>
-        <div className="metric-value">{completedCount}</div>
-        <div className="metric-sub">deep research</div>
-      </div>
-      <div className="metric-card stagger-in">
-        <div className="metric-label">In Progress</div>
-        <div className="metric-value">{inProgressCount}</div>
-        <div className="metric-sub">sessions</div>
-      </div>
+      <MetricCard label="Triaged" value={triageCount} sub="policies ranked" />
+      <MetricCard label="Researched" value={completedCount} sub="deep research" />
+      <MetricCard label="In Progress" value={inProgressCount} sub="sessions" />
     </div>
   );
 }
@@ -187,19 +174,11 @@ function SessionCard({ session, isExpanded, policyName, findings, assessments, o
   assessments: QualityAssessment[];
   onExpand: (policyId: string) => void;
 }) {
-  const handleClick = useCallback(() => onExpand(session.policy_id), [onExpand, session.policy_id]);
-  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onExpand(session.policy_id); }
-  }, [onExpand, session.policy_id]);
-
   return (
     <div className="panel mb-2">
       <div
         className="panel-header clickable"
-        onClick={handleClick}
-        onKeyDown={handleKeyDown}
-        role="button"
-        tabIndex={0}
+        {...expandableProps(() => onExpand(session.policy_id))}
       >
         {isExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
         <span className="font-semibold ml-2">{policyName}</span>
@@ -218,22 +197,22 @@ function SessionsPanel({ sessions, policyName }: {
 }) {
   const fetchFindings = useFetchFindings();
   const fetchAssessments = useFetchAssessments();
-  const [expandedPolicy, setExpandedPolicy] = useState<string | null>(null);
+  const { expandedId: expandedPolicy, toggle: togglePolicy } = useExpandSingle();
   const [findings, setFindings] = useState<StructuralFinding[]>([]);
   const [assessments, setAssessments] = useState<QualityAssessment[]>([]);
 
   const handleExpand = useCallback(
     async (policyId: string) => {
       if (expandedPolicy === policyId) {
-        setExpandedPolicy(null);
+        togglePolicy(policyId);
         return;
       }
-      setExpandedPolicy(policyId);
+      togglePolicy(policyId);
       const [f, a] = await Promise.all([fetchFindings(policyId), fetchAssessments(policyId)]);
       setFindings(f);
       setAssessments(a);
     },
-    [expandedPolicy, fetchFindings, fetchAssessments],
+    [expandedPolicy, togglePolicy, fetchFindings, fetchAssessments],
   );
 
   return (
@@ -295,12 +274,7 @@ export default function ResearchView() {
   return (
     <div>
       <ErrorBanner error={error} onDismiss={clearError} />
-      <div className="view-header stagger-in">
-        <h2>Policy Research</h2>
-        <div className="view-desc">
-          Three-pass structural vulnerability analysis: triage, deep regulatory research, and quality assessment.
-        </div>
-      </div>
+      <ViewHeader title="Policy Research" description="Three-pass structural vulnerability analysis: triage, deep regulatory research, and quality assessment." />
       <ResearchMetrics triageCount={triage_results.length} completedCount={completedCount} inProgressCount={inProgressCount} />
       <div className="filter-bar filter-bar-mb stagger-in">
         <button className="btn btn-accent" onClick={handleRunTriage} disabled={!!busy}>

@@ -1,7 +1,8 @@
-import React, { useCallback, useState } from "react";
+import React from "react";
 import { ExternalLink, ChevronDown, ChevronRight } from "lucide-react";
 import { useCases, useEnforcementSources } from "../data/usePipelineSelectors";
-import { QualityTags } from "../components/SharedUI";
+import { QualityTags, ViewHeader } from "../components/SharedUI";
+import { useExpandSingle } from "../hooks";
 import { formatDollars } from "../utils";
 import type { Case, EnforcementSource } from "../types";
 
@@ -89,15 +90,11 @@ function CaseRow({
 export default function CaseSourcing() {
   const cases = useCases();
   const enforcement_sources = useEnforcementSources();
-  const [expandedCase, setExpandedCase] = useState<string | null>(null);
-  const toggleCase = useCallback((id: string) => setExpandedCase((prev) => (prev === id ? null : id)), []);
+  const { expandedId: expandedCase, toggle: toggleCase } = useExpandSingle();
 
   return (
     <div>
-      <div className="view-header stagger-in">
-        <h2>Case Sourcing</h2>
-        <div className="view-desc">Enforcement cases in the corpus and sources for discovering new cases</div>
-      </div>
+      <ViewHeader title="Case Sourcing" description="Enforcement cases in the corpus and sources for discovering new cases" />
 
       <SourceRegistry sources={enforcement_sources} />
 

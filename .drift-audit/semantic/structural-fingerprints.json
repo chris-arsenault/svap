@@ -209,7 +209,7 @@
     ],
     "importConstellation": {
       "../data/usePipelineSelectors": 1.5789787049493917,
-      "../types": 1.5301885407799598,
+      "../types": 1.483668525145067,
       "../utils": 2.272125885509337,
       "react": 1.483668525145067
     },
@@ -244,7 +244,7 @@
     ],
     "importConstellation": {
       "../data/usePipelineSelectors": 1.5789787049493917,
-      "../types": 1.5301885407799598,
+      "../types": 1.483668525145067,
       "../utils": 2.272125885509337,
       "react": 1.483668525145067
     },
@@ -279,7 +279,7 @@
     ],
     "importConstellation": {
       "../data/usePipelineSelectors": 1.5789787049493917,
-      "../types": 1.5301885407799598,
+      "../types": 1.483668525145067,
       "../utils": 2.272125885509337,
       "react": 1.483668525145067
     },
@@ -314,7 +314,7 @@
     ],
     "importConstellation": {
       "../data/usePipelineSelectors": 1.5789787049493917,
-      "../types": 1.5301885407799598,
+      "../types": 1.483668525145067,
       "../utils": 2.272125885509337,
       "react": 1.483668525145067
     },
@@ -349,7 +349,7 @@
     ],
     "importConstellation": {
       "../data/usePipelineSelectors": 1.5789787049493917,
-      "../types": 1.5301885407799598,
+      "../types": 1.483668525145067,
       "../utils": 2.272125885509337,
       "react": 1.483668525145067
     },
@@ -384,7 +384,7 @@
     ],
     "importConstellation": {
       "../data/usePipelineSelectors": 1.5789787049493917,
-      "../types": 1.5301885407799598,
+      "../types": 1.483668525145067,
       "../utils": 2.272125885509337,
       "react": 1.483668525145067
     },
@@ -419,7 +419,7 @@
     ],
     "importConstellation": {
       "../data/usePipelineSelectors": 1.5789787049493917,
-      "../types": 1.5301885407799598,
+      "../types": 1.483668525145067,
       "../utils": 2.272125885509337,
       "react": 1.483668525145067
     },
@@ -454,7 +454,7 @@
     ],
     "importConstellation": {
       "../data/usePipelineSelectors": 1.5789787049493917,
-      "../types": 1.5301885407799598,
+      "../types": 1.483668525145067,
       "./SharedUI": 4.574710978503383,
       "lucide-react": 2.495269436823547,
       "react-router-dom": 3.4760986898352733
@@ -624,7 +624,7 @@
       0
     ],
     "importConstellation": {
-      "../types": 1.5301885407799598
+      "../types": 1.483668525145067
     },
     "jsxHash": {
       "exact": null,
@@ -656,7 +656,7 @@
       0
     ],
     "importConstellation": {
-      "../types": 1.5301885407799598,
+      "../types": 1.483668525145067,
       "./api": 3.4760986898352733,
       "zustand": 3.8815637979434374
     },
@@ -690,7 +690,7 @@
       0
     ],
     "importConstellation": {
-      "../types": 1.5301885407799598,
+      "../types": 1.483668525145067,
       "./api": 3.4760986898352733,
       "zustand": 3.8815637979434374
     },
@@ -2086,7 +2086,7 @@
       0
     ],
     "importConstellation": {
-      "../types": 1.5301885407799598,
+      "../types": 1.483668525145067,
       "./api": 3.4760986898352733,
       "./pipelineStore": 0.861138911799075,
       "react": 1.483668525145067
@@ -2845,7 +2845,7 @@
     "importConstellation": {
       "../components/SharedUI": 2.272125885509337,
       "../data/usePipelineSelectors": 1.5789787049493917,
-      "../types": 1.5301885407799598,
+      "../types": 1.483668525145067,
       "../utils": 2.272125885509337,
       "lucide-react": 2.495269436823547,
       "react": 1.483668525145067
@@ -2881,7 +2881,7 @@
     ],
     "importConstellation": {
       "../data/usePipelineSelectors": 1.5789787049493917,
-      "../types": 1.5301885407799598,
+      "../types": 1.483668525145067,
       "../utils": 2.272125885509337,
       "react": 1.483668525145067
     },
@@ -2901,9 +2901,7 @@
       0,
       0
     ],
-    "dataAccessPattern": {
-      "store:usePipelineStore": 1.0
-    },
+    "dataAccessPattern": {},
     "hookProfile": [
       0,
       0,
@@ -2918,14 +2916,12 @@
     ],
     "importConstellation": {
       "../components/SharedUI": 2.272125885509337,
-      "../data/pipelineStore": 4.574710978503383,
       "../data/usePipelineSelectors": 1.5789787049493917,
       "../hooks": 2.9652730660692823,
-      "../types": 1.5301885407799598,
+      "../types": 1.483668525145067,
       "../utils": 2.272125885509337,
       "react": 1.483668525145067,
-      "react-router-dom": 3.4760986898352733,
-      "zustand/shallow": 4.574710978503383
+      "react-router-dom": 3.4760986898352733
     },
     "jsxHash": {
       "exact": null,
@@ -2959,7 +2955,7 @@
     "importConstellation": {
       "../components/SharedUI": 2.272125885509337,
       "../data/usePipelineSelectors": 1.5789787049493917,
-      "../types": 1.5301885407799598,
+      "../types": 1.483668525145067,
       "lucide-react": 2.495269436823547,
       "react": 1.483668525145067
     },
@@ -2995,6 +2991,7 @@
     "importConstellation": {
       "../components/SharedUI": 2.272125885509337,
       "../data/usePipelineSelectors": 1.5789787049493917,
+      "../types": 1.483668525145067,
       "lucide-react": 2.495269436823547,
       "react": 1.483668525145067
     },
@@ -3008,9 +3005,9 @@
       0,
       0,
       0,
-      1,
       0,
-      1,
+      0,
+      0,
       1,
       1
     ],
@@ -3031,7 +3028,7 @@
       "../components/SharedUI": 4.544251771018674,
       "../data/usePipelineSelectors": 1.5789787049493917,
       "../hooks": 2.9652730660692823,
-      "../types": 1.5301885407799598,
+      "../types": 1.483668525145067,
       "lucide-react": 2.495269436823547,
       "react": 1.483668525145067
     },
@@ -3045,10 +3042,10 @@
       0,
       0,
       0,
-      1,
       0,
-      1,
-      1,
+      0,
+      0,
+      0,
       1
     ],
     "dataAccessPattern": {},
@@ -3137,7 +3134,7 @@
     "importConstellation": {
       "../components/SharedUI": 2.272125885509337,
       "../data/usePipelineSelectors": 1.5789787049493917,
-      "../types": 1.5301885407799598,
+      "../types": 1.483668525145067,
       "lucide-react": 2.495269436823547,
       "react": 1.483668525145067
     },
@@ -3151,9 +3148,9 @@
       0,
       0,
       0,
-      1,
       0,
-      1,
+      0,
+      0,
       1,
       1
     ],
@@ -3174,7 +3171,7 @@
       "../components/SharedUI": 4.544251771018674,
       "../data/usePipelineSelectors": 1.5789787049493917,
       "../hooks": 2.9652730660692823,
-      "../types": 1.5301885407799598,
+      "../types": 1.483668525145067,
       "lucide-react": 2.495269436823547,
       "react": 1.483668525145067
     },
@@ -3211,7 +3208,7 @@
       "../components/SharedUI": 2.272125885509337,
       "../data/usePipelineSelectors": 1.5789787049493917,
       "../hooks": 2.9652730660692823,
-      "../types": 1.5301885407799598,
+      "../types": 1.483668525145067,
       "lucide-react": 2.495269436823547,
       "react": 1.483668525145067
     },
@@ -3246,7 +3243,7 @@
     ],
     "importConstellation": {
       "../data/usePipelineSelectors": 1.5789787049493917,
-      "../types": 1.5301885407799598,
+      "../types": 1.483668525145067,
       "react": 1.483668525145067
     },
     "jsxHash": {

@@ -3,9 +3,8 @@ import {
   useSourceFeeds, useSourceCandidates,
   useFetchDiscovery, useRunDiscoveryFeeds, useReviewCandidate,
 } from "../data/usePipelineSelectors";
-import { useAsyncAction } from "../hooks";
-import { ErrorBanner } from "../components/SharedUI";
-import { Badge } from "../components/SharedUI";
+import { useAsyncAction, useExpandSingle } from "../hooks";
+import { ErrorBanner, Badge, ViewHeader, MetricCard } from "../components/SharedUI";
 import { ChevronDown, ChevronRight, ExternalLink } from "lucide-react";
 import type { RiskLevel, SourceCandidate, SourceFeed } from "../types";
 
@@ -34,26 +33,10 @@ function DiscoveryMetrics({ feedCount, candidateCount, reviewCount, acceptedCoun
 }) {
   return (
     <div className="metrics-row">
-      <div className="metric-card stagger-in">
-        <div className="metric-label">Feeds</div>
-        <div className="metric-value">{feedCount}</div>
-        <div className="metric-sub">configured</div>
-      </div>
-      <div className="metric-card stagger-in">
-        <div className="metric-label">Candidates</div>
-        <div className="metric-value">{candidateCount}</div>
-        <div className="metric-sub">discovered</div>
-      </div>
-      <div className="metric-card stagger-in">
-        <div className="metric-label">Review Queue</div>
-        <div className={`metric-value${reviewCount > 0 ? " text-high" : ""}`}>{reviewCount}</div>
-        <div className="metric-sub">pending</div>
-      </div>
-      <div className="metric-card stagger-in">
-        <div className="metric-label">Accepted</div>
-        <div className="metric-value">{acceptedCount}</div>
-        <div className="metric-sub">sources</div>
-      </div>
+      <MetricCard label="Feeds" value={feedCount} sub="configured" />
+      <MetricCard label="Candidates" value={candidateCount} sub="discovered" />
+      <MetricCard label="Review Queue" value={<span className={reviewCount > 0 ? "text-high" : ""}>{reviewCount}</span>} sub="pending" />
+      <MetricCard label="Accepted" value={acceptedCount} sub="sources" />
     </div>
   );
 }
@@ -66,11 +49,7 @@ export default function DiscoveryView() {
   const reviewCandidate = useReviewCandidate();
 
   const { busy, error, run, clearError } = useAsyncAction();
-  const [expandedFeed, setExpandedFeed] = useState<string | null>(null);
-  const toggleFeed = useCallback(
-    (id: string) => setExpandedFeed((prev) => (prev === id ? null : id)),
-    [],
-  );
+  const { expandedId: expandedFeed, toggle: toggleFeed } = useExpandSingle();
   const [filter, setFilter] = useState<string | null>(null);
 
   useEffect(() => {
@@ -93,12 +72,7 @@ export default function DiscoveryView() {
   return (
     <div>
       <ErrorBanner error={error} onDismiss={clearError} />
-      <div className="view-header stagger-in">
-        <h2>Case Discovery</h2>
-        <div className="view-desc">
-          Automated monitoring of government enforcement feeds for new case sources.
-        </div>
-      </div>
+      <ViewHeader title="Case Discovery" description="Automated monitoring of government enforcement feeds for new case sources." />
 
       <DiscoveryMetrics
         feedCount={source_feeds.length}

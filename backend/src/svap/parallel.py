@@ -1,6 +1,9 @@
 """Shared parallel LLM execution utility."""
 
+import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
+
+logger = logging.getLogger(__name__)
 
 
 def run_parallel_llm(invoke_fn, jobs, on_result, max_concurrency):
@@ -21,7 +24,7 @@ def run_parallel_llm(invoke_fn, jobs, on_result, max_concurrency):
         whose LLM call raised an exception.
     """
     jobs = list(jobs)
-    print(f"  Submitting {len(jobs)} parallel Bedrock calls (concurrency={max_concurrency})...")
+    logger.info("Submitting %d parallel Bedrock calls (concurrency=%d)", len(jobs), max_concurrency)
 
     total = 0
     failed = []
@@ -36,12 +39,12 @@ def run_parallel_llm(invoke_fn, jobs, on_result, max_concurrency):
                 result = future.result()
                 count = on_result(result, ctx)
                 total += count
-                print(f"    {label}: {count} items (total: {total})")
+                logger.info("%s: %d items (total: %d)", label, count, total)
             except Exception as e:
-                print(f"    FAILED {label}: {e}")
+                logger.error("FAILED %s: %s", label, e)
                 failed.append(label)
 
     if failed:
-        print(f"\n  WARNING: {len(failed)} items failed")
+        logger.warning("%d items failed", len(failed))
 
     return total, failed

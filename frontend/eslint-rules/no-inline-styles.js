@@ -60,10 +60,7 @@ function isCustomPropertiesOnly(valueNode) {
   // style={expr} -> valueNode is JSXExpressionContainer
   if (!valueNode || valueNode.type !== "JSXExpressionContainer") return false;
 
-  let expr = valueNode.expression;
-
-  // Unwrap TypeScript type assertions: { ... } as CSSProperties
-  if (expr && expr.type === "TSAsExpression") expr = expr.expression;
+  const expr = valueNode.expression;
 
   // style={{ ... }} -> expr is ObjectExpression
   if (!expr || expr.type !== "ObjectExpression") return false;

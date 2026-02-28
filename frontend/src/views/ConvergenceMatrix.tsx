@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useCases, useTaxonomy, usePolicies, useThreshold } from "../data/usePipelineSelectors";
+import { ViewHeader } from "../components/SharedUI";
 import { formatDollars, scoreColor } from "../utils";
 import type { Case, Policy, Quality } from "../types";
 
@@ -114,14 +115,10 @@ export default function ConvergenceMatrix() {
 
   return (
     <div>
-      <div className="view-header stagger-in">
-        <h2>Convergence Matrix</h2>
-        <div className="view-desc">
-          {showPolicies ? "Policies" : "Cases"} scored against {qualities.length} vulnerability qualities — threshold:
-          {"\u2265"}
-          {threshold}
-        </div>
-      </div>
+      <ViewHeader
+        title="Convergence Matrix"
+        description={<>{showPolicies ? "Policies" : "Cases"} scored against {qualities.length} vulnerability qualities — threshold: {"\u2265"}{threshold}</>}
+      />
 
       <div className="filter-bar filter-bar-mb stagger-in">
         <button className={`btn ${!showPolicies ? "btn-accent" : ""}`} onClick={() => setShowPolicies(false)}>

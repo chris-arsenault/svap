@@ -95,3 +95,27 @@ export function ErrorBanner({ error, onDismiss }: { error: string | null; onDism
     </div>
   );
 }
+
+export function ViewHeader({ title, description }: { title: string; description: React.ReactNode }) {
+  return (
+    <div className="view-header stagger-in">
+      <h2>{title}</h2>
+      <div className="view-desc">{description}</div>
+    </div>
+  );
+}
+
+export function MetricCard({ label, value, sub, className }: {
+  label: string;
+  value: React.ReactNode;
+  sub?: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={`metric-card stagger-in${className ? ` ${className}` : ""}`}>
+      <div className="metric-label">{label}</div>
+      <div className="metric-value">{value}</div>
+      {sub && <div className="metric-sub">{sub}</div>}
+    </div>
+  );
+}
