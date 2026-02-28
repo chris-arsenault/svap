@@ -13,4 +13,5 @@ frontend/dist/
 .terraform.lock.hcl
 backend/dist/
 .env
+offline-review-docs/
 *.Zone.Identifier
