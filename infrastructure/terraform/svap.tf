@@ -1,14 +1,13 @@
 # =============================================================================
-# Remote state — pull Cognito config from websites project
+# Platform SSM lookups
 # =============================================================================
 
-data "terraform_remote_state" "websites" {
-  backend = "s3"
-  config = {
-    bucket = "tf-state-websites-559098897826"
-    key    = "ahara-static-websites.tfstate"
-    region = "us-east-1"
-  }
+data "aws_ssm_parameter" "cognito_user_pool_id" {
+  name = "/platform/cognito/user-pool-id"
+}
+
+data "aws_ssm_parameter" "cognito_client_svap" {
+  name = "/platform/cognito/clients/svap"
 }
 
 # =============================================================================

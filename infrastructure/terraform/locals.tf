@@ -24,8 +24,8 @@ locals {
   stage_runner_timeout = 900
   lambda_memory        = 512
 
-  # Cognito (from websites remote state)
-  cognito_user_pool_id = data.terraform_remote_state.websites.outputs.cognito_user_pool_id
-  cognito_client_id    = data.terraform_remote_state.websites.outputs.cognito_client_ids["svap"]
+  # Cognito (from platform SSM)
+  cognito_user_pool_id = nonsensitive(data.aws_ssm_parameter.cognito_user_pool_id.value)
+  cognito_client_id    = nonsensitive(data.aws_ssm_parameter.cognito_client_svap.value)
   cognito_issuer       = "https://cognito-idp.us-east-1.amazonaws.com/${local.cognito_user_pool_id}"
 }
