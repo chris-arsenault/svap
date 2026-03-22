@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
-# deploy.sh - Build backend + frontend and deploy via Terraform
+# deploy.sh - Build backend + frontend, sync migrations, deploy via Terraform
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+STATE_BUCKET="${STATE_BUCKET:-tfstate-559098897826}"
+STATE_REGION="${STATE_REGION:-us-east-1}"
 
 # ── Build Lambda zip ─────────────────────────────────────────────────
 echo "==> Building Lambda deployment package"
@@ -15,14 +18,12 @@ echo "==> Building frontend"
 cd "$REPO_ROOT/frontend"
 
 if [ -d "dist" ]; then
-  echo "    Cleaning old dist directory..."
   rm -rf dist
 fi
 
 npm install --silent
 npm run build
 
-# Sanity check: no dev markers in production build
 if [ ! -d "dist" ]; then
   echo "    ERROR: Missing dist directory after build"
   exit 1
@@ -44,20 +45,26 @@ fi
 
 echo "    Frontend build OK"
 
-# ── Ensure remote state bucket exists ────────────────────────────────
-echo ""
-echo "==> Ensuring Terraform state bucket"
-source "$SCRIPT_DIR/ensure-state-bucket.sh"
+# ── Sync database migrations ─────────────────────────────────────────
+if [ -d "$REPO_ROOT/db/migrations" ]; then
+  echo ""
+  echo "==> Uploading database migrations"
+  MIGRATIONS_BUCKET=$(aws ssm get-parameter --name /platform/db/migrations-bucket \
+    --query Parameter.Value --output text --region "${STATE_REGION}")
+  aws s3 sync "$REPO_ROOT/db/migrations/" \
+    "s3://${MIGRATIONS_BUCKET}/migrations/svap/" \
+    --delete
+fi
 
 # ── Deploy with Terraform ────────────────────────────────────────────
 echo ""
 echo "==> Running Terraform"
 cd "$REPO_ROOT/infrastructure/terraform"
-terraform init \
+terraform init -reconfigure \
   -backend-config="bucket=${STATE_BUCKET}" \
-  -backend-config="region=${STATE_REGION}"
-terraform apply
+  -backend-config="region=${STATE_REGION}" \
+  -backend-config="use_lockfile=true"
+terraform apply -auto-approve
 
 echo ""
 echo "==> Deployment complete!"
-terraform output
