@@ -37,10 +37,10 @@ echo "    Old host: ${OLD_HOST}"
 DUMP_FILE=$(mktemp --suffix=.sql)
 SCHEMA_FILE=$(mktemp --suffix=.sql)
 
-echo "==> Dumping svap database (data + schema)"
+echo "==> Dumping svap database (data + schema, INSERT format)"
 PGPASSWORD="${OLD_PASS}" pg_dump \
   -h "${OLD_HOST}" -p "${OLD_PORT}" -U svap -d svap \
-  --no-owner --no-acl \
+  --no-owner --no-acl --inserts \
   -f "${DUMP_FILE}"
 
 echo "==> Dumping svap schema only (for baseline migration file)"
