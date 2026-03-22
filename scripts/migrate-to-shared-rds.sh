@@ -60,10 +60,15 @@ PGPASSWORD="${OLD_PASS}" pg_dump \
 
 # --- Restore to shared RDS ---
 
+echo "==> Testing shared RDS connectivity"
+PGPASSWORD="${SHARED_PASS}" psql \
+  -h "${SHARED_HOST}" -p "${SHARED_PORT}" -U "${SHARED_USER}" -d postgres \
+  -c "SELECT 1;" > /dev/null || { echo "ERROR: Cannot connect to shared RDS. Is the VPN connected?"; exit 1; }
+
 echo "==> Creating svap database on shared RDS"
 PGPASSWORD="${SHARED_PASS}" psql \
   -h "${SHARED_HOST}" -p "${SHARED_PORT}" -U "${SHARED_USER}" -d postgres \
-  -c "CREATE DATABASE svap;" 2>/dev/null || echo "    Database already exists"
+  -c "CREATE DATABASE svap;" 2>&1 | grep -v "already exists" || true
 
 echo "==> Restoring dump to shared RDS"
 PGPASSWORD="${SHARED_PASS}" psql \
