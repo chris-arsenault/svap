@@ -40,13 +40,14 @@ SCHEMA_FILE=$(mktemp --suffix=.sql)
 echo "==> Dumping svap database (data + schema, INSERT format)"
 PGPASSWORD="${OLD_PASS}" pg_dump \
   -h "${OLD_HOST}" -p "${OLD_PORT}" -U svap -d svap \
-  --no-owner --no-acl --inserts \
+  --inserts --rows-per-insert=1000 \
+  --no-owner --no-acl --no-comments \
   -f "${DUMP_FILE}"
 
 echo "==> Dumping svap schema only (for baseline migration file)"
 PGPASSWORD="${OLD_PASS}" pg_dump \
   -h "${OLD_HOST}" -p "${OLD_PORT}" -U svap -d svap \
-  --schema-only --no-owner --no-acl \
+  --schema-only --no-owner --no-acl --no-comments \
   -f "${SCHEMA_FILE}"
 
 # --- Create baseline migration file before restore ---
