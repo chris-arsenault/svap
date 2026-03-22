@@ -45,18 +45,7 @@ fi
 
 echo "    Frontend build OK"
 
-# ── Sync database migrations ─────────────────────────────────────────
-if [ -d "$REPO_ROOT/db/migrations" ]; then
-  echo ""
-  echo "==> Uploading database migrations"
-  MIGRATIONS_BUCKET=$(aws ssm get-parameter --name /platform/db/migrations-bucket \
-    --query Parameter.Value --output text --region "${STATE_REGION}")
-  aws s3 sync "$REPO_ROOT/db/migrations/" \
-    "s3://${MIGRATIONS_BUCKET}/migrations/svap/" \
-    --delete
-fi
-
-# ── Deploy with Terraform ────────────────────────────────────────────
+# ── Deploy with Terraform (includes migration upload + invoke) ────────
 echo ""
 echo "==> Running Terraform"
 cd "$REPO_ROOT/infrastructure/terraform"
