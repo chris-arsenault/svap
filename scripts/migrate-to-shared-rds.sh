@@ -11,6 +11,15 @@ TF_DIR="${REPO_ROOT}/infrastructure/terraform"
 MIGRATIONS_DIR="${REPO_ROOT}/db/migrations"
 REGION="us-east-1"
 
+# --- Init terraform against old state ---
+
+echo "==> Initializing Terraform (old state bucket)"
+terraform -chdir="${TF_DIR}" init -reconfigure \
+  -backend-config="bucket=svap-tfstate-559098897826" \
+  -backend-config="region=${REGION}" \
+  -backend-config="use_lockfile=true" \
+  > /dev/null
+
 # --- Read old RDS from current terraform state ---
 
 echo "==> Reading old RDS details from Terraform state"
