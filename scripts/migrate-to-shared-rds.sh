@@ -1,31 +1,31 @@
 #!/usr/bin/env bash
 # One-time migration of svap database from per-project RDS to shared platform RDS.
 #
-# Usage:
-#   source .env  # AWS credentials
-#   ./scripts/migrate-to-shared-rds.sh <old-rds-host> <old-rds-password>
+# Run this BEFORE applying the consolidation terraform changes.
 #
 # Prerequisites:
+#   - AWS credentials (source .env)
 #   - pg_dump and psql installed
+#   - Terraform initialized (old state still active)
 #   - Network access to both old RDS (public) and new RDS (via VPN)
 
 set -euo pipefail
 
-if [ $# -lt 2 ]; then
-  echo "Usage: $0 <old-rds-host> <old-rds-password>"
-  echo ""
-  echo "Get these from the current terraform state before applying consolidation:"
-  echo "  terraform output rds_endpoint"
-  echo "  terraform output -raw database_url"
-  exit 1
-fi
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+TF_DIR="${SCRIPT_DIR}/../infrastructure/terraform"
+REGION=us-east-1
 
-OLD_HOST="$1"
-OLD_PASS="$2"
-OLD_PORT=5432
+echo "==> Reading old RDS details from Terraform state"
+OLD_ENDPOINT=$(terraform -chdir="${TF_DIR}" output -raw rds_endpoint)
+OLD_HOST="${OLD_ENDPOINT%%:*}"
+OLD_PORT="${OLD_ENDPOINT##*:}"
+OLD_DB_URL=$(terraform -chdir="${TF_DIR}" output -raw database_url)
+OLD_PASS=$(echo "${OLD_DB_URL}" | sed -n 's|.*://[^:]*:\([^@]*\)@.*|\1|p')
 OLD_USER=svap
 OLD_DB=svap
-REGION=us-east-1
+
+echo "    Host: ${OLD_HOST}"
+echo "    Port: ${OLD_PORT}"
 
 echo "==> Reading shared RDS details from SSM"
 SHARED_HOST=$(aws ssm get-parameter --name /platform/rds/address --query Parameter.Value --output text --region "${REGION}")
@@ -33,9 +33,11 @@ SHARED_PORT=$(aws ssm get-parameter --name /platform/rds/port --query Parameter.
 SHARED_USER=$(aws ssm get-parameter --name /platform/rds/master-username --query Parameter.Value --output text --region "${REGION}")
 SHARED_PASS=$(aws ssm get-parameter --name /platform/rds/master-password --with-decryption --query Parameter.Value --output text --region "${REGION}")
 
+echo "    Host: ${SHARED_HOST}"
+
 DUMP_FILE="/tmp/svap-db-dump.sql"
 
-echo "==> Dumping svap database from old RDS (${OLD_HOST})"
+echo "==> Dumping svap database from old RDS"
 PGPASSWORD="${OLD_PASS}" pg_dump \
   -h "${OLD_HOST}" \
   -p "${OLD_PORT}" \
@@ -45,7 +47,7 @@ PGPASSWORD="${OLD_PASS}" pg_dump \
   --no-acl \
   -f "${DUMP_FILE}"
 
-echo "==> Creating svap database on shared RDS (${SHARED_HOST})"
+echo "==> Creating svap database on shared RDS"
 PGPASSWORD="${SHARED_PASS}" psql \
   -h "${SHARED_HOST}" \
   -p "${SHARED_PORT}" \
@@ -64,5 +66,4 @@ PGPASSWORD="${SHARED_PASS}" psql \
 rm "${DUMP_FILE}"
 
 echo ""
-echo "==> Migration complete."
-echo "    Verify: PGPASSWORD='${SHARED_PASS}' psql -h ${SHARED_HOST} -U ${SHARED_USER} -d svap"
+echo "==> Migration complete. Now apply the consolidation terraform."
