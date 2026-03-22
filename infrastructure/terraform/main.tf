@@ -12,7 +12,7 @@ terraform {
   }
   backend "s3" {
     region       = "us-east-1"
-    key          = "svap.tfstate"
+    key          = "projects/svap.tfstate"
     encrypt      = true
     use_lockfile = true
   }
