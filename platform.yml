@@ -1,0 +1,3 @@
+project: svap
+prefix: svap
+migrations: db/migrations

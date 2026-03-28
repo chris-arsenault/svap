@@ -1,0 +1,90 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.ref == 'refs/heads/main' && 'svap-deploy' || format('svap-{0}', github.ref) }}
+      cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Install backend deps
+        working-directory: backend
+        run: uv sync --extra dev
+
+      - name: Lint backend
+        working-directory: backend
+        run: uv run --extra dev ruff check src/
+
+      - name: Format check backend
+        working-directory: backend
+        run: uv run --extra dev ruff format --check src/
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install frontend deps
+        working-directory: frontend
+        run: npm ci
+
+      - name: Lint frontend
+        working-directory: frontend
+        run: npx eslint .
+
+      - name: Typecheck frontend
+        working-directory: frontend
+        run: npx tsc --noEmit
+
+      - name: Terraform fmt
+        run: terraform fmt -check -recursive infrastructure/terraform/
+
+      # Deploy (main only)
+      - uses: aws-actions/configure-aws-credentials@v5
+        if: github.ref == 'refs/heads/main'
+        with:
+          role-to-assume: ${{ secrets.OIDC_ROLE }}
+          role-session-name: GitHubActions-${{ github.run_id }}
+          aws-region: us-east-1
+
+      - name: Deploy
+        if: github.ref == 'refs/heads/main'
+        env:
+          STATE_BUCKET: ${{ secrets.STATE_BUCKET }}
+        run: bash scripts/deploy.sh
+
+  report:
+    if: always()
+    needs: [ci]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ secrets.OIDC_ROLE }}
+          role-session-name: GitHubActions-${{ github.run_id }}
+          aws-region: us-east-1
+      - uses: chris-arsenault/platform/.github/actions/report-build@main
+        with:
+          status: ${{ needs.ci.result }}
+          lint-passed: ${{ needs.ci.result == 'success' }}
