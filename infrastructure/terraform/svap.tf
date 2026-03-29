@@ -18,12 +18,16 @@ data "aws_ssm_parameter" "rds_port" {
   name = "/platform/rds/port"
 }
 
-data "aws_ssm_parameter" "rds_master_username" {
-  name = "/platform/rds/master-username"
+data "aws_ssm_parameter" "db_username" {
+  name = "/platform/db/svap/username"
 }
 
-data "aws_ssm_parameter" "rds_master_password" {
-  name = "/platform/rds/master-password"
+data "aws_ssm_parameter" "db_password" {
+  name = "/platform/db/svap/password"
+}
+
+data "aws_ssm_parameter" "db_database" {
+  name = "/platform/db/svap/database"
 }
 
 data "aws_ssm_parameter" "private_subnet_ids" {
@@ -52,7 +56,7 @@ resource "aws_security_group" "lambda" {
 }
 
 locals {
-  db_url = "postgresql://${nonsensitive(data.aws_ssm_parameter.rds_master_username.value)}:${data.aws_ssm_parameter.rds_master_password.value}@${nonsensitive(data.aws_ssm_parameter.rds_address.value)}:${nonsensitive(data.aws_ssm_parameter.rds_port.value)}/svap?sslmode=require"
+  db_url = "postgresql://${nonsensitive(data.aws_ssm_parameter.db_username.value)}:${data.aws_ssm_parameter.db_password.value}@${nonsensitive(data.aws_ssm_parameter.rds_address.value)}:${nonsensitive(data.aws_ssm_parameter.rds_port.value)}/${nonsensitive(data.aws_ssm_parameter.db_database.value)}?sslmode=require"
 }
 
 # =============================================================================
