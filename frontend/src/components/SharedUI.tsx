@@ -112,7 +112,7 @@ export function MetricCard({ label, value, sub, className }: {
   className?: string;
 }) {
   return (
-    <div className={`metric-card stagger-in${className ? ` ${className}` : ""}`}>
+    <div className={["metric-card stagger-in", className].filter(Boolean).join(" ")}>
       <div className="metric-label">{label}</div>
       <div className="metric-value">{value}</div>
       {sub && <div className="metric-sub">{sub}</div>}

@@ -9,7 +9,6 @@ Input:  Policies, taxonomy, cases from current run
 Output: triage_results table (ranked policies with scores and rationale)
 """
 
-
 import logging
 
 from svap import delta
@@ -74,25 +73,34 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
         for i, entry in enumerate(rankings):
             policy_id = _resolve_policy_id(entry.get("policy_name", ""), policies)
             if not policy_id:
-                logger.warning("Could not match policy '%s'", entry.get('policy_name'))
+                logger.warning("Could not match policy '%s'", entry.get("policy_name"))
                 continue
 
-            storage.insert_triage_result(run_id, {
-                "policy_id": policy_id,
-                "triage_score": float(entry.get("score", 0.0)),
-                "rationale": entry.get("rationale", ""),
-                "uncertainty": entry.get("uncertainty", ""),
-                "priority_rank": i + 1,
-            })
+            storage.insert_triage_result(
+                run_id,
+                {
+                    "policy_id": policy_id,
+                    "triage_score": float(entry.get("score", 0.0)),
+                    "rationale": entry.get("rationale", ""),
+                    "uncertainty": entry.get("uncertainty", ""),
+                    "priority_rank": i + 1,
+                },
+            )
             storage.update_policy_lifecycle(policy_id, "triaged")
             stored += 1
-            logger.info("#%d: %s -- score=%.2f", i + 1, entry.get('policy_name', '?'), entry.get('score', 0))
+            logger.info(
+                "#%d: %s -- score=%.2f", i + 1, entry.get("policy_name", "?"), entry.get("score", 0)
+            )
 
         storage.record_processing(40, "triage_batch", h, run_id)
-        storage.log_stage_complete(run_id, 40, {
-            "policies_triaged": stored,
-            "total_rankings": len(rankings),
-        })
+        storage.log_stage_complete(
+            run_id,
+            40,
+            {
+                "policies_triaged": stored,
+                "total_rankings": len(rankings),
+            },
+        )
         logger.info("Triage complete: %d policies ranked.", stored)
 
     except Exception as e:

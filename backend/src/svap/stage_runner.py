@@ -130,5 +130,3 @@ def _get_config(overrides: dict | None = None) -> dict:
         config.update(overrides)
 
     return config
-
-

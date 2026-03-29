@@ -50,7 +50,9 @@ even if worded differently or illustrated with different examples."""
 
 
 def _semantic_dedup(
-    client: BedrockClient, draft: dict, existing_taxonomy: list[dict],
+    client: BedrockClient,
+    draft: dict,
+    existing_taxonomy: list[dict],
 ) -> dict | None:
     """Compare a draft quality against existing taxonomy.
 
@@ -104,18 +106,24 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
             logger.info(
                 "All %d cases already processed for taxonomy. "
                 "Nothing to extract. (%d qualities in taxonomy)",
-                len(cases), len(taxonomy),
+                len(cases),
+                len(taxonomy),
             )
-            storage.log_stage_complete(run_id, 2, {
-                "qualities_total": len(taxonomy),
-                "cases_processed": 0,
-                "note": "no new cases",
-            })
+            storage.log_stage_complete(
+                run_id,
+                2,
+                {
+                    "qualities_total": len(taxonomy),
+                    "cases_processed": 0,
+                    "note": "no new cases",
+                },
+            )
             return
 
         logger.info(
             "%d new cases to process (%d already processed)",
-            len(new_cases), len(cases) - len(new_cases),
+            len(new_cases),
+            len(cases) - len(new_cases),
         )
 
         ContextAssembler(storage, config)
@@ -134,12 +142,11 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
         )
 
         clusters = client.invoke_json(
-            cluster_prompt, system=SYSTEM_PROMPT_CLUSTER, max_tokens=4096,
+            cluster_prompt,
+            system=SYSTEM_PROMPT_CLUSTER,
+            max_tokens=4096,
         )
-        qualities_draft = (
-            clusters if isinstance(clusters, list)
-            else clusters.get("qualities", [])
-        )
+        qualities_draft = clusters if isinstance(clusters, list) else clusters.get("qualities", [])
         logger.info("Identified %d draft qualities.", len(qualities_draft))
 
         # 3. Pass 2: Refine each draft quality
@@ -157,28 +164,34 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
                 quality_name=draft.get("name", ""),
                 quality_definition=draft.get("definition", ""),
                 example_conditions=json.dumps(
-                    draft.get("enabling_conditions", []), indent=2,
+                    draft.get("enabling_conditions", []),
+                    indent=2,
                 ),
                 other_quality_names=", ".join(other_qualities),
             )
 
             refined = client.invoke_json(
-                refine_prompt, system=SYSTEM_PROMPT_REFINE, max_tokens=2048,
+                refine_prompt,
+                system=SYSTEM_PROMPT_REFINE,
+                max_tokens=2048,
             )
 
             final_name = refined.get("name", name)
             quality_id = hashlib.sha256(final_name.encode()).hexdigest()[:8]
 
-            refined_qualities.append({
-                "quality_id": quality_id,
-                "name": final_name,
-                "definition": refined.get("definition", draft.get("definition", "")),
-                "recognition_test": refined.get("recognition_test", ""),
-                "exploitation_logic": refined.get("exploitation_logic", ""),
-                "canonical_examples": refined.get(
-                    "canonical_examples", draft.get("enabling_conditions", []),
-                ),
-            })
+            refined_qualities.append(
+                {
+                    "quality_id": quality_id,
+                    "name": final_name,
+                    "definition": refined.get("definition", draft.get("definition", "")),
+                    "recognition_test": refined.get("recognition_test", ""),
+                    "exploitation_logic": refined.get("exploitation_logic", ""),
+                    "canonical_examples": refined.get(
+                        "canonical_examples",
+                        draft.get("enabling_conditions", []),
+                    ),
+                }
+            )
 
         # 4. Pass 3: Semantic deduplication against existing taxonomy
         logger.info("Pass 3: Semantic deduplication against existing taxonomy...")
@@ -195,14 +208,17 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
                     matched_id,
                 )
                 logger.info(
-                    "MERGED: '%s' -> existing '%s'", draft['name'], matched_name,
+                    "MERGED: '%s' -> existing '%s'",
+                    draft["name"],
+                    matched_name,
                 )
                 storage.merge_quality_examples(
-                    matched_id, draft.get("canonical_examples", []),
+                    matched_id,
+                    draft.get("canonical_examples", []),
                 )
                 merged_count += 1
             else:
-                logger.info("NOVEL: '%s' -- adding as draft", draft['name'])
+                logger.info("NOVEL: '%s' -- adding as draft", draft["name"])
                 draft["review_status"] = "draft"
                 storage.insert_quality(draft)
                 novel_qualities.append(draft)
@@ -227,15 +243,19 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
             storage.log_stage_pending_review(run_id, 2)
             logger.info("HUMAN REVIEW REQUIRED -- new draft qualities need approval:")
             for q in novel_qualities:
-                logger.info("%s: %s", q['quality_id'], q['name'])
+                logger.info("%s: %s", q["quality_id"], q["name"])
             logger.info("Approve with: python -m svap.orchestrator approve --stage 2")
         else:
-            storage.log_stage_complete(run_id, 2, {
-                "qualities_total": len(taxonomy),
-                "cases_processed": len(new_cases),
-                "merged": merged_count,
-                "novel": 0,
-            })
+            storage.log_stage_complete(
+                run_id,
+                2,
+                {
+                    "qualities_total": len(taxonomy),
+                    "cases_processed": len(new_cases),
+                    "merged": merged_count,
+                    "novel": 0,
+                },
+            )
             logger.info("No new draft qualities -- stage complete, no review needed.")
 
     except Exception as e:

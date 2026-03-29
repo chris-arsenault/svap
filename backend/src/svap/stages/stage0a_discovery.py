@@ -71,10 +71,12 @@ class _HTMLLinkExtractor(HTMLParser):
 
     def handle_endtag(self, tag):
         if tag == "a" and self._current_href:
-            self.links.append({
-                "url": self._current_href,
-                "text": " ".join(self._current_text).strip(),
-            })
+            self.links.append(
+                {
+                    "url": self._current_href,
+                    "text": " ".join(self._current_text).strip(),
+                }
+            )
             self._current_href = None
 
 
@@ -85,7 +87,9 @@ def _extract_links(html: str) -> list[dict]:
     return parser.links
 
 
-def _filter_links_by_selector(links: list[dict], base_url: str, link_selector: str | None) -> list[dict]:
+def _filter_links_by_selector(
+    links: list[dict], base_url: str, link_selector: str | None
+) -> list[dict]:
     """Filter links using a regex selector pattern, resolving relative URLs."""
     result = []
     for link in links:
@@ -103,9 +107,7 @@ def _extract_links_via_llm(
     feed: dict,
 ) -> list[dict]:
     """Use LLM to identify enforcement document links from a listing page."""
-    link_list = "\n".join(
-        f"- [{link['text'][:80]}]({link['url']})" for link in links[:100]
-    )
+    link_list = "\n".join(f"- [{link['text'][:80]}]({link['url']})" for link in links[:100])
     prompt = client.render_prompt(
         "discovery_extract_links.txt",
         feed_name=feed["name"],
@@ -114,7 +116,9 @@ def _extract_links_via_llm(
         link_list=link_list,
         page_text=page_text[:3000],
     )
-    result = client.invoke_json(prompt, system=LINK_EXTRACTION_SYSTEM, temperature=0.1, max_tokens=2000)
+    result = client.invoke_json(
+        prompt, system=LINK_EXTRACTION_SYSTEM, temperature=0.1, max_tokens=2000
+    )
     if isinstance(result, list):
         return result
     return result.get("links", [])
@@ -127,7 +131,7 @@ def _check_feed(
     listing_url = feed["listing_url"]
     max_per_feed = config.get("discovery", {}).get("max_candidates_per_feed", 50)
 
-    logger.info("Checking feed: %s", feed['name'])
+    logger.info("Checking feed: %s", feed["name"])
     try:
         html = _fetch_url(listing_url)
     except Exception as e:
@@ -142,7 +146,9 @@ def _check_feed(
 
     # If selector matched nothing or no selector, use LLM
     if not filtered:
-        resolved = [{"url": urljoin(listing_url, lnk["url"]), "text": lnk["text"]} for lnk in raw_links]
+        resolved = [
+            {"url": urljoin(listing_url, lnk["url"]), "text": lnk["text"]} for lnk in raw_links
+        ]
         filtered = _extract_links_via_llm(client, resolved, page_text, feed)
 
     # Dedup against existing candidates
@@ -172,9 +178,7 @@ def _check_feed(
     return new_candidates
 
 
-def _evaluate_richness(
-    client: BedrockClient, candidate: dict, text: str
-) -> dict:
+def _evaluate_richness(client: BedrockClient, candidate: dict, text: str) -> dict:
     """Score a document's structural richness via LLM."""
     prompt = client.render_prompt(
         "discovery_richness.txt",
@@ -203,9 +207,7 @@ def _apply_disposition(eval_result: dict, config: dict) -> str:
     return "rejected"
 
 
-def _ingest_candidate(
-    candidate: dict, text: str, storage: SVAPStorage, config: dict
-) -> dict:
+def _ingest_candidate(candidate: dict, text: str, storage: SVAPStorage, config: dict) -> dict:
     """Ingest an accepted candidate into enforcement_sources and RAG.
 
     Checks for an existing enforcement source with the same URL to avoid
@@ -235,18 +237,20 @@ def _ingest_candidate(
         },
     )
 
-    storage.upsert_enforcement_source({
-        "source_id": source_id,
-        "name": candidate["title"],
-        "url": candidate["url"],
-        "source_type": "discovery",
-        "description": f"Discovered from feed. Richness: {candidate.get('richness_score', 'N/A')}",
-        "has_document": True,
-        "doc_id": doc_id,
-        "validation_status": "pending",
-        "candidate_id": candidate["candidate_id"],
-        "feed_id": candidate.get("feed_id"),
-    })
+    storage.upsert_enforcement_source(
+        {
+            "source_id": source_id,
+            "name": candidate["title"],
+            "url": candidate["url"],
+            "source_type": "discovery",
+            "description": f"Discovered from feed. Richness: {candidate.get('richness_score', 'N/A')}",
+            "has_document": True,
+            "doc_id": doc_id,
+            "validation_status": "pending",
+            "candidate_id": candidate["candidate_id"],
+            "feed_id": candidate.get("feed_id"),
+        }
+    )
 
     storage.update_candidate_ingested(candidate["candidate_id"], source_id, doc_id)
     return {"doc_id": doc_id, "n_chunks": n_chunks, "source_id": source_id}
@@ -284,7 +288,7 @@ def run(storage: SVAPStorage, client: BedrockClient, config: dict) -> dict:
                 html = _fetch_url(candidate["url"])
                 text = _extract_text(html)
             except Exception as e:
-                logger.error("Failed to fetch %s: %s", candidate['url'], e)
+                logger.error("Failed to fetch %s: %s", candidate["url"], e)
                 storage.update_candidate_status(candidate["candidate_id"], "error")
                 continue
 
@@ -314,7 +318,9 @@ def run(storage: SVAPStorage, client: BedrockClient, config: dict) -> dict:
             disposition = _apply_disposition(eval_result, config)
             logger.info(
                 "%s: richness=%.2f -> %s",
-                candidate['title'][:60], eval_result['richness_score'], disposition,
+                candidate["title"][:60],
+                eval_result["richness_score"],
+                disposition,
             )
 
             if disposition == "accepted":
@@ -340,6 +346,9 @@ def run(storage: SVAPStorage, client: BedrockClient, config: dict) -> dict:
     }
     logger.info(
         "Discovery complete: %d discovered, %d accepted, %d rejected, %d pending review.",
-        total_discovered, total_accepted, total_rejected, total_review,
+        total_discovered,
+        total_accepted,
+        total_rejected,
+        total_review,
     )
     return summary

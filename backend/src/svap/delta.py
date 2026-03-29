@@ -36,8 +36,6 @@ def policy_quality_profile(policy_id: str, policy_scores: list[dict]) -> str:
     Used by Stage 5 to detect when a policy's scoring profile changes.
     """
     present_qualities = sorted(
-        ps["quality_id"]
-        for ps in policy_scores
-        if ps["policy_id"] == policy_id and ps["present"]
+        ps["quality_id"] for ps in policy_scores if ps["policy_id"] == policy_id and ps["present"]
     )
     return ":".join(present_qualities) if present_qualities else "none"

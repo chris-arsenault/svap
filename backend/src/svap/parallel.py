@@ -29,10 +29,7 @@ def run_parallel_llm(invoke_fn, jobs, on_result, max_concurrency):
     total = 0
     failed = []
     with ThreadPoolExecutor(max_workers=max_concurrency) as executor:
-        futures = {
-            executor.submit(invoke_fn, prompt): (label, ctx)
-            for label, prompt, ctx in jobs
-        }
+        futures = {executor.submit(invoke_fn, prompt): (label, ctx) for label, prompt, ctx in jobs}
         for future in as_completed(futures):
             label, ctx = futures[future]
             try:

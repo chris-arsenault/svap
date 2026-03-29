@@ -35,10 +35,10 @@ Be conservative — false negatives are better than false positives at this stag
 def _characterize_policy(storage, client, ctx, run_id, policy):
     """Run structural characterization for a single policy."""
     if policy.get("structural_characterization"):
-        logger.info("Already characterized: %s", policy['name'])
+        logger.info("Already characterized: %s", policy["name"])
         return
 
-    logger.info("Characterizing: %s", policy['name'])
+    logger.info("Characterizing: %s", policy["name"])
     rag_context = ctx.retrieve(
         policy["name"] + " " + (policy.get("description", "") or ""), doc_type="policy"
     )
@@ -57,7 +57,7 @@ def _characterize_policy(storage, client, ctx, run_id, policy):
 
 def _score_policy(storage, client, run_id, policy, taxonomy_context):
     """Score a single policy against the taxonomy and return the result."""
-    logger.info("Scoring: %s", policy['name'])
+    logger.info("Scoring: %s", policy["name"])
     prompt = client.render_prompt(
         "stage4_score.txt",
         policy_name=policy["name"],
@@ -142,7 +142,7 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
         for policy in policies:
             existing = storage.get_quality_assessments(policy["policy_id"])
             if existing:
-                logger.info("Skipping %s -- already assessed via deep research", policy['name'])
+                logger.info("Skipping %s -- already assessed via deep research", policy["name"])
             else:
                 policies_to_score.append(policy)
 
@@ -150,11 +150,17 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
         delta_policies, skipped = _filter_changed_policies(storage, policies_to_score, taxonomy)
 
         if not delta_policies:
-            logger.info("All %d scorable policies unchanged. Skipping scoring.", len(policies_to_score))
-            storage.log_stage_complete(run_id, 4, {
-                "policies_scored": 0,
-                "skipped_unchanged": skipped,
-            })
+            logger.info(
+                "All %d scorable policies unchanged. Skipping scoring.", len(policies_to_score)
+            )
+            storage.log_stage_complete(
+                run_id,
+                4,
+                {
+                    "policies_scored": 0,
+                    "skipped_unchanged": skipped,
+                },
+            )
             logger.info("Stage 4 complete (no changes).")
             return
 
@@ -194,7 +200,7 @@ def _print_ranking(results, threshold):
             marker = "[MED] "
         else:
             marker = "[LOW] "
-        logger.info("%s %s: score=%d", marker, r['policy'], r['convergence_score'])
+        logger.info("%s %s: score=%d", marker, r["policy"], r["convergence_score"])
 
 
 def load_seed_policies(storage: SVAPStorage, seed_path: str):
@@ -236,6 +242,6 @@ DOCUMENT:
                 storage.insert_policy(policy)
                 all_policies.append(policy)
         except Exception as e:
-            logger.warning("Could not extract policies from %s: %s", doc['filename'], e)
+            logger.warning("Could not extract policies from %s: %s", doc["filename"], e)
 
     return all_policies

@@ -9,8 +9,14 @@ policy_scores, etc.). The UI expects enriched objects with computed fields
 from collections import defaultdict
 
 _COLOR_PALETTE = [
-    "var(--v1)", "var(--v2)", "var(--v3)", "var(--v4)",
-    "var(--v5)", "var(--v6)", "var(--v7)", "var(--v8)",
+    "var(--v1)",
+    "var(--v2)",
+    "var(--v3)",
+    "var(--v4)",
+    "var(--v5)",
+    "var(--v6)",
+    "var(--v7)",
+    "var(--v8)",
 ]
 
 

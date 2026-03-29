@@ -50,14 +50,14 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
         skipped = 0
         for doc in docs:
             if storage.cases_exist_for_document(doc["doc_id"]):
-                logger.info("Skipping (cases exist): %s", doc['filename'])
+                logger.info("Skipping (cases exist): %s", doc["filename"])
                 skipped += 1
             else:
                 new_docs.append(doc)
 
         total_cases = 0
         for doc in new_docs:
-            logger.info("Processing: %s", doc['filename'])
+            logger.info("Processing: %s", doc["filename"])
             prompt = client.render_prompt(
                 "stage1_extract.txt",
                 document_text=_truncate(doc["full_text"], 12000),
@@ -86,16 +86,22 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
                 }
                 storage.insert_case(case)
                 total_cases += 1
-                logger.info("Extracted: %s", case['case_name'])
+                logger.info("Extracted: %s", case["case_name"])
 
-        storage.log_stage_complete(run_id, 1, {
-            "cases_extracted": total_cases,
-            "documents_processed": len(new_docs),
-            "documents_skipped": skipped,
-        })
+        storage.log_stage_complete(
+            run_id,
+            1,
+            {
+                "cases_extracted": total_cases,
+                "documents_processed": len(new_docs),
+                "documents_skipped": skipped,
+            },
+        )
         logger.info(
             "Stage 1 complete: %d cases from %d new documents (%d unchanged, skipped).",
-            total_cases, len(new_docs), skipped,
+            total_cases,
+            len(new_docs),
+            skipped,
         )
 
     except Exception as e:
@@ -135,5 +141,3 @@ def _parse_dollars(val) -> float | None:
     if not match:
         return None
     return float(match.group())
-
-

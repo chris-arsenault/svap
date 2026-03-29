@@ -300,8 +300,8 @@ module "api" {
   ]
 
   cors_allow_origins = local.allowed_origins
-  jwt_issuer   = local.cognito_issuer
-  jwt_audience = [local.cognito_client_id]
+  jwt_issuer         = local.cognito_issuer
+  jwt_audience       = [local.cognito_client_id]
   custom_domain_name = local.api_domain
   domain_zone_name   = local.domain_name
 }

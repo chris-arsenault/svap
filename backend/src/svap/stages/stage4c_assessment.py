@@ -87,10 +87,14 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
 
         if not sessions_to_assess:
             logger.info("All %d researched policies unchanged. Skipping assessment.", len(sessions))
-            storage.log_stage_complete(run_id, 42, {
-                "policies_assessed": 0,
-                "skipped_unchanged": skipped,
-            })
+            storage.log_stage_complete(
+                run_id,
+                42,
+                {
+                    "policies_assessed": 0,
+                    "skipped_unchanged": skipped,
+                },
+            )
             return
 
         assessed = 0
@@ -113,7 +117,9 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
                 # Backward compat: sync to policy_scores
                 present_bool = assessment["present"] == "yes"
                 storage.insert_policy_score(
-                    run_id, policy_id, quality["quality_id"],
+                    run_id,
+                    policy_id,
+                    quality["quality_id"],
                     present=present_bool,
                     evidence=assessment.get("rationale", ""),
                 )
@@ -124,11 +130,15 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
             assessed += 1
             logger.info("Assessed %d qualities", len(taxonomy))
 
-        storage.log_stage_complete(run_id, 42, {
-            "policies_assessed": assessed,
-            "skipped": skipped,
-            "qualities_per_policy": len(taxonomy),
-        })
+        storage.log_stage_complete(
+            run_id,
+            42,
+            {
+                "policies_assessed": assessed,
+                "skipped": skipped,
+                "qualities_per_policy": len(taxonomy),
+            },
+        )
         logger.info("Assessment complete: %d policies (%d unchanged).", assessed, skipped)
 
     except Exception as e:
@@ -171,9 +181,7 @@ def _assess_quality(
 
     result = client.invoke_json(prompt, system=ASSESSMENT_SYSTEM, temperature=0.1, max_tokens=1000)
 
-    assessment_id = hashlib.sha256(
-        f"{policy_id}:{quality['quality_id']}".encode()
-    ).hexdigest()[:12]
+    assessment_id = hashlib.sha256(f"{policy_id}:{quality['quality_id']}".encode()).hexdigest()[:12]
 
     # Validate finding_ids against actual findings
     cited_ids = result.get("finding_ids", [])

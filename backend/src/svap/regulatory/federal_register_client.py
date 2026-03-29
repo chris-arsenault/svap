@@ -45,8 +45,14 @@ class FederalRegisterClient:
             params.append(("conditions[type][]", doc_type))
         # Request specific fields to keep response size manageable
         for field in [
-            "title", "abstract", "document_number", "publication_date",
-            "raw_text_url", "html_url", "type", "agencies",
+            "title",
+            "abstract",
+            "document_number",
+            "publication_date",
+            "raw_text_url",
+            "html_url",
+            "type",
+            "agencies",
         ]:
             params.append(("fields[]", field))
 

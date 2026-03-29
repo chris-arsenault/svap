@@ -21,7 +21,9 @@ import psycopg2.extras
 
 logger = logging.getLogger(__name__)
 
-_TERRAFORM_DIR = Path(__file__).resolve().parent.parent.parent.parent / "infrastructure" / "terraform"
+_TERRAFORM_DIR = (
+    Path(__file__).resolve().parent.parent.parent.parent / "infrastructure" / "terraform"
+)
 
 
 def resolve_database_url(config: dict | None = None) -> str:
@@ -62,6 +64,7 @@ def resolve_database_url(config: dict | None = None) -> str:
         _TERRAFORM_DIR,
     )
     sys.exit(1)
+
 
 _conn = None
 
@@ -153,14 +156,16 @@ SCHEMA_VERSION = 7
 
 MIGRATIONS: list[tuple[int, list[str]]] = [
     # ── v1: Initial schema (all tables) ──────────────────────────────
-    (1, [
-        """CREATE TABLE IF NOT EXISTS pipeline_runs (
+    (
+        1,
+        [
+            """CREATE TABLE IF NOT EXISTS pipeline_runs (
             run_id          TEXT PRIMARY KEY,
             created_at      TEXT NOT NULL,
             config_snapshot TEXT NOT NULL,
             notes           TEXT
         )""",
-        """CREATE TABLE IF NOT EXISTS stage_log (
+            """CREATE TABLE IF NOT EXISTS stage_log (
             id              SERIAL PRIMARY KEY,
             run_id          TEXT NOT NULL,
             stage           INTEGER NOT NULL,
@@ -172,7 +177,7 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
             task_token       TEXT,
             FOREIGN KEY (run_id) REFERENCES pipeline_runs(run_id)
         )""",
-        """CREATE TABLE IF NOT EXISTS cases (
+            """CREATE TABLE IF NOT EXISTS cases (
             case_id             TEXT PRIMARY KEY,
             source_doc_id       TEXT,
             case_name           TEXT NOT NULL,
@@ -186,7 +191,7 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
             raw_extraction      TEXT,
             created_at          TEXT NOT NULL
         )""",
-        """CREATE TABLE IF NOT EXISTS taxonomy (
+            """CREATE TABLE IF NOT EXISTS taxonomy (
             quality_id          TEXT PRIMARY KEY,
             name                TEXT NOT NULL,
             definition          TEXT NOT NULL,
@@ -197,12 +202,12 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
             reviewer_notes      TEXT,
             created_at          TEXT NOT NULL
         )""",
-        """CREATE TABLE IF NOT EXISTS taxonomy_case_log (
+            """CREATE TABLE IF NOT EXISTS taxonomy_case_log (
             case_id             TEXT PRIMARY KEY,
             processed_at        TEXT NOT NULL,
             FOREIGN KEY (case_id) REFERENCES cases(case_id)
         )""",
-        """CREATE TABLE IF NOT EXISTS convergence_scores (
+            """CREATE TABLE IF NOT EXISTS convergence_scores (
             id                  SERIAL PRIMARY KEY,
             run_id              TEXT NOT NULL,
             case_id             TEXT NOT NULL,
@@ -214,7 +219,7 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
             FOREIGN KEY (case_id) REFERENCES cases(case_id),
             FOREIGN KEY (quality_id) REFERENCES taxonomy(quality_id)
         )""",
-        """CREATE TABLE IF NOT EXISTS calibration (
+            """CREATE TABLE IF NOT EXISTS calibration (
             run_id              TEXT PRIMARY KEY,
             threshold           INTEGER NOT NULL,
             correlation_notes   TEXT,
@@ -223,7 +228,7 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
             created_at          TEXT NOT NULL,
             FOREIGN KEY (run_id) REFERENCES pipeline_runs(run_id)
         )""",
-        """CREATE TABLE IF NOT EXISTS policies (
+            """CREATE TABLE IF NOT EXISTS policies (
             policy_id           TEXT PRIMARY KEY,
             name                TEXT NOT NULL,
             description         TEXT,
@@ -231,7 +236,7 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
             structural_characterization TEXT,
             created_at          TEXT NOT NULL
         )""",
-        """CREATE TABLE IF NOT EXISTS policy_scores (
+            """CREATE TABLE IF NOT EXISTS policy_scores (
             id                  SERIAL PRIMARY KEY,
             run_id              TEXT NOT NULL,
             policy_id           TEXT NOT NULL,
@@ -243,7 +248,7 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
             FOREIGN KEY (policy_id) REFERENCES policies(policy_id),
             FOREIGN KEY (quality_id) REFERENCES taxonomy(quality_id)
         )""",
-        """CREATE TABLE IF NOT EXISTS predictions (
+            """CREATE TABLE IF NOT EXISTS predictions (
             prediction_id       TEXT PRIMARY KEY,
             run_id              TEXT NOT NULL,
             policy_id           TEXT NOT NULL,
@@ -259,7 +264,7 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
             FOREIGN KEY (run_id) REFERENCES pipeline_runs(run_id),
             FOREIGN KEY (policy_id) REFERENCES policies(policy_id)
         )""",
-        """CREATE TABLE IF NOT EXISTS detection_patterns (
+            """CREATE TABLE IF NOT EXISTS detection_patterns (
             pattern_id          TEXT PRIMARY KEY,
             run_id              TEXT NOT NULL,
             prediction_id       TEXT NOT NULL,
@@ -274,7 +279,7 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
             FOREIGN KEY (run_id) REFERENCES pipeline_runs(run_id),
             FOREIGN KEY (prediction_id) REFERENCES predictions(prediction_id)
         )""",
-        """CREATE TABLE IF NOT EXISTS documents (
+            """CREATE TABLE IF NOT EXISTS documents (
             doc_id              TEXT PRIMARY KEY,
             filename            TEXT,
             doc_type            TEXT CHECK(doc_type IN ('enforcement','policy','guidance','report','other')),
@@ -282,7 +287,7 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
             metadata            TEXT,
             created_at          TEXT NOT NULL
         )""",
-        """CREATE TABLE IF NOT EXISTS chunks (
+            """CREATE TABLE IF NOT EXISTS chunks (
             chunk_id            TEXT PRIMARY KEY,
             doc_id              TEXT NOT NULL,
             chunk_index         INTEGER NOT NULL,
@@ -290,7 +295,7 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
             token_count         INTEGER,
             FOREIGN KEY (doc_id) REFERENCES documents(doc_id)
         )""",
-        """CREATE TABLE IF NOT EXISTS enforcement_sources (
+            """CREATE TABLE IF NOT EXISTS enforcement_sources (
             source_id         TEXT PRIMARY KEY,
             name              TEXT NOT NULL,
             url               TEXT,
@@ -305,9 +310,9 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
             created_at        TEXT NOT NULL,
             updated_at        TEXT NOT NULL
         )""",
-        "CREATE UNIQUE INDEX IF NOT EXISTS uq_convergence ON convergence_scores(run_id, case_id, quality_id)",
-        "CREATE UNIQUE INDEX IF NOT EXISTS uq_policy_score ON policy_scores(run_id, policy_id, quality_id)",
-        """CREATE TABLE IF NOT EXISTS dimension_registry (
+            "CREATE UNIQUE INDEX IF NOT EXISTS uq_convergence ON convergence_scores(run_id, case_id, quality_id)",
+            "CREATE UNIQUE INDEX IF NOT EXISTS uq_policy_score ON policy_scores(run_id, policy_id, quality_id)",
+            """CREATE TABLE IF NOT EXISTS dimension_registry (
             dimension_id        TEXT PRIMARY KEY,
             name                TEXT NOT NULL,
             definition          TEXT NOT NULL,
@@ -317,7 +322,7 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
             created_at          TEXT NOT NULL,
             created_by          TEXT
         )""",
-        """CREATE TABLE IF NOT EXISTS structural_findings (
+            """CREATE TABLE IF NOT EXISTS structural_findings (
             finding_id          TEXT PRIMARY KEY,
             run_id              TEXT NOT NULL,
             policy_id           TEXT NOT NULL,
@@ -337,7 +342,7 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
             FOREIGN KEY (policy_id) REFERENCES policies(policy_id),
             FOREIGN KEY (dimension_id) REFERENCES dimension_registry(dimension_id)
         )""",
-        """CREATE TABLE IF NOT EXISTS quality_assessments (
+            """CREATE TABLE IF NOT EXISTS quality_assessments (
             assessment_id       TEXT PRIMARY KEY,
             run_id              TEXT NOT NULL,
             policy_id           TEXT NOT NULL,
@@ -354,8 +359,8 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
             FOREIGN KEY (policy_id) REFERENCES policies(policy_id),
             FOREIGN KEY (quality_id) REFERENCES taxonomy(quality_id)
         )""",
-        "CREATE UNIQUE INDEX IF NOT EXISTS uq_quality_assessment ON quality_assessments(run_id, policy_id, quality_id)",
-        """CREATE TABLE IF NOT EXISTS source_feeds (
+            "CREATE UNIQUE INDEX IF NOT EXISTS uq_quality_assessment ON quality_assessments(run_id, policy_id, quality_id)",
+            """CREATE TABLE IF NOT EXISTS source_feeds (
             feed_id             TEXT PRIMARY KEY,
             name                TEXT NOT NULL,
             listing_url         TEXT NOT NULL UNIQUE,
@@ -367,7 +372,7 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
             created_at          TEXT NOT NULL,
             updated_at          TEXT NOT NULL
         )""",
-        """CREATE TABLE IF NOT EXISTS source_candidates (
+            """CREATE TABLE IF NOT EXISTS source_candidates (
             candidate_id        TEXT PRIMARY KEY,
             feed_id             TEXT,
             title               TEXT NOT NULL,
@@ -386,7 +391,7 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
             updated_at          TEXT NOT NULL,
             FOREIGN KEY (feed_id) REFERENCES source_feeds(feed_id)
         )""",
-        """CREATE TABLE IF NOT EXISTS triage_results (
+            """CREATE TABLE IF NOT EXISTS triage_results (
             id                  SERIAL PRIMARY KEY,
             run_id              TEXT NOT NULL,
             policy_id           TEXT NOT NULL,
@@ -398,8 +403,8 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
             FOREIGN KEY (run_id) REFERENCES pipeline_runs(run_id),
             FOREIGN KEY (policy_id) REFERENCES policies(policy_id)
         )""",
-        "CREATE UNIQUE INDEX IF NOT EXISTS uq_triage ON triage_results(run_id, policy_id)",
-        """CREATE TABLE IF NOT EXISTS research_sessions (
+            "CREATE UNIQUE INDEX IF NOT EXISTS uq_triage ON triage_results(run_id, policy_id)",
+            """CREATE TABLE IF NOT EXISTS research_sessions (
             session_id          TEXT PRIMARY KEY,
             run_id              TEXT NOT NULL,
             policy_id           TEXT NOT NULL,
@@ -414,7 +419,7 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
             FOREIGN KEY (run_id) REFERENCES pipeline_runs(run_id),
             FOREIGN KEY (policy_id) REFERENCES policies(policy_id)
         )""",
-        """CREATE TABLE IF NOT EXISTS regulatory_sources (
+            """CREATE TABLE IF NOT EXISTS regulatory_sources (
             source_id           TEXT PRIMARY KEY,
             source_type         TEXT NOT NULL,
             url                 TEXT NOT NULL,
@@ -424,54 +429,60 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
             fetched_at          TEXT NOT NULL,
             metadata            TEXT
         )""",
-        "ALTER TABLE policies ADD COLUMN IF NOT EXISTS lifecycle_status TEXT DEFAULT 'cataloged'",
-        "ALTER TABLE policies ADD COLUMN IF NOT EXISTS lifecycle_updated_at TEXT",
-        "ALTER TABLE enforcement_sources ADD COLUMN IF NOT EXISTS candidate_id TEXT",
-        "ALTER TABLE enforcement_sources ADD COLUMN IF NOT EXISTS feed_id TEXT",
-        "CREATE UNIQUE INDEX IF NOT EXISTS uq_enforcement_source_url ON enforcement_sources(url) WHERE url IS NOT NULL",
-    ]),
+            "ALTER TABLE policies ADD COLUMN IF NOT EXISTS lifecycle_status TEXT DEFAULT 'cataloged'",
+            "ALTER TABLE policies ADD COLUMN IF NOT EXISTS lifecycle_updated_at TEXT",
+            "ALTER TABLE enforcement_sources ADD COLUMN IF NOT EXISTS candidate_id TEXT",
+            "ALTER TABLE enforcement_sources ADD COLUMN IF NOT EXISTS feed_id TEXT",
+            "CREATE UNIQUE INDEX IF NOT EXISTS uq_enforcement_source_url ON enforcement_sources(url) WHERE url IS NOT NULL",
+        ],
+    ),
     # ── v2: Drop legacy columns ──────────────────────────────────────
-    (2, [
-        "ALTER TABLE cases DROP COLUMN IF EXISTS run_id",
-        "ALTER TABLE cases ADD COLUMN IF NOT EXISTS source_doc_id TEXT",
-        "ALTER TABLE taxonomy DROP COLUMN IF EXISTS run_id",
-        "ALTER TABLE policies DROP COLUMN IF EXISTS run_id",
-        "ALTER TABLE documents DROP COLUMN IF EXISTS content_hash",
-        "ALTER TABLE documents DROP COLUMN IF EXISTS source_id",
-        "ALTER TABLE documents DROP COLUMN IF EXISTS last_processed_run",
-    ]),
+    (
+        2,
+        [
+            "ALTER TABLE cases DROP COLUMN IF EXISTS run_id",
+            "ALTER TABLE cases ADD COLUMN IF NOT EXISTS source_doc_id TEXT",
+            "ALTER TABLE taxonomy DROP COLUMN IF EXISTS run_id",
+            "ALTER TABLE policies DROP COLUMN IF EXISTS run_id",
+            "ALTER TABLE documents DROP COLUMN IF EXISTS content_hash",
+            "ALTER TABLE documents DROP COLUMN IF EXISTS source_id",
+            "ALTER TABLE documents DROP COLUMN IF EXISTS last_processed_run",
+        ],
+    ),
     # ── v3: Remove run_id scoping — data is corpus-level ────────────
-    (3, [
-        # Drop FK constraints on run_id (provenance only, no referential enforcement)
-        "ALTER TABLE convergence_scores DROP CONSTRAINT IF EXISTS convergence_scores_run_id_fkey",
-        "ALTER TABLE policy_scores DROP CONSTRAINT IF EXISTS policy_scores_run_id_fkey",
-        "ALTER TABLE predictions DROP CONSTRAINT IF EXISTS predictions_run_id_fkey",
-        "ALTER TABLE detection_patterns DROP CONSTRAINT IF EXISTS detection_patterns_run_id_fkey",
-        "ALTER TABLE structural_findings DROP CONSTRAINT IF EXISTS structural_findings_run_id_fkey",
-        "ALTER TABLE quality_assessments DROP CONSTRAINT IF EXISTS quality_assessments_run_id_fkey",
-        "ALTER TABLE triage_results DROP CONSTRAINT IF EXISTS triage_results_run_id_fkey",
-        "ALTER TABLE research_sessions DROP CONSTRAINT IF EXISTS research_sessions_run_id_fkey",
-        # Deduplicate: keep row with highest id per natural key
-        """DELETE FROM convergence_scores a USING convergence_scores b
+    (
+        3,
+        [
+            # Drop FK constraints on run_id (provenance only, no referential enforcement)
+            "ALTER TABLE convergence_scores DROP CONSTRAINT IF EXISTS convergence_scores_run_id_fkey",
+            "ALTER TABLE policy_scores DROP CONSTRAINT IF EXISTS policy_scores_run_id_fkey",
+            "ALTER TABLE predictions DROP CONSTRAINT IF EXISTS predictions_run_id_fkey",
+            "ALTER TABLE detection_patterns DROP CONSTRAINT IF EXISTS detection_patterns_run_id_fkey",
+            "ALTER TABLE structural_findings DROP CONSTRAINT IF EXISTS structural_findings_run_id_fkey",
+            "ALTER TABLE quality_assessments DROP CONSTRAINT IF EXISTS quality_assessments_run_id_fkey",
+            "ALTER TABLE triage_results DROP CONSTRAINT IF EXISTS triage_results_run_id_fkey",
+            "ALTER TABLE research_sessions DROP CONSTRAINT IF EXISTS research_sessions_run_id_fkey",
+            # Deduplicate: keep row with highest id per natural key
+            """DELETE FROM convergence_scores a USING convergence_scores b
            WHERE a.case_id = b.case_id AND a.quality_id = b.quality_id AND a.id < b.id""",
-        """DELETE FROM policy_scores a USING policy_scores b
+            """DELETE FROM policy_scores a USING policy_scores b
            WHERE a.policy_id = b.policy_id AND a.quality_id = b.quality_id AND a.id < b.id""",
-        """DELETE FROM quality_assessments a USING quality_assessments b
+            """DELETE FROM quality_assessments a USING quality_assessments b
            WHERE a.policy_id = b.policy_id AND a.quality_id = b.quality_id
              AND a.assessment_id < b.assessment_id""",
-        """DELETE FROM triage_results a USING triage_results b
+            """DELETE FROM triage_results a USING triage_results b
            WHERE a.policy_id = b.policy_id AND a.id < b.id""",
-        # Rebuild UNIQUE indexes without run_id
-        "DROP INDEX IF EXISTS uq_convergence",
-        "CREATE UNIQUE INDEX uq_convergence ON convergence_scores(case_id, quality_id)",
-        "DROP INDEX IF EXISTS uq_policy_score",
-        "CREATE UNIQUE INDEX uq_policy_score ON policy_scores(policy_id, quality_id)",
-        "DROP INDEX IF EXISTS uq_quality_assessment",
-        "CREATE UNIQUE INDEX uq_quality_assessment ON quality_assessments(policy_id, quality_id)",
-        "DROP INDEX IF EXISTS uq_triage",
-        "CREATE UNIQUE INDEX uq_triage ON triage_results(policy_id)",
-        # Calibration: convert from per-run PK to single-row table
-        """CREATE TABLE IF NOT EXISTS calibration_new (
+            # Rebuild UNIQUE indexes without run_id
+            "DROP INDEX IF EXISTS uq_convergence",
+            "CREATE UNIQUE INDEX uq_convergence ON convergence_scores(case_id, quality_id)",
+            "DROP INDEX IF EXISTS uq_policy_score",
+            "CREATE UNIQUE INDEX uq_policy_score ON policy_scores(policy_id, quality_id)",
+            "DROP INDEX IF EXISTS uq_quality_assessment",
+            "CREATE UNIQUE INDEX uq_quality_assessment ON quality_assessments(policy_id, quality_id)",
+            "DROP INDEX IF EXISTS uq_triage",
+            "CREATE UNIQUE INDEX uq_triage ON triage_results(policy_id)",
+            # Calibration: convert from per-run PK to single-row table
+            """CREATE TABLE IF NOT EXISTS calibration_new (
             id                  INTEGER PRIMARY KEY DEFAULT 1 CHECK(id = 1),
             run_id              TEXT,
             threshold           INTEGER NOT NULL,
@@ -480,18 +491,21 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
             quality_combinations TEXT,
             created_at          TEXT NOT NULL
         )""",
-        """INSERT INTO calibration_new (id, run_id, threshold, correlation_notes,
+            """INSERT INTO calibration_new (id, run_id, threshold, correlation_notes,
            quality_frequency, quality_combinations, created_at)
            SELECT 1, run_id, threshold, correlation_notes, quality_frequency,
                   quality_combinations, created_at
            FROM calibration ORDER BY created_at DESC LIMIT 1
            ON CONFLICT (id) DO NOTHING""",
-        "DROP TABLE IF EXISTS calibration",
-        "ALTER TABLE calibration_new RENAME TO calibration",
-    ]),
+            "DROP TABLE IF EXISTS calibration",
+            "ALTER TABLE calibration_new RENAME TO calibration",
+        ],
+    ),
     # ── v4: Stage processing log for incremental delta detection ──
-    (4, [
-        """CREATE TABLE IF NOT EXISTS stage_processing_log (
+    (
+        4,
+        [
+            """CREATE TABLE IF NOT EXISTS stage_processing_log (
             stage        INTEGER NOT NULL,
             entity_id    TEXT NOT NULL,
             input_hash   TEXT NOT NULL,
@@ -499,35 +513,38 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
             processed_at TEXT NOT NULL,
             PRIMARY KEY (stage, entity_id)
         )""",
-    ]),
+        ],
+    ),
     # ── v5: Lineage junction tables + FK constraints ─────────────
-    (5, [
-        # Junction: prediction → qualities (replaces JSON blob)
-        """CREATE TABLE IF NOT EXISTS prediction_qualities (
+    (
+        5,
+        [
+            # Junction: prediction → qualities (replaces JSON blob)
+            """CREATE TABLE IF NOT EXISTS prediction_qualities (
             prediction_id  TEXT NOT NULL REFERENCES predictions(prediction_id) ON DELETE CASCADE,
             quality_id     TEXT NOT NULL REFERENCES taxonomy(quality_id),
             PRIMARY KEY (prediction_id, quality_id)
         )""",
-        # Junction: assessment → findings (replaces JSON blob)
-        """CREATE TABLE IF NOT EXISTS assessment_findings (
+            # Junction: assessment → findings (replaces JSON blob)
+            """CREATE TABLE IF NOT EXISTS assessment_findings (
             assessment_id  TEXT NOT NULL REFERENCES quality_assessments(assessment_id) ON DELETE CASCADE,
             finding_id     TEXT NOT NULL REFERENCES structural_findings(finding_id),
             PRIMARY KEY (assessment_id, finding_id)
         )""",
-        # FK: cases.source_doc_id → documents.doc_id
-        """DO $$ BEGIN
+            # FK: cases.source_doc_id → documents.doc_id
+            """DO $$ BEGIN
             ALTER TABLE cases ADD CONSTRAINT cases_source_doc_fkey
                 FOREIGN KEY (source_doc_id) REFERENCES documents(doc_id);
         EXCEPTION WHEN duplicate_object THEN NULL;
         END $$""",
-        # FK: enforcement_sources.doc_id → documents.doc_id
-        """DO $$ BEGIN
+            # FK: enforcement_sources.doc_id → documents.doc_id
+            """DO $$ BEGIN
             ALTER TABLE enforcement_sources ADD CONSTRAINT enforcement_sources_doc_fkey
                 FOREIGN KEY (doc_id) REFERENCES documents(doc_id);
         EXCEPTION WHEN duplicate_object THEN NULL;
         END $$""",
-        # Backfill prediction_qualities from predictions.enabling_qualities JSON
-        """INSERT INTO prediction_qualities (prediction_id, quality_id)
+            # Backfill prediction_qualities from predictions.enabling_qualities JSON
+            """INSERT INTO prediction_qualities (prediction_id, quality_id)
            SELECT p.prediction_id, elem.value
            FROM predictions p,
                 json_array_elements_text(p.enabling_qualities::json) AS elem(value)
@@ -535,8 +552,8 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
              AND p.enabling_qualities != '[]'
              AND p.enabling_qualities != ''
            ON CONFLICT DO NOTHING""",
-        # Backfill assessment_findings from quality_assessments.evidence_finding_ids JSON
-        """INSERT INTO assessment_findings (assessment_id, finding_id)
+            # Backfill assessment_findings from quality_assessments.evidence_finding_ids JSON
+            """INSERT INTO assessment_findings (assessment_id, finding_id)
            SELECT qa.assessment_id, elem.value
            FROM quality_assessments qa,
                 json_array_elements_text(qa.evidence_finding_ids::json) AS elem(value)
@@ -544,11 +561,14 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
              AND qa.evidence_finding_ids != '[]'
              AND qa.evidence_finding_ids != ''
            ON CONFLICT DO NOTHING""",
-    ]),
+        ],
+    ),
     # ── v6: Exploitation tree decomposition (replaces flat predictions) ──
-    (6, [
-        # New: exploitation trees — one per policy
-        """CREATE TABLE IF NOT EXISTS exploitation_trees (
+    (
+        6,
+        [
+            # New: exploitation trees — one per policy
+            """CREATE TABLE IF NOT EXISTS exploitation_trees (
             tree_id             TEXT PRIMARY KEY,
             policy_id           TEXT NOT NULL UNIQUE,
             convergence_score   INTEGER NOT NULL,
@@ -562,8 +582,8 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
             created_at          TEXT NOT NULL,
             FOREIGN KEY (policy_id) REFERENCES policies(policy_id)
         )""",
-        # New: exploitation steps within a tree
-        """CREATE TABLE IF NOT EXISTS exploitation_steps (
+            # New: exploitation steps within a tree
+            """CREATE TABLE IF NOT EXISTS exploitation_steps (
             step_id             TEXT PRIMARY KEY,
             tree_id             TEXT NOT NULL,
             parent_step_id      TEXT,
@@ -577,16 +597,16 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
             FOREIGN KEY (tree_id) REFERENCES exploitation_trees(tree_id) ON DELETE CASCADE,
             FOREIGN KEY (parent_step_id) REFERENCES exploitation_steps(step_id) ON DELETE CASCADE
         )""",
-        "CREATE INDEX IF NOT EXISTS idx_steps_tree ON exploitation_steps(tree_id)",
-        "CREATE INDEX IF NOT EXISTS idx_steps_parent ON exploitation_steps(parent_step_id)",
-        # New: step → quality junction
-        """CREATE TABLE IF NOT EXISTS step_qualities (
+            "CREATE INDEX IF NOT EXISTS idx_steps_tree ON exploitation_steps(tree_id)",
+            "CREATE INDEX IF NOT EXISTS idx_steps_parent ON exploitation_steps(parent_step_id)",
+            # New: step → quality junction
+            """CREATE TABLE IF NOT EXISTS step_qualities (
             step_id     TEXT NOT NULL REFERENCES exploitation_steps(step_id) ON DELETE CASCADE,
             quality_id  TEXT NOT NULL REFERENCES taxonomy(quality_id),
             PRIMARY KEY (step_id, quality_id)
         )""",
-        # Migrate: create tree per policy from existing predictions
-        """INSERT INTO exploitation_trees (tree_id, policy_id, convergence_score,
+            # Migrate: create tree per policy from existing predictions
+            """INSERT INTO exploitation_trees (tree_id, policy_id, convergence_score,
                actor_profile, lifecycle_stage, detection_difficulty,
                review_status, reviewer_notes, run_id, created_at)
            SELECT DISTINCT ON (policy_id)
@@ -596,8 +616,8 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
            FROM predictions
            ORDER BY policy_id, created_at DESC
            ON CONFLICT DO NOTHING""",
-        # Migrate: predictions become flat root steps
-        """INSERT INTO exploitation_steps (step_id, tree_id, parent_step_id,
+            # Migrate: predictions become flat root steps
+            """INSERT INTO exploitation_steps (step_id, tree_id, parent_step_id,
                step_order, title, description, actor_action, created_at)
            SELECT prediction_id,
                substring(encode(sha256(policy_id::bytea), 'hex') from 1 for 12),
@@ -607,29 +627,33 @@ MIGRATIONS: list[tuple[int, list[str]]] = [
                mechanics, actor_profile, created_at
            FROM predictions
            ON CONFLICT DO NOTHING""",
-        # Migrate: prediction_qualities → step_qualities
-        """INSERT INTO step_qualities (step_id, quality_id)
+            # Migrate: prediction_qualities → step_qualities
+            """INSERT INTO step_qualities (step_id, quality_id)
            SELECT prediction_id, quality_id FROM prediction_qualities
            ON CONFLICT DO NOTHING""",
-        # Migrate: add step_id to detection_patterns
-        "ALTER TABLE detection_patterns ADD COLUMN IF NOT EXISTS step_id TEXT",
-        "UPDATE detection_patterns SET step_id = prediction_id WHERE step_id IS NULL",
-        # Add FK for new step_id column
-        """DO $$ BEGIN
+            # Migrate: add step_id to detection_patterns
+            "ALTER TABLE detection_patterns ADD COLUMN IF NOT EXISTS step_id TEXT",
+            "UPDATE detection_patterns SET step_id = prediction_id WHERE step_id IS NULL",
+            # Add FK for new step_id column
+            """DO $$ BEGIN
             ALTER TABLE detection_patterns ADD CONSTRAINT detection_patterns_step_fkey
                 FOREIGN KEY (step_id) REFERENCES exploitation_steps(step_id) ON DELETE CASCADE;
         EXCEPTION WHEN duplicate_object THEN NULL;
         END $$""",
-        "CREATE INDEX IF NOT EXISTS idx_patterns_step ON detection_patterns(step_id)",
-        # Drop old prediction_id FK (keep column for now — clean up in v7)
-        "ALTER TABLE detection_patterns DROP CONSTRAINT IF EXISTS detection_patterns_prediction_id_fkey",
-        # Invalidate stage 5 + 6 processing logs to force regeneration
-        "DELETE FROM stage_processing_log WHERE stage IN (5, 6)",
-    ]),
+            "CREATE INDEX IF NOT EXISTS idx_patterns_step ON detection_patterns(step_id)",
+            # Drop old prediction_id FK (keep column for now — clean up in v7)
+            "ALTER TABLE detection_patterns DROP CONSTRAINT IF EXISTS detection_patterns_prediction_id_fkey",
+            # Invalidate stage 5 + 6 processing logs to force regeneration
+            "DELETE FROM stage_processing_log WHERE stage IN (5, 6)",
+        ],
+    ),
     # ── v7: Make prediction_id nullable (new stage 6 writes step_id only) ──
-    (7, [
-        "ALTER TABLE detection_patterns ALTER COLUMN prediction_id DROP NOT NULL",
-    ]),
+    (
+        7,
+        [
+            "ALTER TABLE detection_patterns ALTER COLUMN prediction_id DROP NOT NULL",
+        ],
+    ),
 ]
 
 
@@ -958,7 +982,9 @@ class SVAPStorage:
     def get_approved_taxonomy(self) -> list[dict]:
         """Return only approved qualities for use by downstream pipeline stages."""
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
-            cur.execute("SELECT * FROM taxonomy WHERE review_status = 'approved' ORDER BY quality_id")
+            cur.execute(
+                "SELECT * FROM taxonomy WHERE review_status = 'approved' ORDER BY quality_id"
+            )
             rows = cur.fetchall()
         return [dict(r) for r in rows]
 
@@ -1615,7 +1641,6 @@ class SVAPStorage:
             row = cur.fetchone()
         return row["task_token"] if row else None
 
-
     # ── Enforcement Sources ────────────────────────────────────────
 
     def upsert_enforcement_source(self, source: dict):
@@ -1687,9 +1712,7 @@ class SVAPStorage:
             )
         self._safe_commit()
 
-    def update_enforcement_source_document(
-        self, source_id: str, s3_key: str, doc_id: str
-    ):
+    def update_enforcement_source_document(self, source_id: str, s3_key: str, doc_id: str):
         with self.conn.cursor() as cur:
             cur.execute(
                 """UPDATE enforcement_sources
@@ -1823,9 +1846,7 @@ class SVAPStorage:
             )
         self._safe_commit()
 
-    def get_structural_findings(
-        self, policy_id: str, status: str = "active"
-    ) -> list[dict]:
+    def get_structural_findings(self, policy_id: str, status: str = "active") -> list[dict]:
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             cur.execute(
                 """SELECT sf.*, dr.name as dimension_name
@@ -1900,9 +1921,7 @@ class SVAPStorage:
         finally:
             self.conn.autocommit = old
 
-    def get_quality_assessments(
-        self, policy_id: str | None = None
-    ) -> list[dict]:
+    def get_quality_assessments(self, policy_id: str | None = None) -> list[dict]:
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             if policy_id:
                 cur.execute(
@@ -1910,9 +1929,7 @@ class SVAPStorage:
                     (policy_id,),
                 )
             else:
-                cur.execute(
-                    "SELECT * FROM quality_assessments ORDER BY policy_id, quality_id"
-                )
+                cur.execute("SELECT * FROM quality_assessments ORDER BY policy_id, quality_id")
             rows = cur.fetchall()
         return [dict(r) for r in rows]
 
@@ -2035,9 +2052,7 @@ class SVAPStorage:
             row = cur.fetchone()
         return dict(row) if row else None
 
-    def get_candidates(
-        self, feed_id: str | None = None, status: str | None = None
-    ) -> list[dict]:
+    def get_candidates(self, feed_id: str | None = None, status: str | None = None) -> list[dict]:
         clauses, params = ["1=1"], []
         if feed_id:
             clauses.append("feed_id = %s")
@@ -2154,7 +2169,9 @@ class SVAPStorage:
         sources_queried: list | None = None,
     ):
         with self.conn.cursor() as cur:
-            completed = _now() if status in ("findings_complete", "assessment_complete", "failed") else None
+            completed = (
+                _now() if status in ("findings_complete", "assessment_complete", "failed") else None
+            )
             cur.execute(
                 """UPDATE research_sessions
                    SET status=%s, error_message=%s, completed_at=COALESCE(%s, completed_at),
@@ -2170,9 +2187,7 @@ class SVAPStorage:
             )
         self._safe_commit()
 
-    def get_research_sessions(
-        self, status: str | None = None
-    ) -> list[dict]:
+    def get_research_sessions(self, status: str | None = None) -> list[dict]:
         with self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
             if status:
                 cur.execute(
@@ -2180,9 +2195,7 @@ class SVAPStorage:
                     (status,),
                 )
             else:
-                cur.execute(
-                    "SELECT * FROM research_sessions ORDER BY started_at"
-                )
+                cur.execute("SELECT * FROM research_sessions ORDER BY started_at")
             rows = cur.fetchall()
         return [dict(r) for r in rows]
 

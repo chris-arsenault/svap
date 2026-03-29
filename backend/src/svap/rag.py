@@ -34,7 +34,9 @@ class DocumentIngester:
         self.chunk_size = config.get("rag", {}).get("chunk_size", 1500)
         self.chunk_overlap = config.get("rag", {}).get("chunk_overlap", 200)
 
-    def _ingest(self, text: str, filename: str, doc_type: str, metadata: dict | None) -> tuple[str, int]:
+    def _ingest(
+        self, text: str, filename: str, doc_type: str, metadata: dict | None
+    ) -> tuple[str, int]:
         """Insert document and chunks. Returns (doc_id, n_chunks)."""
         doc_id = hashlib.sha256(f"{filename}:{text[:200]}".encode()).hexdigest()[:16]
         self.storage.insert_document(

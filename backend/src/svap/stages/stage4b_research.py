@@ -83,9 +83,7 @@ def run(
 
         # Determine which policies to research
         if policy_ids:
-            policies_to_research = [
-                {"policy_id": pid} for pid in policy_ids
-            ]
+            policies_to_research = [{"policy_id": pid} for pid in policy_ids]
         else:
             triage = storage.get_triage_results()
             policies_to_research = triage[:top_n]
@@ -96,9 +94,7 @@ def run(
             return
 
         # Delta detection — per-policy
-        delta_entries, skipped = _filter_changed_research(
-            storage, policies_to_research, dimensions
-        )
+        delta_entries, skipped = _filter_changed_research(storage, policies_to_research, dimensions)
 
         if not delta_entries:
             logger.info("All %d policies unchanged. Skipping research.", len(policies_to_research))
@@ -112,15 +108,15 @@ def run(
         researched = 0
 
         for entry, h in delta_entries:
-            ok = _research_one_policy(
-                storage, client, ecfr, fr, run_id, entry, dimensions
-            )
+            ok = _research_one_policy(storage, client, ecfr, fr, run_id, entry, dimensions)
             if ok:
                 researched += 1
                 if h is not None:
                     storage.record_processing(41, entry["policy_id"], h, run_id)
 
-        storage.log_stage_complete(run_id, 41, {"policies_researched": researched, "skipped": skipped})
+        storage.log_stage_complete(
+            run_id, 41, {"policies_researched": researched, "skipped": skipped}
+        )
         logger.info("Research complete: %d policies.", researched)
 
     except Exception as e:
@@ -154,11 +150,13 @@ def _research_one_policy(storage, client, ecfr, fr, run_id, entry, dimensions):
             for finding in findings:
                 finding["policy_id"] = policy_id
                 storage.insert_structural_finding(run_id, finding)
-            sources_queried.append({
-                "type": "ecfr",
-                "title": ecfr_ref.get("title"),
-                "part": ecfr_ref.get("part"),
-            })
+            sources_queried.append(
+                {
+                    "type": "ecfr",
+                    "title": ecfr_ref.get("title"),
+                    "part": ecfr_ref.get("part"),
+                }
+            )
             time.sleep(0.5)
 
         for fr_search in research_plan.get("fr_searches", [])[:3]:
@@ -166,10 +164,12 @@ def _research_one_policy(storage, client, ecfr, fr, run_id, entry, dimensions):
             for finding in findings:
                 finding["policy_id"] = policy_id
                 storage.insert_structural_finding(run_id, finding)
-            sources_queried.append({
-                "type": "federal_register",
-                "term": fr_search.get("term"),
-            })
+            sources_queried.append(
+                {
+                    "type": "federal_register",
+                    "term": fr_search.get("term"),
+                }
+            )
             time.sleep(0.5)
 
         storage.update_research_session(
@@ -187,9 +187,7 @@ def _research_one_policy(storage, client, ecfr, fr, run_id, entry, dimensions):
         return False
 
 
-def _plan_research(
-    client: BedrockClient, policy: dict, dimensions: list[dict]
-) -> dict:
+def _plan_research(client: BedrockClient, policy: dict, dimensions: list[dict]) -> dict:
     """Ask the LLM to plan which regulatory sources to consult."""
     policy_name = policy["name"]
     policy_desc = policy.get("description") or ""
@@ -199,15 +197,15 @@ def _plan_research(
     known_refs = ""
     if known_sources["ecfr"]:
         known_refs = "\n".join(
-            f"- Title {r['title']}, Part {r['part']}" + (f", Subpart {r['subpart']}" if r.get("subpart") else "")
+            f"- Title {r['title']}, Part {r['part']}"
+            + (f", Subpart {r['subpart']}" if r.get("subpart") else "")
             for r in known_sources["ecfr"]
         )
     else:
         known_refs = "None pre-mapped. Use your knowledge of federal healthcare regulations."
 
     dimensions_text = "\n".join(
-        f"- {d['dimension_id']}: {d['name']} — {d['definition'][:100]}"
-        for d in dimensions
+        f"- {d['dimension_id']}: {d['name']} — {d['definition'][:100]}" for d in dimensions
     )
 
     prompt = client.render_prompt(
@@ -226,12 +224,14 @@ def _plan_research(
         existing_parts = {(q.get("title"), q.get("part")) for q in ecfr_queries}
         for ref in known_sources["ecfr"]:
             if (ref["title"], ref["part"]) not in existing_parts:
-                ecfr_queries.append({
-                    "title": ref["title"],
-                    "part": ref["part"],
-                    "subpart": ref.get("subpart"),
-                    "rationale": "Pre-mapped from policy catalog",
-                })
+                ecfr_queries.append(
+                    {
+                        "title": ref["title"],
+                        "part": ref["part"],
+                        "subpart": ref.get("subpart"),
+                        "rationale": "Pre-mapped from policy catalog",
+                    }
+                )
 
     result["ecfr_queries"] = ecfr_queries
     return result
@@ -259,14 +259,16 @@ def _research_ecfr_source(
     else:
         try:
             xml_text = ecfr.get_full_text(title=title, part=part)
-            storage.insert_regulatory_source({
-                "source_id": source_id,
-                "source_type": "ecfr",
-                "url": f"https://www.ecfr.gov/current/title-{title}/part-{part}",
-                "title": f"Title {title} Part {part}",
-                "cfr_reference": f"{title} CFR Part {part}",
-                "full_text": xml_text,
-            })
+            storage.insert_regulatory_source(
+                {
+                    "source_id": source_id,
+                    "source_type": "ecfr",
+                    "url": f"https://www.ecfr.gov/current/title-{title}/part-{part}",
+                    "title": f"Title {title} Part {part}",
+                    "cfr_reference": f"{title} CFR Part {part}",
+                    "full_text": xml_text,
+                }
+            )
         except Exception as e:
             logger.error("Failed to fetch eCFR title %s part %s: %s", title, part, e)
             return []
@@ -278,8 +280,7 @@ def _research_ecfr_source(
     logger.info("Processing eCFR %s CFR Part %s: %d sections", title, part, len(sections))
 
     dimensions_text = "\n".join(
-        f"- {d['dimension_id']}: {d['name']} — {d['definition'][:100]}"
-        for d in dimensions
+        f"- {d['dimension_id']}: {d['name']} — {d['definition'][:100]}" for d in dimensions
     )
 
     all_findings = []
@@ -309,16 +310,18 @@ def _research_ecfr_source(
             finding_id = hashlib.sha256(
                 f"{policy['policy_id']}:{f.get('dimension_id', '')}:{f.get('source_citation', '')}".encode()
             ).hexdigest()[:12]
-            all_findings.append({
-                "finding_id": finding_id,
-                "dimension_id": f.get("dimension_id"),
-                "observation": f.get("observation", ""),
-                "source_type": "ecfr",
-                "source_citation": f.get("source_citation", source_citation),
-                "source_text": f.get("source_text_excerpt", ""),
-                "confidence": f.get("confidence", "medium"),
-                "created_by": "stage4b_research",
-            })
+            all_findings.append(
+                {
+                    "finding_id": finding_id,
+                    "dimension_id": f.get("dimension_id"),
+                    "observation": f.get("observation", ""),
+                    "source_type": "ecfr",
+                    "source_citation": f.get("source_citation", source_citation),
+                    "source_text": f.get("source_text_excerpt", ""),
+                    "confidence": f.get("confidence", "medium"),
+                    "created_by": "stage4b_research",
+                }
+            )
 
         time.sleep(0.3)  # rate limit
 
@@ -354,8 +357,7 @@ def _research_fr_source(
         return []
 
     dimensions_text = "\n".join(
-        f"- {d['dimension_id']}: {d['name']} — {d['definition'][:100]}"
-        for d in dimensions
+        f"- {d['dimension_id']}: {d['name']} — {d['definition'][:100]}" for d in dimensions
     )
 
     all_findings = []
@@ -373,18 +375,20 @@ def _research_fr_source(
         else:
             try:
                 text = fr.get_document_text(raw_text_url)
-                storage.insert_regulatory_source({
-                    "source_id": source_id,
-                    "source_type": "federal_register",
-                    "url": doc.get("html_url", raw_text_url),
-                    "title": doc.get("title", ""),
-                    "full_text": text,
-                    "metadata": {
-                        "document_number": doc_number,
-                        "publication_date": doc.get("publication_date"),
-                        "type": doc.get("type"),
-                    },
-                })
+                storage.insert_regulatory_source(
+                    {
+                        "source_id": source_id,
+                        "source_type": "federal_register",
+                        "url": doc.get("html_url", raw_text_url),
+                        "title": doc.get("title", ""),
+                        "full_text": text,
+                        "metadata": {
+                            "document_number": doc_number,
+                            "publication_date": doc.get("publication_date"),
+                            "type": doc.get("type"),
+                        },
+                    }
+                )
             except Exception as e:
                 logger.error("Failed to fetch FR doc %s: %s", doc_number, e)
                 continue
@@ -407,16 +411,18 @@ def _research_fr_source(
             finding_id = hashlib.sha256(
                 f"{policy['policy_id']}:fr:{doc_number}:{f.get('dimension_id', '')}".encode()
             ).hexdigest()[:12]
-            all_findings.append({
-                "finding_id": finding_id,
-                "dimension_id": f.get("dimension_id"),
-                "observation": f.get("observation", ""),
-                "source_type": "federal_register",
-                "source_citation": f.get("source_citation", source_citation),
-                "source_text": f.get("source_text_excerpt", ""),
-                "confidence": f.get("confidence", "medium"),
-                "created_by": "stage4b_research",
-            })
+            all_findings.append(
+                {
+                    "finding_id": finding_id,
+                    "dimension_id": f.get("dimension_id"),
+                    "observation": f.get("observation", ""),
+                    "source_type": "federal_register",
+                    "source_citation": f.get("source_citation", source_citation),
+                    "source_text": f.get("source_text_excerpt", ""),
+                    "confidence": f.get("confidence", "medium"),
+                    "created_by": "stage4b_research",
+                }
+            )
 
         time.sleep(0.5)
 

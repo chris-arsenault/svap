@@ -25,6 +25,7 @@ from svap.api_schemas import (
     enrich_taxonomy,
     enrich_trees,
 )
+from svap.defaults import default_config as _default_config
 from svap.hhs_data import (
     ENFORCEMENT_SOURCES,
     HHS_DATA_SOURCES,
@@ -48,8 +49,6 @@ CONFIG_BUCKET = os.environ.get("SVAP_CONFIG_BUCKET", "")
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────
-
-from svap.defaults import default_config as _default_config
 
 
 def _get_config(overrides: dict | None = None) -> dict:
@@ -298,11 +297,13 @@ def _run_pipeline(event):
             name=run_id,
             input=json.dumps({"run_id": run_id}),
         )
-        return _accepted({
-            "status": "started",
-            "run_id": run_id,
-            "execution_arn": response["executionArn"],
-        })
+        return _accepted(
+            {
+                "status": "started",
+                "run_id": run_id,
+                "execution_arn": response["executionArn"],
+            }
+        )
 
     return _accepted({"status": "started", "run_id": run_id})
 
@@ -362,7 +363,9 @@ def _create_enforcement_source(event):
     if not name:
         raise ApiError(400, "Missing required field: name")
 
-    source_id = body.get("source_id") or re.sub(r"[^a-z0-9_]", "", name.lower().replace(" ", "_"))[:50]
+    source_id = (
+        body.get("source_id") or re.sub(r"[^a-z0-9_]", "", name.lower().replace(" ", "_"))[:50]
+    )
     storage = get_storage()
     if storage.get_enforcement_source(source_id):
         raise ApiError(409, f"Source '{source_id}' already exists")
@@ -552,13 +555,15 @@ def _create_feed(event):
 
     feed_id = re.sub(r"[^a-z0-9_]", "", name.lower().replace(" ", "_"))[:50]
     storage = get_storage()
-    storage.upsert_source_feed({
-        "feed_id": feed_id,
-        "name": name,
-        "listing_url": listing_url,
-        "content_type": body.get("content_type", "press_release"),
-        "link_selector": body.get("link_selector"),
-    })
+    storage.upsert_source_feed(
+        {
+            "feed_id": feed_id,
+            "name": name,
+            "listing_url": listing_url,
+            "content_type": body.get("content_type", "press_release"),
+            "link_selector": body.get("link_selector"),
+        }
+    )
     return {"status": "created", "feed_id": feed_id}
 
 
@@ -647,13 +652,15 @@ def _list_executions(event):
             maxResults=5 if status_filter != "RUNNING" else 20,
         )
         for ex in resp.get("executions", []):
-            executions.append({
-                "name": ex["name"],
-                "execution_arn": ex["executionArn"],
-                "status": ex["status"],
-                "start_date": ex["startDate"].isoformat(),
-                "stop_date": ex.get("stopDate", "").isoformat() if ex.get("stopDate") else None,
-            })
+            executions.append(
+                {
+                    "name": ex["name"],
+                    "execution_arn": ex["executionArn"],
+                    "status": ex["status"],
+                    "start_date": ex["startDate"].isoformat(),
+                    "stop_date": ex.get("stopDate", "").isoformat() if ex.get("stopDate") else None,
+                }
+            )
 
     executions.sort(key=lambda e: e["start_date"], reverse=True)
     return executions

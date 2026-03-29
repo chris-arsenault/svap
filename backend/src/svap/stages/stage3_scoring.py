@@ -31,7 +31,7 @@ in the evidence field. Do not over-score."""
 
 def _score_case(storage, client, run_id, case, taxonomy_context):
     """Score a single case against the taxonomy and store results."""
-    logger.info("Scoring: %s", case['case_name'])
+    logger.info("Scoring: %s", case["case_name"])
     prompt = client.render_prompt(
         "stage3_score.txt",
         case_name=case["case_name"],
@@ -175,7 +175,9 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
         logger.info("Case scores:")
         for cs in sorted_cases:
             marker = "!" if cs["count"] >= threshold else " "
-            logger.info("%s %s: score=%d, scale=$%,.0f", marker, cs['name'], cs['count'], cs['scale'])
+            logger.info(
+                "%s %s: score=%d, scale=$%,.0f", marker, cs["name"], cs["count"], cs["scale"]
+            )
 
         storage.log_stage_complete(run_id, 3, {"cases_scored": len(cases), "threshold": threshold})
         logger.info("Stage 3 complete.")

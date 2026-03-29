@@ -78,7 +78,9 @@ class BedrockClient:
                     wait = self.retry_delay * (2**attempt)
                     logger.warning(
                         "Bedrock call failed (attempt %d): %s. Retrying in %ds...",
-                        attempt + 1, e, wait,
+                        attempt + 1,
+                        e,
+                        wait,
                     )
                     time.sleep(wait)
                 else:

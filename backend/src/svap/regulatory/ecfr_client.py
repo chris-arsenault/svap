@@ -129,7 +129,9 @@ def parse_xml_sections(xml_text: str) -> list[dict]:
     # Try section-level elements first, then broader elements
     sections = _extract_at_level(root, ("DIV8", "SECTION", "SECTNO"), "section", min_len=20)
     if not sections:
-        sections = _extract_at_level(root, ("DIV5", "DIV6", "DIV7", "PART", "SUBPART"), "div", min_len=100)
+        sections = _extract_at_level(
+            root, ("DIV5", "DIV6", "DIV7", "PART", "SUBPART"), "div", min_len=100
+        )
     if not sections:
         return _make_fallback_section(xml_text)
     return sections
@@ -146,12 +148,14 @@ def _extract_at_level(root, tag_names: tuple, id_prefix: str, min_len: int) -> l
         if len(text.strip()) < min_len:
             continue
         heading, cfr_ref = _extract_heading(elem)
-        sections.append({
-            "section_id": cfr_ref or f"{id_prefix}_{len(sections)}",
-            "heading": heading,
-            "text": text,
-            "cfr_reference": cfr_ref,
-        })
+        sections.append(
+            {
+                "section_id": cfr_ref or f"{id_prefix}_{len(sections)}",
+                "heading": heading,
+                "text": text,
+                "cfr_reference": cfr_ref,
+            }
+        )
     return sections
 
 
@@ -173,12 +177,14 @@ def _make_fallback_section(xml_text: str) -> list[dict]:
     clean = _strip_xml_tags(xml_text)
     if not clean.strip():
         return []
-    return [{
-        "section_id": "full_text",
-        "heading": "Full regulatory text",
-        "text": clean,
-        "cfr_reference": "",
-    }]
+    return [
+        {
+            "section_id": "full_text",
+            "heading": "Full regulatory text",
+            "text": clean,
+            "cfr_reference": "",
+        }
+    ]
 
 
 def _element_text(elem) -> str:
@@ -196,6 +202,7 @@ def _element_text(elem) -> str:
 def _strip_xml_tags(xml_text: str) -> str:
     """Crude XML tag removal for fallback cases."""
     import re
+
     text = re.sub(r"<[^>]+>", " ", xml_text)
     text = re.sub(r"\s+", " ", text)
     return text.strip()

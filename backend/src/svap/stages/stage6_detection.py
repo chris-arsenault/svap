@@ -60,9 +60,7 @@ def _store_patterns(storage, run_id, step, result):
     patterns = result if isinstance(result, list) else result.get("patterns", [result])
     count = 0
     for i, pat_data in enumerate(patterns):
-        pat_id = hashlib.sha256(
-            f"{step['step_id']}:pat:{i}".encode()
-        ).hexdigest()[:12]
+        pat_id = hashlib.sha256(f"{step['step_id']}:pat:{i}".encode()).hexdigest()[:12]
 
         pattern = {
             "pattern_id": pat_id,
@@ -105,8 +103,8 @@ def _print_pattern_summary(all_patterns):
         if by_priority[priority]:
             logger.info("[%s]", priority.upper())
             for p in by_priority[priority]:
-                logger.info("- %s: %s", p['policy_name'], p['anomaly_signal'][:100])
-                logger.info("  Data source: %s", p['data_source'])
+                logger.info("- %s: %s", p["policy_name"], p["anomaly_signal"][:100])
+                logger.info("  Data source: %s", p["data_source"])
 
 
 def _get_data_sources_context(storage, config):
@@ -158,7 +156,9 @@ def _run_parallel_detection(storage, client, run_id, jobs, max_concurrency):
     ]
     return run_parallel_llm(
         lambda prompt: _invoke_llm(client, prompt),
-        parallel_jobs, _on_result, max_concurrency,
+        parallel_jobs,
+        _on_result,
+        max_concurrency,
     )
 
 
@@ -170,9 +170,7 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
     try:
         stage5_status = storage.get_stage_status(run_id, 5)
         if stage5_status not in ("approved", "completed"):
-            raise ValueError(
-                f"Stage 5 status is '{stage5_status}'. Trees must be approved first."
-            )
+            raise ValueError(f"Stage 5 status is '{stage5_status}'. Trees must be approved first.")
 
         trees = storage.get_exploitation_trees(approved_only=True)
         if not trees:
@@ -186,10 +184,14 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
         to_detect = _detect_changed_steps(storage, all_steps)
         if not to_detect:
             logger.info("All %d steps unchanged -- skipping.", len(all_steps))
-            storage.log_stage_complete(run_id, 6, {
-                "patterns_generated": 0,
-                "skipped_unchanged": len(all_steps),
-            })
+            storage.log_stage_complete(
+                run_id,
+                6,
+                {
+                    "patterns_generated": 0,
+                    "skipped_unchanged": len(all_steps),
+                },
+            )
             return
 
         logger.info("%d/%d steps changed, generating patterns...", len(to_detect), len(all_steps))
@@ -209,7 +211,11 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
             jobs.append((step, h, prompt))
 
         total_patterns, failed_steps = _run_parallel_detection(
-            storage, client, run_id, jobs, max_concurrency,
+            storage,
+            client,
+            run_id,
+            jobs,
+            max_concurrency,
         )
 
         all_patterns = storage.get_detection_patterns()

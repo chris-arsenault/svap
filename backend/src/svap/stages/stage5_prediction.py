@@ -110,7 +110,8 @@ def _store_tree(storage, run_id, policy_id, profile, result):
         if parent_order and parent_id is None:
             logger.warning(
                 "step %d references parent_step_order=%s which hasn't been seen yet -- treating as root",
-                order, parent_order,
+                order,
+                parent_order,
             )
 
         step = {
@@ -144,7 +145,9 @@ def _run_parallel_predictions(storage, client, run_id, jobs, max_concurrency):
     ]
     return run_parallel_llm(
         lambda prompt: _invoke_llm(client, prompt),
-        parallel_jobs, _on_result, max_concurrency,
+        parallel_jobs,
+        _on_result,
+        max_concurrency,
     )
 
 
@@ -184,15 +187,21 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
 
         if not to_predict:
             logger.info("All %d high-risk policies unchanged -- skipping.", len(high_risk))
-            storage.log_stage_complete(run_id, 5, {
-                "trees_generated": 0,
-                "skipped_unchanged": len(high_risk),
-            })
+            storage.log_stage_complete(
+                run_id,
+                5,
+                {
+                    "trees_generated": 0,
+                    "skipped_unchanged": len(high_risk),
+                },
+            )
             return
 
         logger.info(
             "%d/%d policies changed (threshold=%d), generating exploitation trees...",
-            len(to_predict), len(high_risk), threshold,
+            len(to_predict),
+            len(high_risk),
+            threshold,
         )
 
         # -- Delete stale data BEFORE LLM calls ----------------------------
@@ -208,24 +217,38 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
             policy = next((p for p in policies if p["policy_id"] == policy_id), None)
             if not policy:
                 continue
-            prompt = _build_prompt(client, policy_id, profile, policy, quality_lookup, policy_scores)
+            prompt = _build_prompt(
+                client, policy_id, profile, policy, quality_lookup, policy_scores
+            )
             jobs.append((policy_id, profile, h, prompt))
 
         total_steps, failed_policies = _run_parallel_predictions(
-            storage, client, run_id, jobs, max_concurrency,
+            storage,
+            client,
+            run_id,
+            jobs,
+            max_concurrency,
         )
 
         if total_steps > 0:
             storage.log_stage_pending_review(run_id, 5)
-            logger.info("Stage 5 complete: %d steps generated across %d trees.", total_steps, len(jobs) - len(failed_policies))
+            logger.info(
+                "Stage 5 complete: %d steps generated across %d trees.",
+                total_steps,
+                len(jobs) - len(failed_policies),
+            )
             logger.info("HUMAN REVIEW REQUIRED before proceeding to Stage 6.")
             logger.info("Approve with: python -m svap.orchestrator approve --stage 5")
         else:
-            storage.log_stage_complete(run_id, 5, {
-                "trees_generated": 0,
-                "steps_generated": 0,
-                "all_failed": len(failed_policies),
-            })
+            storage.log_stage_complete(
+                run_id,
+                5,
+                {
+                    "trees_generated": 0,
+                    "steps_generated": 0,
+                    "all_failed": len(failed_policies),
+                },
+            )
             logger.info("Stage 5 complete: no steps generated (%d failed).", len(failed_policies))
 
     except Exception as e:

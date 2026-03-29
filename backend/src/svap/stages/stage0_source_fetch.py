@@ -103,10 +103,7 @@ def _is_binary_content(text: str) -> bool:
     if sample.lstrip().startswith("%PDF"):
         return True
     # Count non-printable, non-whitespace characters
-    non_printable = sum(
-        1 for c in sample
-        if not c.isprintable() and c not in ("\n", "\r", "\t")
-    )
+    non_printable = sum(1 for c in sample if not c.isprintable() and c not in ("\n", "\r", "\t"))
     # If >15% of the sample is non-printable, it's binary
     return non_printable / max(len(sample), 1) > 0.15
 
@@ -215,7 +212,7 @@ def _validate_pending_documents(storage, client):
         if not source["has_document"] or source["validation_status"] != "pending":
             continue
 
-        logger.info("Validating: %s", source['name'])
+        logger.info("Validating: %s", source["name"])
         try:
             doc = next((d for d in docs if d["doc_id"] == source["doc_id"]), None)
             if not doc:
@@ -268,7 +265,10 @@ def run(storage: SVAPStorage, client: BedrockClient, run_id: str, config: dict):
         )
         logger.info(
             "Stage 0 complete: %d fetched, %d skipped, %d failed, %d validated.",
-            fetched, skipped, failed, validated,
+            fetched,
+            skipped,
+            failed,
+            validated,
         )
 
     except Exception as e:
