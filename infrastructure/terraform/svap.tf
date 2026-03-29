@@ -10,131 +10,49 @@ data "aws_ssm_parameter" "cognito_client_svap" {
   name = "/platform/cognito/clients/svap"
 }
 
-# =============================================================================
-# VPC (minimal)
-# =============================================================================
-
-data "aws_availability_zones" "available" {
-  state = "available"
+data "aws_ssm_parameter" "rds_address" {
+  name = "/platform/rds/address"
 }
 
-resource "aws_vpc" "main" {
-  cidr_block           = "10.0.0.0/16"
-  enable_dns_support   = true
-  enable_dns_hostnames = true
-
-  tags = { Name = "${local.name_prefix}-vpc" }
+data "aws_ssm_parameter" "rds_port" {
+  name = "/platform/rds/port"
 }
 
-# --- DB subnets (RDS requires two AZs) ---
-
-resource "aws_subnet" "db_a" {
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = "10.0.100.0/24"
-  availability_zone       = data.aws_availability_zones.available.names[0]
-  map_public_ip_on_launch = true
-
-  tags = { Name = "${local.name_prefix}-db-a" }
+data "aws_ssm_parameter" "rds_master_username" {
+  name = "/platform/rds/master-username"
 }
 
-resource "aws_subnet" "db_b" {
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = "10.0.101.0/24"
-  availability_zone       = data.aws_availability_zones.available.names[1]
-  map_public_ip_on_launch = true
-
-  tags = { Name = "${local.name_prefix}-db-b" }
+data "aws_ssm_parameter" "rds_master_password" {
+  name = "/platform/rds/master-password"
 }
 
-# --- Internet gateway ---
-
-resource "aws_internet_gateway" "main" {
-  vpc_id = aws_vpc.main.id
-
-  tags = { Name = "${local.name_prefix}-igw" }
+data "aws_ssm_parameter" "private_subnet_ids" {
+  name = "/platform/network/private-subnet-ids"
 }
 
-# --- Route tables ---
-
-resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.main.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.main.id
-  }
-
-  tags = { Name = "${local.name_prefix}-public-rt" }
-}
-
-resource "aws_route_table_association" "db_a" {
-  subnet_id      = aws_subnet.db_a.id
-  route_table_id = aws_route_table.public.id
-}
-
-resource "aws_route_table_association" "db_b" {
-  subnet_id      = aws_subnet.db_b.id
-  route_table_id = aws_route_table.public.id
+data "aws_ssm_parameter" "vpc_id" {
+  name = "/platform/network/vpc-id"
 }
 
 # =============================================================================
-# RDS PostgreSQL
+# VPC networking (uses shared platform VPC)
 # =============================================================================
 
-resource "random_password" "db" {
-  length  = 32
-  special = false
-}
-
-resource "aws_security_group" "rds" {
-  name_prefix = "${local.name_prefix}-rds-"
-  description = "Security group for RDS PostgreSQL (prototype)"
-  vpc_id      = aws_vpc.main.id
-
-  ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "Allow PostgreSQL from anywhere (prototype - restrict for production)"
-  }
+resource "aws_security_group" "lambda" {
+  name        = "${local.name_prefix}-lambda"
+  description = "SVAP Lambda functions"
+  vpc_id      = nonsensitive(data.aws_ssm_parameter.vpc_id.value)
 
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
-    description = "Allow all outbound"
   }
-
-  tags = { Name = "${local.name_prefix}-rds-sg" }
 }
 
-resource "aws_db_subnet_group" "main" {
-  name       = "${local.name_prefix}-db"
-  subnet_ids = [aws_subnet.db_a.id, aws_subnet.db_b.id]
-  tags       = { Name = "${local.name_prefix}-db-subnet-group" }
-}
-
-resource "aws_db_instance" "main" {
-  identifier     = "${local.name_prefix}-db"
-  engine         = "postgres"
-  engine_version = "16"
-  instance_class = "db.t4g.micro"
-
-  allocated_storage = 20
-  storage_type      = "gp3"
-
-  db_name  = "svap"
-  username = "svap"
-  password = random_password.db.result
-
-  db_subnet_group_name   = aws_db_subnet_group.main.name
-  vpc_security_group_ids = [aws_security_group.rds.id]
-  publicly_accessible    = true
-  skip_final_snapshot    = true
-
-  tags = { Name = "${local.name_prefix}-db" }
+locals {
+  db_url = "postgresql://${nonsensitive(data.aws_ssm_parameter.rds_master_username.value)}:${data.aws_ssm_parameter.rds_master_password.value}@${nonsensitive(data.aws_ssm_parameter.rds_address.value)}:${nonsensitive(data.aws_ssm_parameter.rds_port.value)}/svap?sslmode=require"
 }
 
 # =============================================================================
@@ -247,11 +165,16 @@ module "api" {
   lambda_memory   = local.lambda_memory
 
   lambda_environment = {
-    DATABASE_URL               = "postgresql://${aws_db_instance.main.username}:${random_password.db.result}@${aws_db_instance.main.endpoint}/${aws_db_instance.main.db_name}?sslmode=require"
+    DATABASE_URL               = local.db_url
     SVAP_CONFIG_BUCKET         = aws_s3_bucket.data.bucket
     PIPELINE_STATE_MACHINE_ARN = aws_sfn_state_machine.pipeline.arn
     COGNITO_USER_POOL_ID       = local.cognito_user_pool_id
     COGNITO_CLIENT_ID          = local.cognito_client_id
+  }
+
+  vpc_config = {
+    subnet_ids         = split(",", nonsensitive(data.aws_ssm_parameter.private_subnet_ids.value))
+    security_group_ids = [aws_security_group.lambda.id]
   }
 
   iam_policy_json = data.aws_iam_policy_document.lambda.json
@@ -320,9 +243,14 @@ resource "aws_lambda_function" "stage_runner" {
   timeout          = local.stage_runner_timeout
   memory_size      = 1024
 
+  vpc_config {
+    subnet_ids         = split(",", nonsensitive(data.aws_ssm_parameter.private_subnet_ids.value))
+    security_group_ids = [aws_security_group.lambda.id]
+  }
+
   environment {
     variables = {
-      DATABASE_URL       = "postgresql://${aws_db_instance.main.username}:${random_password.db.result}@${aws_db_instance.main.endpoint}/${aws_db_instance.main.db_name}?sslmode=require"
+      DATABASE_URL       = local.db_url
       SVAP_CONFIG_BUCKET = aws_s3_bucket.data.bucket
     }
   }

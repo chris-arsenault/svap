@@ -8,24 +8,13 @@ output "api_endpoint" {
   value       = "https://${local.api_domain}"
 }
 
-output "rds_endpoint" {
-  description = "RDS PostgreSQL endpoint"
-  value       = aws_db_instance.main.endpoint
-}
-
-output "database_url" {
-  description = "PostgreSQL connection string"
-  value       = "postgresql://${aws_db_instance.main.username}:${random_password.db.result}@${aws_db_instance.main.endpoint}/${aws_db_instance.main.db_name}?sslmode=require"
-  sensitive   = true
-}
-
 output "state_machine_arn" {
   description = "Step Functions state machine ARN"
   value       = aws_sfn_state_machine.pipeline.arn
 }
 
 output "cognito_user_pool_id" {
-  description = "Cognito user pool ID (from websites)"
+  description = "Cognito user pool ID"
   value       = local.cognito_user_pool_id
 }
 

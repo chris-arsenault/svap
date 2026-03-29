@@ -17,14 +17,12 @@ echo "==> Building frontend"
 cd "${ROOT_DIR}/frontend"
 
 if [ -d "dist" ]; then
-  echo "    Cleaning old dist directory..."
   rm -rf dist
 fi
 
 npm install --silent
 npm run build
 
-# Sanity check: no dev markers in production build
 if [ ! -d "dist" ]; then
   echo "    ERROR: Missing dist directory after build"
   exit 1
