@@ -1,18 +1,20 @@
 #!/usr/bin/env bash
-# deploy.sh - Build backend + frontend and deploy via Terraform
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+TF_DIR="${ROOT_DIR}/infrastructure/terraform"
+
+STATE_BUCKET="${STATE_BUCKET:-tfstate-559098897826}"
+STATE_REGION="${STATE_REGION:-us-east-1}"
 
 # ── Build Lambda zip ─────────────────────────────────────────────────
 echo "==> Building Lambda deployment package"
-bash "$SCRIPT_DIR/build-lambda.sh"
+bash "${ROOT_DIR}/scripts/build-lambda.sh"
 
 # ── Build frontend ───────────────────────────────────────────────────
 echo ""
 echo "==> Building frontend"
-cd "$REPO_ROOT/frontend"
+cd "${ROOT_DIR}/frontend"
 
 if [ -d "dist" ]; then
   echo "    Cleaning old dist directory..."
@@ -44,20 +46,15 @@ fi
 
 echo "    Frontend build OK"
 
-# ── Ensure remote state bucket exists ────────────────────────────────
-echo ""
-echo "==> Ensuring Terraform state bucket"
-source "$SCRIPT_DIR/ensure-state-bucket.sh"
-
 # ── Deploy with Terraform ────────────────────────────────────────────
 echo ""
 echo "==> Running Terraform"
-cd "$REPO_ROOT/infrastructure/terraform"
-terraform init \
+terraform -chdir="${TF_DIR}" init -reconfigure \
   -backend-config="bucket=${STATE_BUCKET}" \
-  -backend-config="region=${STATE_REGION}"
-terraform apply
+  -backend-config="region=${STATE_REGION}" \
+  -backend-config="use_lockfile=true"
+
+terraform -chdir="${TF_DIR}" apply -auto-approve
 
 echo ""
 echo "==> Deployment complete!"
-terraform output
