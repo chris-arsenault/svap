@@ -90,7 +90,7 @@ export default function App() {
         <div className="splash-card">
           <div className="splash-title">SVAP</div>
           <form className="login-form" onSubmit={handleSignIn}>
-            <input name="username" type="email" placeholder="Email" required autoComplete="username" />
+            <input name="username" type="text" placeholder="Username" required autoComplete="username" />
             <input name="password" type="password" placeholder="Password" required autoComplete="current-password" />
             {errorMessage && <div className="login-error">{errorMessage}</div>}
             <button type="submit" className="login-btn">Sign in</button>
