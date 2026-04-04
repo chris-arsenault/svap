@@ -59,6 +59,20 @@ jobs:
       - name: Terraform fmt
         run: terraform fmt -check -recursive infrastructure/terraform/
 
+      # SonarQube
+      - uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ secrets.OIDC_ROLE }}
+          role-session-name: GitHubActions-${{ github.run_id }}
+          aws-region: us-east-1
+
+      - uses: chris-arsenault/platform/.github/actions/sonar-scan@main
+        continue-on-error: true
+        with:
+          project-key: svap
+          sources: backend/src,frontend/src,infrastructure/terraform
+          exclusions: "**/__pycache__/**,**/node_modules/**,**/dist/**,**/.terraform/**"
+
       # Deploy (main only)
       - uses: aws-actions/configure-aws-credentials@v5
         if: github.ref == 'refs/heads/main'
