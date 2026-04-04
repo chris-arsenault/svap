@@ -18,12 +18,12 @@ jobs:
       group: ${{ github.ref == 'refs/heads/main' && 'svap-deploy' || format('svap-{0}', github.ref) }}
       cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - uses: hashicorp/setup-terraform@v4
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -42,7 +42,7 @@ jobs:
         working-directory: backend
         run: uv run --extra dev ruff format --check src/
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: "24"
 
@@ -62,7 +62,7 @@ jobs:
         run: terraform fmt -check -recursive infrastructure/terraform/
 
       # SonarQube
-      - uses: aws-actions/configure-aws-credentials@v5
+      - uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ secrets.OIDC_ROLE }}
           role-session-name: GitHubActions-${{ github.run_id }}
@@ -76,7 +76,7 @@ jobs:
           exclusions: "**/__pycache__/**,**/node_modules/**,**/dist/**,**/.terraform/**"
 
       # Deploy (main only)
-      - uses: aws-actions/configure-aws-credentials@v5
+      - uses: aws-actions/configure-aws-credentials@v6
         if: github.ref == 'refs/heads/main'
         with:
           role-to-assume: ${{ secrets.OIDC_ROLE }}
@@ -114,8 +114,8 @@ jobs:
     needs: [ci]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: aws-actions/configure-aws-credentials@v5
+      - uses: actions/checkout@v6
+      - uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ secrets.OIDC_ROLE }}
           role-session-name: GitHubActions-${{ github.run_id }}
