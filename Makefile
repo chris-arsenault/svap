@@ -1,7 +1,9 @@
-.PHONY: lint lint-fix format format-check \
+.PHONY: ci lint lint-fix format format-check typecheck terraform-fmt-check \
        lint-frontend lint-fix-frontend format-frontend format-check-frontend \
        lint-backend lint-fix-backend format-backend format-check-backend \
        seed reset reset-corpus reset-runs reset-dry-run reset-trees runs
+
+ci: lint format-check typecheck terraform-fmt-check
 
 lint: lint-frontend lint-backend
 lint-fix: lint-fix-frontend lint-fix-backend
@@ -31,6 +33,12 @@ format-backend:
 
 format-check-backend:
 	cd backend && uv run --extra dev ruff format --check src/
+
+typecheck:
+	cd frontend && npx tsc --noEmit
+
+terraform-fmt-check:
+	terraform fmt -check -recursive infrastructure/terraform/
 
 # ── Pipeline data ────────────────────────────────────────────
 

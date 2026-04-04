@@ -79,3 +79,7 @@ make runs          # List pipeline runs
 - [Data Model](docs/DATA_MODEL.md) — Database schema, entity relationships
 - [Prompt Engineering](docs/PROMPT_ENGINEERING.md) — Prompt design patterns, template format
 - [Replication Guide](docs/REPLICATION_GUIDE.md) — Reproducing the HHS OIG analysis
+
+## Pre-commit CI check
+
+**Run `make ci` before committing any change.** This runs the same lint, format, typecheck, and test steps as GitHub Actions. Do not commit if it fails.
