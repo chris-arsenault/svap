@@ -1,3 +1,7 @@
 project: svap
 prefix: svap
 migrations: db/migrations
+stack:
+  - python
+  - typescript
+  - terraform
