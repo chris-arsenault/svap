@@ -11,16 +11,16 @@ format: format-frontend format-backend
 format-check: format-check-frontend format-check-backend
 
 lint-frontend:
-	cd frontend && npx eslint .
+	cd frontend && pnpm exec eslint .
 
 lint-fix-frontend:
-	cd frontend && npx eslint . --fix
+	cd frontend && pnpm exec eslint . --fix
 
 format-frontend:
-	cd frontend && npx prettier --write .
+	cd frontend && pnpm exec prettier --write .
 
 format-check-frontend:
-	cd frontend && npx prettier --check .
+	cd frontend && pnpm exec prettier --check .
 
 lint-backend:
 	cd backend && uv run --extra dev ruff check src/
@@ -35,7 +35,7 @@ format-check-backend:
 	cd backend && uv run --extra dev ruff format --check src/
 
 typecheck:
-	cd frontend && npx tsc --noEmit
+	cd frontend && pnpm exec tsc --noEmit
 
 terraform-fmt-check:
 	terraform fmt -check -recursive infrastructure/terraform/

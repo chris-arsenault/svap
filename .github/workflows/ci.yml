@@ -48,17 +48,27 @@ jobs:
         with:
           node-version: "24"
 
+      - name: Install pnpm
+        run: corepack enable && corepack prepare pnpm@10.29.3 --activate
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/pnpm/store/v10
+          key: pnpm-${{ hashFiles('frontend/pnpm-lock.yaml') }}
+          restore-keys: pnpm-
+
       - name: Install frontend deps
         working-directory: frontend
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Lint frontend
         working-directory: frontend
-        run: npx eslint .
+        run: pnpm exec eslint .
 
       - name: Lint typecheck frontend
         working-directory: frontend
-        run: npx tsc --noEmit
+        run: pnpm exec tsc --noEmit
 
       - name: Lint terraform
         run: terraform fmt -check -recursive infrastructure/terraform/
@@ -98,7 +108,7 @@ jobs:
       - name: Build frontend
         if: github.ref == 'refs/heads/main'
         working-directory: frontend
-        run: npm ci && npm run build
+        run: pnpm run build
 
       - name: Terraform deploy
         if: github.ref == 'refs/heads/main'
