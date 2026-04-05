@@ -38,7 +38,7 @@ jobs:
         working-directory: backend
         run: uv run --extra dev ruff check src/
 
-      - name: Format check backend
+      - name: Lint format backend
         working-directory: backend
         run: uv run --extra dev ruff format --check src/
 
@@ -54,11 +54,11 @@ jobs:
         working-directory: frontend
         run: npx eslint .
 
-      - name: Typecheck frontend
+      - name: Lint typecheck frontend
         working-directory: frontend
         run: npx tsc --noEmit
 
-      - name: Terraform fmt
+      - name: Lint terraform
         run: terraform fmt -check -recursive infrastructure/terraform/
 
       # SonarQube
@@ -121,6 +121,3 @@ jobs:
           role-session-name: GitHubActions-${{ github.run_id }}
           aws-region: us-east-1
       - uses: chris-arsenault/platform/.github/actions/report-build@main
-        with:
-          status: ${{ needs.ci.result }}
-          lint-passed: ${{ needs.ci.result == 'success' }}
