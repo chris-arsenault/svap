@@ -15,3 +15,8 @@ backend/dist/
 .env
 offline-review-docs/
 *.Zone.Identifier
+.serena/
+.drift-audit/
+.claude/
+drift-output.txt
+target/
