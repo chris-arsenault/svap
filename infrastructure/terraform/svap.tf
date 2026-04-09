@@ -1,69 +1,35 @@
 # =============================================================================
-# Platform SSM lookups
+# Platform context + Cognito client
 # =============================================================================
 
-data "aws_ssm_parameter" "cognito_user_pool_id" {
-  name = "/platform/cognito/user-pool-id"
+module "ctx" {
+  source = "git::https://github.com/chris-arsenault/ahara-tf-patterns.git//modules/platform-context"
 }
 
-data "aws_ssm_parameter" "cognito_client_svap" {
-  name = "/platform/cognito/clients/svap"
+module "cognito" {
+  source  = "git::https://github.com/chris-arsenault/ahara-tf-patterns.git//modules/cognito-app"
+  name    = "${local.prefix}-app"
+  cognito = module.ctx.cognito
 }
 
-data "aws_ssm_parameter" "rds_address" {
-  name = "/platform/rds/address"
-}
-
-data "aws_ssm_parameter" "rds_port" {
-  name = "/platform/rds/port"
-}
+# =============================================================================
+# Per-project DB credentials (not in platform-context — per-project SSM)
+# =============================================================================
 
 data "aws_ssm_parameter" "db_username" {
-  name = "/platform/db/svap/username"
+  name = "/ahara/db/svap/username"
 }
 
 data "aws_ssm_parameter" "db_password" {
-  name = "/platform/db/svap/password"
+  name = "/ahara/db/svap/password"
 }
 
 data "aws_ssm_parameter" "db_database" {
-  name = "/platform/db/svap/database"
-}
-
-data "aws_subnets" "private" {
-  filter {
-    name   = "tag:subnet:access"
-    values = ["private"]
-  }
-}
-
-data "aws_ssm_parameter" "vpc_id" {
-  name = "/platform/network/vpc-id"
+  name = "/ahara/db/svap/database"
 }
 
 # =============================================================================
-# VPC networking (uses shared platform VPC)
-# =============================================================================
-
-resource "aws_security_group" "lambda" {
-  name        = "${local.name_prefix}-lambda"
-  description = "SVAP Lambda functions"
-  vpc_id      = nonsensitive(data.aws_ssm_parameter.vpc_id.value)
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-locals {
-  db_url = "postgresql://${nonsensitive(data.aws_ssm_parameter.db_username.value)}:${data.aws_ssm_parameter.db_password.value}@${nonsensitive(data.aws_ssm_parameter.rds_address.value)}:${nonsensitive(data.aws_ssm_parameter.rds_port.value)}/${nonsensitive(data.aws_ssm_parameter.db_database.value)}?sslmode=require"
-}
-
-# =============================================================================
-# Data S3 bucket
+# Data S3 bucket (svap-specific — enforcement source documents)
 # =============================================================================
 
 resource "aws_s3_bucket" "data" {
@@ -71,13 +37,13 @@ resource "aws_s3_bucket" "data" {
 }
 
 resource "aws_kms_key" "data_bucket" {
-  description             = "KMS key for ${local.name_prefix}-data S3 bucket encryption"
+  description             = "KMS key for ${local.prefix}-data S3 bucket encryption"
   deletion_window_in_days = 10
   enable_key_rotation     = true
 }
 
 resource "aws_kms_alias" "data_bucket" {
-  name          = "alias/${local.name_prefix}-data-bucket"
+  name          = "alias/${local.prefix}-data-bucket"
   target_key_id = aws_kms_key.data_bucket.key_id
 }
 
@@ -102,7 +68,7 @@ resource "aws_s3_bucket_public_access_block" "data" {
 }
 
 # =============================================================================
-# IAM
+# IAM policy for Lambda functions (shared between API + stage-runner)
 # =============================================================================
 
 data "aws_iam_policy_document" "lambda" {
@@ -111,11 +77,11 @@ data "aws_iam_policy_document" "lambda" {
     actions = [
       "s3:GetObject",
       "s3:PutObject",
-      "s3:ListBucket"
+      "s3:ListBucket",
     ]
     resources = [
       aws_s3_bucket.data.arn,
-      "${aws_s3_bucket.data.arn}/*"
+      "${aws_s3_bucket.data.arn}/*",
     ]
   }
 
@@ -123,7 +89,7 @@ data "aws_iam_policy_document" "lambda" {
     sid = "DataBucketKms"
     actions = [
       "kms:Decrypt",
-      "kms:GenerateDataKey"
+      "kms:GenerateDataKey",
     ]
     resources = [aws_kms_key.data_bucket.arn]
   }
@@ -131,11 +97,11 @@ data "aws_iam_policy_document" "lambda" {
   statement {
     sid = "BedrockInvoke"
     actions = [
-      "bedrock:InvokeModel"
+      "bedrock:InvokeModel",
     ]
     resources = [
       "arn:aws:bedrock:*::foundation-model/anthropic.*",
-      "arn:aws:bedrock:*:*:inference-profile/*"
+      "arn:aws:bedrock:*:*:inference-profile/*",
     ]
   }
 
@@ -158,111 +124,64 @@ data "aws_iam_policy_document" "lambda" {
 }
 
 # =============================================================================
-# API Lambda (via api-http module)
+# API Lambda (via ahara-tf-patterns alb-api — shared ALB, jwt-validation)
+#
+# Replaces the previous API Gateway V2 HTTP API with the shared ALB pattern.
+# JWT validation is handled by the ALB's jwt-validation action (same as
+# dosekit/tastebase). CORS is handled by the platform-wide CORS Lambda in
+# ahara-infra/services.
 # =============================================================================
 
 module "api" {
-  source = "./modules/api-http"
+  source   = "git::https://github.com/chris-arsenault/ahara-tf-patterns.git//modules/alb-api"
+  prefix   = local.prefix
+  hostname = local.api_domain
 
-  name            = local.name_prefix
-  lambda_zip_path = "${path.module}/../../backend/dist/lambda-api.zip"
-  lambda_runtime  = local.lambda_runtime
-  lambda_handler  = "svap.api.handler"
-  lambda_timeout  = local.api_lambda_timeout
-  lambda_memory   = local.lambda_memory
+  vpc     = module.ctx.vpc
+  alb     = module.ctx.alb
+  cognito = module.ctx.cognito
 
-  lambda_environment = {
+  environment = {
     DATABASE_URL               = local.db_url
     SVAP_CONFIG_BUCKET         = aws_s3_bucket.data.bucket
     PIPELINE_STATE_MACHINE_ARN = aws_sfn_state_machine.pipeline.arn
-    COGNITO_USER_POOL_ID       = local.cognito_user_pool_id
-    COGNITO_CLIENT_ID          = local.cognito_client_id
+    COGNITO_USER_POOL_ID       = module.ctx.cognito_user_pool_id
+    COGNITO_CLIENT_ID          = module.cognito.client_id
   }
 
-  vpc_config = {
-    subnet_ids         = data.aws_subnets.private.ids
-    security_group_ids = [aws_security_group.lambda.id]
+  iam_policy = [data.aws_iam_policy_document.lambda.json]
+
+  lambdas = {
+    api = {
+      binary = "${path.module}/../../backend/target/lambda/api/bootstrap"
+      routes = [
+        { priority = 300, paths = ["/api/health"], methods = ["GET"], authenticated = false },
+        { priority = 301, paths = ["/api/*"], methods = ["GET", "HEAD"], authenticated = false },
+        { priority = 302, paths = ["/api/*"], authenticated = true },
+      ]
+    }
   }
-
-  iam_policy_json = data.aws_iam_policy_document.lambda.json
-
-  routes = [
-    "GET /api/dashboard",
-    "GET /api/status",
-    "GET /api/cases",
-    "GET /api/cases/{case_id}",
-    "GET /api/taxonomy",
-    "GET /api/taxonomy/{quality_id}",
-    "GET /api/convergence/cases",
-    "GET /api/convergence/policies",
-    "GET /api/policies",
-    "GET /api/policies/{policy_id}",
-    "GET /api/predictions",
-    "GET /api/detection-patterns",
-    "GET /api/hhs/policy-catalog",
-    "GET /api/hhs/policy-catalog/flat",
-    "GET /api/hhs/enforcement-sources",
-    "GET /api/hhs/data-sources",
-    "GET /api/enforcement-sources",
-    "POST /api/enforcement-sources",
-    "POST /api/enforcement-sources/upload",
-    "POST /api/enforcement-sources/delete",
-    "POST /api/pipeline/run",
-    "POST /api/pipeline/approve",
-    "POST /api/pipeline/seed",
-    "GET /api/health",
-    "POST /api/discovery/run-feeds",
-    "GET /api/discovery/candidates",
-    "POST /api/discovery/candidates/review",
-    "GET /api/discovery/feeds",
-    "POST /api/discovery/feeds",
-    "POST /api/research/triage",
-    "POST /api/research/deep",
-    "GET /api/research/triage",
-    "GET /api/research/sessions",
-    "GET /api/research/findings/{policy_id}",
-    "GET /api/research/assessments/{policy_id}",
-    "GET /api/dimensions",
-    "GET /api/management/executions",
-    "POST /api/management/executions/stop",
-    "GET /api/management/runs",
-    "POST /api/management/runs/delete",
-  ]
-
-  cors_allow_origins = local.allowed_origins
-  jwt_issuer         = local.cognito_issuer
-  jwt_audience       = [local.cognito_client_id]
-  custom_domain_name = local.api_domain
-  domain_zone_name   = local.domain_name
 }
 
 # =============================================================================
-# Stage Runner Lambda (standalone — long-running pipeline stages)
+# Stage Runner Lambda (standalone — long-running pipeline stages, SFN-invoked)
 # =============================================================================
 
-resource "aws_lambda_function" "stage_runner" {
-  function_name    = "${local.name_prefix}-stage-runner"
-  role             = module.api.lambda_role_arn
-  handler          = "svap.stage_runner.handler"
-  runtime          = local.lambda_runtime
-  filename         = "${path.module}/../../backend/dist/lambda-api.zip"
-  source_code_hash = filebase64sha256("${path.module}/../../backend/dist/lambda-api.zip")
-  timeout          = local.stage_runner_timeout
-  memory_size      = 1024
+module "stage_runner" {
+  source = "git::https://github.com/chris-arsenault/ahara-tf-patterns.git//modules/lambda"
 
-  vpc_config {
-    subnet_ids         = data.aws_subnets.private.ids
-    security_group_ids = [aws_security_group.lambda.id]
+  name        = "${local.prefix}-stage-runner"
+  binary      = "${path.module}/../../backend/target/lambda/stage-runner/bootstrap"
+  role_arn    = module.api.role_arn
+  timeout     = local.stage_runner_timeout
+  memory_size = local.stage_runner_memory
+
+  vpc = module.ctx.vpc
+
+  environment = {
+    DATABASE_URL       = local.db_url
+    SVAP_CONFIG_BUCKET = aws_s3_bucket.data.bucket
   }
-
-  environment {
-    variables = {
-      DATABASE_URL       = local.db_url
-      SVAP_CONFIG_BUCKET = aws_s3_bucket.data.bucket
-    }
-  }
-
-  tags = { Name = "${local.name_prefix}-stage-runner" }
 }
 
 # =============================================================================
@@ -281,25 +200,25 @@ data "aws_iam_policy_document" "sfn_assume" {
 }
 
 resource "aws_iam_role" "sfn" {
-  name               = "${local.name_prefix}-sfn"
+  name               = "${local.prefix}-sfn"
   assume_role_policy = data.aws_iam_policy_document.sfn_assume.json
 }
 
 resource "aws_iam_role_policy" "sfn_invoke_lambda" {
-  name = "${local.name_prefix}-sfn-invoke"
+  name = "${local.prefix}-sfn-invoke"
   role = aws_iam_role.sfn.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
       Effect   = "Allow"
       Action   = ["lambda:InvokeFunction"]
-      Resource = [aws_lambda_function.stage_runner.arn]
+      Resource = [module.stage_runner.function_arn]
     }]
   })
 }
 
 resource "aws_sfn_state_machine" "pipeline" {
-  name     = "${local.name_prefix}-pipeline"
+  name     = "${local.prefix}-pipeline"
   role_arn = aws_iam_role.sfn.arn
 
   definition = jsonencode({
@@ -310,7 +229,7 @@ resource "aws_sfn_state_machine" "pipeline" {
         Type     = "Task"
         Resource = "arn:aws:states:::lambda:invoke"
         Parameters = {
-          FunctionName = aws_lambda_function.stage_runner.arn
+          FunctionName = module.stage_runner.function_arn
           Payload = {
             "run_id.$" = "$.run_id"
             stage      = 0
@@ -323,7 +242,7 @@ resource "aws_sfn_state_machine" "pipeline" {
         Type     = "Task"
         Resource = "arn:aws:states:::lambda:invoke"
         Parameters = {
-          FunctionName = aws_lambda_function.stage_runner.arn
+          FunctionName = module.stage_runner.function_arn
           Payload = {
             "run_id.$" = "$.run_id"
             stage      = 1
@@ -336,7 +255,7 @@ resource "aws_sfn_state_machine" "pipeline" {
         Type     = "Task"
         Resource = "arn:aws:states:::lambda:invoke"
         Parameters = {
-          FunctionName = aws_lambda_function.stage_runner.arn
+          FunctionName = module.stage_runner.function_arn
           Payload = {
             "run_id.$" = "$.run_id"
             stage      = 2
@@ -349,7 +268,7 @@ resource "aws_sfn_state_machine" "pipeline" {
         Type     = "Task"
         Resource = "arn:aws:states:::lambda:invoke.waitForTaskToken"
         Parameters = {
-          FunctionName = aws_lambda_function.stage_runner.arn
+          FunctionName = module.stage_runner.function_arn
           Payload = {
             "run_id.$"     = "$.run_id"
             stage          = 2
@@ -364,7 +283,7 @@ resource "aws_sfn_state_machine" "pipeline" {
         Type     = "Task"
         Resource = "arn:aws:states:::lambda:invoke"
         Parameters = {
-          FunctionName = aws_lambda_function.stage_runner.arn
+          FunctionName = module.stage_runner.function_arn
           Payload = {
             "run_id.$" = "$.run_id"
             stage      = 3
@@ -377,7 +296,7 @@ resource "aws_sfn_state_machine" "pipeline" {
         Type     = "Task"
         Resource = "arn:aws:states:::lambda:invoke"
         Parameters = {
-          FunctionName = aws_lambda_function.stage_runner.arn
+          FunctionName = module.stage_runner.function_arn
           Payload = {
             "run_id.$" = "$.run_id"
             stage      = 4
@@ -391,7 +310,7 @@ resource "aws_sfn_state_machine" "pipeline" {
         Resource       = "arn:aws:states:::lambda:invoke"
         TimeoutSeconds = 960
         Parameters = {
-          FunctionName = aws_lambda_function.stage_runner.arn
+          FunctionName = module.stage_runner.function_arn
           Payload = {
             "run_id.$" = "$.run_id"
             stage      = 5
@@ -404,7 +323,7 @@ resource "aws_sfn_state_machine" "pipeline" {
         Type     = "Task"
         Resource = "arn:aws:states:::lambda:invoke.waitForTaskToken"
         Parameters = {
-          FunctionName = aws_lambda_function.stage_runner.arn
+          FunctionName = module.stage_runner.function_arn
           Payload = {
             "run_id.$"     = "$.run_id"
             stage          = 5
@@ -420,7 +339,7 @@ resource "aws_sfn_state_machine" "pipeline" {
         Resource       = "arn:aws:states:::lambda:invoke"
         TimeoutSeconds = 960
         Parameters = {
-          FunctionName = aws_lambda_function.stage_runner.arn
+          FunctionName = module.stage_runner.function_arn
           Payload = {
             "run_id.$" = "$.run_id"
             stage      = 6
@@ -432,24 +351,22 @@ resource "aws_sfn_state_machine" "pipeline" {
     }
   })
 
-  tags = { Name = "${local.name_prefix}-pipeline" }
+  tags = { Name = "${local.prefix}-pipeline" }
 }
 
 # =============================================================================
-# Frontend SPA (via spa-website module)
+# Frontend SPA (via ahara-tf-patterns website module)
 # =============================================================================
 
 module "site" {
-  source = "./modules/spa-website"
-
-  hostname            = local.hostname
-  domain_name         = local.domain_name
-  site_directory_path = "${path.module}/../../frontend/dist"
-  bucket_name         = local.frontend_bucket
+  source         = "git::https://github.com/chris-arsenault/ahara-tf-patterns.git//modules/website"
+  prefix         = local.prefix
+  hostname       = local.hostname
+  site_directory = "${path.module}/../../frontend/dist"
 
   runtime_config = {
     apiBaseUrl        = "https://${local.api_domain}/api"
-    cognitoUserPoolId = local.cognito_user_pool_id
-    cognitoClientId   = local.cognito_client_id
+    cognitoUserPoolId = module.ctx.cognito_user_pool_id
+    cognitoClientId   = module.cognito.client_id
   }
 }

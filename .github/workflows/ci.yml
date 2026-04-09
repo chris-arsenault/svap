@@ -14,6 +14,6 @@ permissions:
 
 jobs:
   ci:
-    uses: chris-arsenault/platform/.github/workflows/ci.yml@main
+    uses: chris-arsenault/ahara/.github/workflows/ci.yml@main
     secrets: inherit
 

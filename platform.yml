@@ -2,6 +2,10 @@ project: svap
 prefix: svap
 migrations: db/migrations
 stack:
-  - python
+  - rust
   - typescript
   - terraform
+rust_artifacts:
+  lambdas:
+    - api
+    - stage-runner

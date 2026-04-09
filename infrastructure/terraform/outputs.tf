@@ -1,6 +1,6 @@
 output "site_url" {
   description = "Frontend URL"
-  value       = module.site.website_url
+  value       = module.site.url
 }
 
 output "api_endpoint" {
@@ -15,10 +15,10 @@ output "state_machine_arn" {
 
 output "cognito_user_pool_id" {
   description = "Cognito user pool ID"
-  value       = local.cognito_user_pool_id
+  value       = module.ctx.cognito_user_pool_id
 }
 
 output "cognito_client_id" {
   description = "SVAP Cognito app client ID"
-  value       = local.cognito_client_id
+  value       = module.cognito.client_id
 }

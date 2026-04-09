@@ -1,31 +1,21 @@
 locals {
   domain_name = "ahara.io"
-  name_prefix = "svap"
+  prefix      = "svap"
 
   # Frontend
-  hostname        = "svap.${local.domain_name}"
-  frontend_bucket = "${local.name_prefix}-frontend"
+  hostname = "svap.${local.domain_name}"
 
   # API
   api_domain = "api.svap.${local.domain_name}"
 
   # Data
-  data_bucket = "${local.name_prefix}-data"
-
-  # CORS
-  allowed_origins = [
-    "http://localhost:5173",
-    "https://${local.hostname}"
-  ]
+  data_bucket = "${local.prefix}-data"
 
   # Lambda
-  lambda_runtime       = "python3.12"
   api_lambda_timeout   = 120
   stage_runner_timeout = 900
-  lambda_memory        = 512
+  stage_runner_memory  = 1024
 
-  # Cognito (from platform SSM)
-  cognito_user_pool_id = nonsensitive(data.aws_ssm_parameter.cognito_user_pool_id.value)
-  cognito_client_id    = nonsensitive(data.aws_ssm_parameter.cognito_client_svap.value)
-  cognito_issuer       = "https://cognito-idp.us-east-1.amazonaws.com/${local.cognito_user_pool_id}"
+  # DB URL constructed from platform-context RDS outputs + per-project SSM creds
+  db_url = "postgresql://${nonsensitive(data.aws_ssm_parameter.db_username.value)}:${data.aws_ssm_parameter.db_password.value}@${module.ctx.rds_address}:${module.ctx.rds_port}/${nonsensitive(data.aws_ssm_parameter.db_database.value)}?sslmode=require"
 }
