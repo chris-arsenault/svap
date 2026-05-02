@@ -1,14 +1,14 @@
 .PHONY: ci lint lint-fix format format-check typecheck terraform-fmt-check \
        lint-frontend lint-fix-frontend format-frontend format-check-frontend \
-       lint-backend lint-fix-backend format-backend format-check-backend \
+       lint-rust format-rust format-check-rust \
        seed reset reset-corpus reset-runs reset-dry-run reset-trees runs
 
-ci: lint format-check typecheck terraform-fmt-check
+ci: format-check-rust lint-rust lint-frontend typecheck terraform-fmt-check
 
-lint: lint-frontend lint-backend
-lint-fix: lint-fix-frontend lint-fix-backend
-format: format-frontend format-backend
-format-check: format-check-frontend format-check-backend
+lint: lint-rust lint-frontend
+lint-fix: lint-fix-frontend
+format: format-rust format-frontend
+format-check: format-check-rust format-check-frontend
 
 lint-frontend:
 	cd frontend && pnpm exec eslint .
@@ -22,17 +22,14 @@ format-frontend:
 format-check-frontend:
 	cd frontend && pnpm exec prettier --check .
 
-lint-backend:
-	cd backend && uv run --extra dev ruff check src/
+lint-rust:
+	cd backend && CARGO_TARGET_DIR=target-clippy cargo clippy --release -- -D warnings -W clippy::cognitive_complexity
 
-lint-fix-backend:
-	cd backend && uv run --extra dev ruff check --fix src/
+format-rust:
+	cd backend && cargo fmt
 
-format-backend:
-	cd backend && uv run --extra dev ruff format src/
-
-format-check-backend:
-	cd backend && uv run --extra dev ruff format --check src/
+format-check-rust:
+	cd backend && cargo fmt -- --check
 
 typecheck:
 	cd frontend && pnpm exec tsc --noEmit

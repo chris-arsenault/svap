@@ -15,6 +15,26 @@ use svap_shared::db;
 use svap_shared::types::*;
 
 type LambdaResult = Result<Response<Body>, Error>;
+type ApiResult<T> = Result<T, Box<dyn std::error::Error + Send + Sync>>;
+
+struct RouteInfo {
+    method: String,
+    path: String,
+    route_key: String,
+}
+
+impl RouteInfo {
+    fn from_request(event: &Request) -> Self {
+        let method = event.method().to_string();
+        let path = event.uri().path().to_string();
+        let route_key = format!("{} {}", method, path);
+        Self {
+            method,
+            path,
+            route_key,
+        }
+    }
+}
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -30,48 +50,15 @@ async fn main() -> Result<(), Error> {
 }
 
 async fn handler(event: Request) -> LambdaResult {
-    // Reconstruct route key from method + path
-    let method = event.method().to_string();
-    let path = event.uri().path().to_string();
-    let route_key = format!("{} {}", method, path);
+    let route_info = RouteInfo::from_request(&event);
+    info!("Request: {}", route_info.route_key);
 
-    info!("Request: {}", route_key);
-
-    let database_url = resolve_database_url();
-    let db_client = match db::connect(&database_url).await {
-        Ok(c) => c,
-        Err(e) => {
-            error!("Database connection failed: {}", e);
-            return ok_json(500, json!({"detail": "Database connection failed"}));
-        }
+    let db_client = match connect_database().await {
+        Ok(client) => client,
+        Err(response) => return response,
     };
-
-    // Extract path parameters by matching route patterns
-    let result = route(&route_key, &method, &path, &event, &db_client).await;
-
-    match result {
-        Ok(body) => {
-            // If the body already has a statusCode, it's a raw API GW response
-            if let Some(status) = body.get("statusCode").and_then(|s| s.as_u64()) {
-                ok_json(status as u16, body)
-            } else {
-                ok_json(200, body)
-            }
-        }
-        Err(e) => {
-            let msg = e.to_string();
-            if let Some(detail) = msg.strip_prefix("404:") {
-                ok_json(404, json!({"detail": detail.trim()}))
-            } else if let Some(detail) = msg.strip_prefix("400:") {
-                ok_json(400, json!({"detail": detail.trim()}))
-            } else if let Some(detail) = msg.strip_prefix("409:") {
-                ok_json(409, json!({"detail": detail.trim()}))
-            } else {
-                error!("Unhandled error on {}: {}", route_key, msg);
-                ok_json(500, json!({"detail": "Internal server error"}))
-            }
-        }
-    }
+    let result = route(&route_info, &event, &db_client).await;
+    route_response(result, &route_info.route_key)
 }
 
 fn ok_json(status: u16, body: Value) -> LambdaResult {
@@ -84,6 +71,45 @@ fn ok_json(status: u16, body: Value) -> LambdaResult {
 
 fn api_error(code: u16, msg: &str) -> Box<dyn std::error::Error + Send + Sync> {
     format!("{}:{}", code, msg).into()
+}
+
+async fn connect_database() -> Result<tokio_postgres::Client, LambdaResult> {
+    let database_url = resolve_database_url();
+    match db::connect(&database_url).await {
+        Ok(client) => Ok(client),
+        Err(e) => {
+            error!("Database connection failed: {}", e);
+            Err(ok_json(
+                500,
+                json!({"detail": "Database connection failed"}),
+            ))
+        }
+    }
+}
+
+fn route_response(result: ApiResult<Value>, route_key: &str) -> LambdaResult {
+    match result {
+        Ok(body) => success_response(body),
+        Err(e) => error_response(&e.to_string(), route_key),
+    }
+}
+
+fn success_response(body: Value) -> LambdaResult {
+    let status = body
+        .get("statusCode")
+        .and_then(|status| status.as_u64())
+        .unwrap_or(200) as u16;
+    ok_json(status, body)
+}
+
+fn error_response(message: &str, route_key: &str) -> LambdaResult {
+    for code in [404, 400, 409] {
+        if let Some(detail) = message.strip_prefix(&format!("{code}:")) {
+            return ok_json(code, json!({"detail": detail.trim()}));
+        }
+    }
+    error!("Unhandled error on {}: {}", route_key, message);
+    ok_json(500, json!({"detail": "Internal server error"}))
 }
 
 fn json_body(event: &Request) -> Value {
@@ -109,456 +135,473 @@ fn query_param(event: &Request, name: &str) -> Option<String> {
 }
 
 async fn route(
-    route_key: &str,
-    method: &str,
-    path: &str,
+    route_info: &RouteInfo,
     event: &Request,
     db_client: &tokio_postgres::Client,
-) -> Result<Value, Box<dyn std::error::Error + Send + Sync>> {
-    // Static data routes
-    let is_lambda = env::var("AWS_LAMBDA_FUNCTION_NAME").is_ok();
-
-    match route_key {
-        "GET /api/health" => {
-            Ok(json!({"status": "ok", "database": "postgresql", "lambda": is_lambda}))
-        }
-
-        "GET /api/status" => {
-            let run_id = db::get_latest_run(db_client).await?.unwrap_or_default();
-            let stages = if !run_id.is_empty() {
-                db::get_pipeline_status(db_client, &run_id).await?
-            } else {
-                Vec::new()
-            };
-            let counts = db::get_corpus_counts(db_client).await?;
-            Ok(json!({"run_id": run_id, "stages": stages, "counts": counts}))
-        }
-
-        "GET /api/dashboard" => {
-            let run_id = db::get_latest_run(db_client).await?.unwrap_or_default();
-            let cases = db::get_cases(db_client).await?;
-            let taxonomy = db::get_taxonomy(db_client).await?;
-            let policies = db::get_policies(db_client).await?;
-            let pipeline_status = if !run_id.is_empty() {
-                db::get_pipeline_status(db_client, &run_id).await?
-            } else {
-                Vec::new()
-            };
-            let convergence_matrix = db::get_convergence_matrix(db_client).await?;
-            let policy_scores = db::get_policy_scores(db_client).await?;
-            let calibration = db::get_calibration(db_client).await?;
-            let trees = db::get_exploitation_trees(db_client, false).await?;
-            let all_steps = db::get_all_exploitation_steps(db_client).await?;
-            let patterns = db::get_detection_patterns(db_client).await?;
-            let enforcement_sources = db::get_enforcement_sources(db_client).await?;
-
-            let threshold = calibration.as_ref().map(|c| c.threshold).unwrap_or(3);
-
-            // Enrich cases with qualities
-            let mut enriched_cases = cases.clone();
-            let mut case_qualities: std::collections::HashMap<String, Vec<String>> =
-                std::collections::HashMap::new();
-            for row in &convergence_matrix {
-                if row.present {
-                    case_qualities
-                        .entry(row.case_id.clone())
-                        .or_default()
-                        .push(row.quality_id.clone());
-                }
-            }
-            for case in &mut enriched_cases {
-                if let Some(quals) = case_qualities.get(&case.case_id) {
-                    case.qualities = quals.clone();
-                    case.qualities.sort();
-                }
-            }
-
-            // Enrich policies with qualities
-            let mut enriched_policies = policies.clone();
-            let mut policy_qualities: std::collections::HashMap<String, Vec<String>> =
-                std::collections::HashMap::new();
-            for row in &policy_scores {
-                if row.present {
-                    policy_qualities
-                        .entry(row.policy_id.clone())
-                        .or_default()
-                        .push(row.quality_id.clone());
-                }
-            }
-            for policy in &mut enriched_policies {
-                if let Some(quals) = policy_qualities.get(&policy.policy_id) {
-                    let mut sorted = quals.clone();
-                    sorted.sort();
-                    let score = sorted.len() as i32;
-                    policy.qualities = sorted;
-                    policy.convergence_score = Some(score);
-                    policy.risk_level = Some(compute_risk_level(score, threshold));
-                }
-            }
-
-            // Enrich trees with steps
-            let mut enriched_trees = trees.clone();
-            let mut steps_by_tree: std::collections::HashMap<String, Vec<ExploitationStep>> =
-                std::collections::HashMap::new();
-            for step in &all_steps {
-                steps_by_tree
-                    .entry(step.tree_id.clone())
-                    .or_default()
-                    .push(step.clone());
-            }
-            for tree in &mut enriched_trees {
-                if let Some(steps) = steps_by_tree.remove(&tree.tree_id) {
-                    tree.steps = steps;
-                }
-            }
-
-            Ok(json!({
-                "run_id": run_id,
-                "source": "api",
-                "pipeline_status": pipeline_status,
-                "counts": {
-                    "cases": cases.len(),
-                    "taxonomy_qualities": taxonomy.len(),
-                    "policies": policies.len(),
-                    "exploitation_trees": trees.len(),
-                    "detection_patterns": patterns.len(),
-                },
-                "calibration": calibration.as_ref().map(|c| json!({"threshold": c.threshold})).unwrap_or(json!({"threshold": 3})),
-                "cases": enriched_cases,
-                "taxonomy": taxonomy,
-                "policies": enriched_policies,
-                "exploitation_trees": enriched_trees,
-                "detection_patterns": patterns,
-                "enforcement_sources": enforcement_sources,
-            }))
-        }
-
-        "GET /api/cases" => {
-            let cases = db::get_cases(db_client).await?;
-            let matrix = db::get_convergence_matrix(db_client).await?;
-            let enriched = enrich_cases(cases, &matrix);
-            Ok(json!(enriched))
-        }
-
-        "GET /api/taxonomy" => {
-            let taxonomy = db::get_taxonomy(db_client).await?;
-            Ok(json!(taxonomy))
-        }
-
-        "GET /api/policies" => {
-            let policies = db::get_policies(db_client).await?;
-            let scores = db::get_policy_scores(db_client).await?;
-            let calibration = db::get_calibration(db_client).await?;
-            let enriched = enrich_policies(policies, &scores, calibration.as_ref());
-            Ok(json!(enriched))
-        }
-
-        "GET /api/predictions" => {
-            let trees = db::get_exploitation_trees(db_client, false).await?;
-            let steps = db::get_all_exploitation_steps(db_client).await?;
-            let enriched = enrich_trees(trees, steps);
-            Ok(json!(enriched))
-        }
-
-        "GET /api/detection-patterns" => {
-            let patterns = db::get_detection_patterns(db_client).await?;
-            Ok(json!(patterns))
-        }
-
-        "GET /api/convergence/cases" => {
-            let matrix = db::get_convergence_matrix(db_client).await?;
-            let calibration = db::get_calibration(db_client).await?;
-            Ok(json!({"matrix": matrix, "calibration": calibration}))
-        }
-
-        "GET /api/convergence/policies" => {
-            let scores = db::get_policy_scores(db_client).await?;
-            let calibration = db::get_calibration(db_client).await?;
-            Ok(json!({"scores": scores, "calibration": calibration}))
-        }
-
-        "GET /api/enforcement-sources" => {
-            let sources = db::get_enforcement_sources(db_client).await?;
-            Ok(json!(sources))
-        }
-
-        "GET /api/dimensions" => {
-            let dimensions = db::get_dimensions(db_client).await?;
-            Ok(json!(dimensions))
-        }
-
-        "GET /api/management/runs" => {
-            let runs = db::list_runs(db_client).await?;
-            Ok(json!(runs))
-        }
-
-        "GET /api/research/triage" => {
-            let results = db::get_triage_results(db_client).await?;
-            Ok(json!(results))
-        }
-
-        "GET /api/research/sessions" => {
-            let status = query_param(event, "status");
-            let sessions = db::get_research_sessions(db_client, status.as_deref()).await?;
-            Ok(json!(sessions))
-        }
-
-        "GET /api/discovery/candidates" => {
-            let feed_id = query_param(event, "feed_id");
-            let status = query_param(event, "status");
-            let candidates =
-                db::get_candidates(db_client, feed_id.as_deref(), status.as_deref()).await?;
-            Ok(json!(candidates))
-        }
-
-        "GET /api/discovery/feeds" => {
-            let feeds = db::get_source_feeds(db_client, false).await?;
-            Ok(json!(feeds))
-        }
-
-        "POST /api/pipeline/run" => {
-            let body = json_body(event);
-            let run_id = format!("run_{}", Utc::now().format("%Y%m%d_%H%M%S"));
-            let config = load_config(body.get("config_overrides")).await;
-            db::create_run(
-                db_client,
-                &run_id,
-                &serde_json::to_value(&config)?,
-                body.get("notes").and_then(|n| n.as_str()).unwrap_or(""),
-            )
-            .await?;
-
-            let sfn_arn = env::var("PIPELINE_STATE_MACHINE_ARN").unwrap_or_default();
-            if is_lambda && !sfn_arn.is_empty() {
-                let sdk_config =
-                    aws_config::load_defaults(aws_config::BehaviorVersion::latest()).await;
-                let sfn = aws_sdk_sfn::Client::new(&sdk_config);
-                let resp = sfn
-                    .start_execution()
-                    .state_machine_arn(&sfn_arn)
-                    .name(&run_id)
-                    .input(serde_json::to_string(&json!({"run_id": run_id}))?)
-                    .send()
-                    .await?;
-                return Ok(json!({
-                    "statusCode": 202,
-                    "status": "started",
-                    "run_id": run_id,
-                    "execution_arn": resp.execution_arn(),
-                }));
-            }
-
-            Ok(json!({"statusCode": 202, "status": "started", "run_id": run_id}))
-        }
-
-        "POST /api/pipeline/approve" => {
-            let body = json_body(event);
-            let stage = body
-                .get("stage")
-                .and_then(|s| s.as_i64())
-                .ok_or_else(|| api_error(400, "Missing stage"))? as i32;
-            if stage != 2 && stage != 5 {
-                return Err(api_error(
-                    400,
-                    "Only stages 2 and 5 have human review gates.",
-                ));
-            }
-            let run_id = db::get_latest_run(db_client)
-                .await?
-                .ok_or_else(|| api_error(404, "No pipeline runs found"))?;
-            let status = db::get_stage_status(db_client, &run_id, stage).await?;
-            if status.as_deref() != Some("pending_review") {
-                return Err(api_error(
-                    400,
-                    &format!("Stage {} is '{:?}', not pending review.", stage, status),
-                ));
-            }
-            db::approve_stage(db_client, &run_id, stage).await?;
-            Ok(json!({"status": "approved", "stage": stage}))
-        }
-
-        "POST /api/enforcement-sources" => {
-            let body = json_body(event);
-            let name = body
-                .get("name")
-                .and_then(|n| n.as_str())
-                .unwrap_or("")
-                .trim()
-                .to_string();
-            if name.is_empty() {
-                return Err(api_error(400, "Missing required field: name"));
-            }
-            let source_id = body
-                .get("source_id")
-                .and_then(|s| s.as_str())
-                .map(String::from)
-                .unwrap_or_else(|| {
-                    let re = Regex::new(r"[^a-z0-9_]").unwrap();
-                    re.replace_all(&name.to_lowercase().replace(' ', "_"), "")[..50.min(name.len())]
-                        .to_string()
-                });
-            if db::get_enforcement_source(db_client, &source_id)
-                .await?
-                .is_some()
-            {
-                return Err(api_error(
-                    409,
-                    &format!("Source '{}' already exists", source_id),
-                ));
-            }
-            let source = EnforcementSource {
-                source_id: source_id.clone(),
-                name,
-                url: body.get("url").and_then(|u| u.as_str()).map(String::from),
-                source_type: body
-                    .get("source_type")
-                    .and_then(|t| t.as_str())
-                    .unwrap_or("press_release")
-                    .to_string(),
-                description: body
-                    .get("description")
-                    .and_then(|d| d.as_str())
-                    .map(String::from),
-                has_document: false,
-                s3_key: None,
-                doc_id: None,
-                summary: None,
-                validation_status: Some("pending".to_string()),
-                created_at: Utc::now().to_rfc3339(),
-                updated_at: Utc::now().to_rfc3339(),
-                candidate_id: None,
-                feed_id: None,
-            };
-            db::upsert_enforcement_source(db_client, &source).await?;
-            let result = db::get_enforcement_source(db_client, &source_id).await?;
-            Ok(json!(result))
-        }
-
-        "POST /api/enforcement-sources/delete" => {
-            let body = json_body(event);
-            let source_id = body
-                .get("source_id")
-                .and_then(|s| s.as_str())
-                .ok_or_else(|| api_error(400, "Missing source_id"))?;
-            if db::get_enforcement_source(db_client, source_id)
-                .await?
-                .is_none()
-            {
-                return Err(api_error(404, &format!("Source '{}' not found", source_id)));
-            }
-            db::delete_enforcement_source(db_client, source_id).await?;
-            Ok(json!({"status": "deleted", "source_id": source_id}))
-        }
-
-        "POST /api/discovery/feeds" => {
-            let body = json_body(event);
-            let name = body
-                .get("name")
-                .and_then(|n| n.as_str())
-                .unwrap_or("")
-                .trim()
-                .to_string();
-            let listing_url = body
-                .get("listing_url")
-                .and_then(|u| u.as_str())
-                .unwrap_or("")
-                .trim()
-                .to_string();
-            if name.is_empty() || listing_url.is_empty() {
-                return Err(api_error(400, "Missing required fields: name, listing_url"));
-            }
-            let re = Regex::new(r"[^a-z0-9_]").unwrap();
-            let feed_id = re.replace_all(&name.to_lowercase().replace(' ', "_"), "")
-                [..50.min(name.len())]
-                .to_string();
-            let feed = SourceFeed {
-                feed_id: feed_id.clone(),
-                name,
-                listing_url,
-                content_type: body
-                    .get("content_type")
-                    .and_then(|t| t.as_str())
-                    .unwrap_or("press_release")
-                    .to_string(),
-                link_selector: body
-                    .get("link_selector")
-                    .and_then(|l| l.as_str())
-                    .map(String::from),
-                last_checked_at: None,
-                last_entry_url: None,
-                enabled: Some(true),
-                created_at: Utc::now().to_rfc3339(),
-                updated_at: Utc::now().to_rfc3339(),
-            };
-            db::upsert_source_feed(db_client, &feed).await?;
-            Ok(json!({"status": "created", "feed_id": feed_id}))
-        }
-
-        "POST /api/management/runs/delete" => {
-            let body = json_body(event);
-            let run_id = body
-                .get("run_id")
-                .and_then(|r| r.as_str())
-                .ok_or_else(|| api_error(400, "Missing run_id"))?
-                .trim();
-            if run_id.is_empty() {
-                return Err(api_error(400, "Missing required field: run_id"));
-            }
-            db::delete_run(db_client, run_id).await?;
-            Ok(json!({"status": "deleted", "run_id": run_id}))
-        }
-
-        _ => {
-            // Try pattern-matched routes
-            if let Some(case_id) = extract_param(path, "/api/cases/") {
-                if method == "GET" {
-                    let cases = db::get_cases(db_client).await?;
-                    let matrix = db::get_convergence_matrix(db_client).await?;
-                    let enriched = enrich_cases(cases, &matrix);
-                    let case = enriched.into_iter().find(|c| c.case_id == case_id);
-                    return case
-                        .map(|c| json!(c))
-                        .ok_or_else(|| api_error(404, &format!("Case {} not found", case_id)));
-                }
-            }
-            if let Some(quality_id) = extract_param(path, "/api/taxonomy/") {
-                if method == "GET" {
-                    let taxonomy = db::get_taxonomy(db_client).await?;
-                    let q = taxonomy.into_iter().find(|q| q.quality_id == quality_id);
-                    return q.map(|q| json!(q)).ok_or_else(|| {
-                        api_error(404, &format!("Quality {} not found", quality_id))
-                    });
-                }
-            }
-            if let Some(policy_id) = extract_param(path, "/api/policies/") {
-                if method == "GET" {
-                    let policies = db::get_policies(db_client).await?;
-                    let scores = db::get_policy_scores(db_client).await?;
-                    let calibration = db::get_calibration(db_client).await?;
-                    let enriched = enrich_policies(policies, &scores, calibration.as_ref());
-                    let policy = enriched.into_iter().find(|p| p.policy_id == policy_id);
-                    return policy
-                        .map(|p| json!(p))
-                        .ok_or_else(|| api_error(404, &format!("Policy {} not found", policy_id)));
-                }
-            }
-            if let Some(policy_id) = extract_param(path, "/api/research/findings/") {
-                if method == "GET" {
-                    let findings = db::get_structural_findings(db_client, &policy_id).await?;
-                    return Ok(json!({"policy_id": policy_id, "findings": findings}));
-                }
-            }
-            if let Some(policy_id) = extract_param(path, "/api/research/assessments/") {
-                if method == "GET" {
-                    let assessments =
-                        db::get_quality_assessments(db_client, Some(&policy_id)).await?;
-                    return Ok(json!({"policy_id": policy_id, "assessments": assessments}));
-                }
-            }
-
-            Err(api_error(404, &format!("Not found: {}", route_key)))
-        }
+) -> ApiResult<Value> {
+    if let Some(response) = get_route(route_info, event, db_client).await? {
+        return Ok(response);
     }
+    if let Some(response) = post_route(route_info, event, db_client).await? {
+        return Ok(response);
+    }
+    if let Some(response) = dynamic_get_route(route_info, db_client).await? {
+        return Ok(response);
+    }
+    Err(api_error(
+        404,
+        &format!("Not found: {}", route_info.route_key),
+    ))
+}
+
+async fn get_route(
+    route_info: &RouteInfo,
+    event: &Request,
+    db_client: &tokio_postgres::Client,
+) -> ApiResult<Option<Value>> {
+    let is_lambda = env::var("AWS_LAMBDA_FUNCTION_NAME").is_ok();
+    let response = match route_info.route_key.as_str() {
+        "GET /api/health" => {
+            json!({"status": "ok", "database": "postgresql", "lambda": is_lambda})
+        }
+        "GET /api/status" => status_response_body(db_client).await?,
+        "GET /api/dashboard" => dashboard_response(db_client).await?,
+        "GET /api/cases" => cases_response(db_client).await?,
+        "GET /api/taxonomy" => json!(db::get_taxonomy(db_client).await?),
+        "GET /api/policies" => policies_response(db_client).await?,
+        "GET /api/predictions" => predictions_response(db_client).await?,
+        "GET /api/detection-patterns" => json!(db::get_detection_patterns(db_client).await?),
+        "GET /api/convergence/cases" => convergence_cases_response(db_client).await?,
+        "GET /api/convergence/policies" => convergence_policies_response(db_client).await?,
+        "GET /api/enforcement-sources" => json!(db::get_enforcement_sources(db_client).await?),
+        "GET /api/dimensions" => json!(db::get_dimensions(db_client).await?),
+        "GET /api/management/runs" => json!(db::list_runs(db_client).await?),
+        "GET /api/research/triage" => json!(db::get_triage_results(db_client).await?),
+        "GET /api/research/sessions" => research_sessions_response(db_client, event).await?,
+        "GET /api/discovery/candidates" => discovery_candidates_response(db_client, event).await?,
+        "GET /api/discovery/feeds" => json!(db::get_source_feeds(db_client, false).await?),
+        _ => return Ok(None),
+    };
+    Ok(Some(response))
+}
+
+async fn post_route(
+    route_info: &RouteInfo,
+    event: &Request,
+    db_client: &tokio_postgres::Client,
+) -> ApiResult<Option<Value>> {
+    let is_lambda = env::var("AWS_LAMBDA_FUNCTION_NAME").is_ok();
+    let response = match route_info.route_key.as_str() {
+        "POST /api/pipeline/run" => start_pipeline(db_client, event, is_lambda).await?,
+        "POST /api/pipeline/approve" => approve_pipeline_stage(db_client, event).await?,
+        "POST /api/enforcement-sources" => create_enforcement_source(db_client, event).await?,
+        "POST /api/enforcement-sources/delete" => {
+            delete_enforcement_source(db_client, event).await?
+        }
+        "POST /api/discovery/feeds" => create_discovery_feed(db_client, event).await?,
+        "POST /api/management/runs/delete" => delete_run(db_client, event).await?,
+        _ => return Ok(None),
+    };
+    Ok(Some(response))
+}
+
+async fn dynamic_get_route(
+    route_info: &RouteInfo,
+    db_client: &tokio_postgres::Client,
+) -> ApiResult<Option<Value>> {
+    if route_info.method != "GET" {
+        return Ok(None);
+    }
+    if let Some(case_id) = extract_param(&route_info.path, "/api/cases/") {
+        return Ok(Some(case_response(db_client, &case_id).await?));
+    }
+    if let Some(quality_id) = extract_param(&route_info.path, "/api/taxonomy/") {
+        return Ok(Some(quality_response(db_client, &quality_id).await?));
+    }
+    if let Some(policy_id) = extract_param(&route_info.path, "/api/policies/") {
+        return Ok(Some(policy_response(db_client, &policy_id).await?));
+    }
+    if let Some(policy_id) = extract_param(&route_info.path, "/api/research/findings/") {
+        let findings = db::get_structural_findings(db_client, &policy_id).await?;
+        return Ok(Some(json!({"policy_id": policy_id, "findings": findings})));
+    }
+    if let Some(policy_id) = extract_param(&route_info.path, "/api/research/assessments/") {
+        let assessments = db::get_quality_assessments(db_client, Some(&policy_id)).await?;
+        return Ok(Some(
+            json!({"policy_id": policy_id, "assessments": assessments}),
+        ));
+    }
+    Ok(None)
+}
+
+async fn status_response_body(db_client: &tokio_postgres::Client) -> ApiResult<Value> {
+    let run_id = db::get_latest_run(db_client).await?.unwrap_or_default();
+    let stages = pipeline_status_for_run(db_client, &run_id).await?;
+    let counts = db::get_corpus_counts(db_client).await?;
+    Ok(json!({"run_id": run_id, "stages": stages, "counts": counts}))
+}
+
+async fn pipeline_status_for_run(
+    db_client: &tokio_postgres::Client,
+    run_id: &str,
+) -> ApiResult<Vec<StageStatusEntry>> {
+    if run_id.is_empty() {
+        return Ok(Vec::new());
+    }
+    db::get_pipeline_status(db_client, run_id).await
+}
+
+async fn dashboard_response(db_client: &tokio_postgres::Client) -> ApiResult<Value> {
+    let run_id = db::get_latest_run(db_client).await?.unwrap_or_default();
+    let cases = db::get_cases(db_client).await?;
+    let taxonomy = db::get_taxonomy(db_client).await?;
+    let policies = db::get_policies(db_client).await?;
+    let pipeline_status = pipeline_status_for_run(db_client, &run_id).await?;
+    let convergence_matrix = db::get_convergence_matrix(db_client).await?;
+    let policy_scores = db::get_policy_scores(db_client).await?;
+    let calibration = db::get_calibration(db_client).await?;
+    let trees = db::get_exploitation_trees(db_client, false).await?;
+    let all_steps = db::get_all_exploitation_steps(db_client).await?;
+    let patterns = db::get_detection_patterns(db_client).await?;
+    let enforcement_sources = db::get_enforcement_sources(db_client).await?;
+
+    Ok(json!({
+        "run_id": run_id,
+        "source": "api",
+        "pipeline_status": pipeline_status,
+        "counts": {
+            "cases": cases.len(),
+            "taxonomy_qualities": taxonomy.len(),
+            "policies": policies.len(),
+            "exploitation_trees": trees.len(),
+            "detection_patterns": patterns.len(),
+        },
+        "calibration": calibration.as_ref().map(|c| json!({"threshold": c.threshold})).unwrap_or(json!({"threshold": 3})),
+        "cases": enrich_cases(cases, &convergence_matrix),
+        "taxonomy": taxonomy,
+        "policies": enrich_policies(policies, &policy_scores, calibration.as_ref()),
+        "exploitation_trees": enrich_trees(trees, all_steps),
+        "detection_patterns": patterns,
+        "enforcement_sources": enforcement_sources,
+    }))
+}
+
+async fn cases_response(db_client: &tokio_postgres::Client) -> ApiResult<Value> {
+    let cases = db::get_cases(db_client).await?;
+    let matrix = db::get_convergence_matrix(db_client).await?;
+    Ok(json!(enrich_cases(cases, &matrix)))
+}
+
+async fn policies_response(db_client: &tokio_postgres::Client) -> ApiResult<Value> {
+    let policies = db::get_policies(db_client).await?;
+    let scores = db::get_policy_scores(db_client).await?;
+    let calibration = db::get_calibration(db_client).await?;
+    Ok(json!(enrich_policies(
+        policies,
+        &scores,
+        calibration.as_ref()
+    )))
+}
+
+async fn predictions_response(db_client: &tokio_postgres::Client) -> ApiResult<Value> {
+    let trees = db::get_exploitation_trees(db_client, false).await?;
+    let steps = db::get_all_exploitation_steps(db_client).await?;
+    Ok(json!(enrich_trees(trees, steps)))
+}
+
+async fn convergence_cases_response(db_client: &tokio_postgres::Client) -> ApiResult<Value> {
+    let matrix = db::get_convergence_matrix(db_client).await?;
+    let calibration = db::get_calibration(db_client).await?;
+    Ok(json!({"matrix": matrix, "calibration": calibration}))
+}
+
+async fn convergence_policies_response(db_client: &tokio_postgres::Client) -> ApiResult<Value> {
+    let scores = db::get_policy_scores(db_client).await?;
+    let calibration = db::get_calibration(db_client).await?;
+    Ok(json!({"scores": scores, "calibration": calibration}))
+}
+
+async fn research_sessions_response(
+    db_client: &tokio_postgres::Client,
+    event: &Request,
+) -> ApiResult<Value> {
+    let status = query_param(event, "status");
+    let sessions = db::get_research_sessions(db_client, status.as_deref()).await?;
+    Ok(json!(sessions))
+}
+
+async fn discovery_candidates_response(
+    db_client: &tokio_postgres::Client,
+    event: &Request,
+) -> ApiResult<Value> {
+    let feed_id = query_param(event, "feed_id");
+    let status = query_param(event, "status");
+    let candidates = db::get_candidates(db_client, feed_id.as_deref(), status.as_deref()).await?;
+    Ok(json!(candidates))
+}
+
+async fn start_pipeline(
+    db_client: &tokio_postgres::Client,
+    event: &Request,
+    is_lambda: bool,
+) -> ApiResult<Value> {
+    let body = json_body(event);
+    let run_id = format!("run_{}", Utc::now().format("%Y%m%d_%H%M%S"));
+    let config = load_config(body.get("config_overrides")).await;
+    db::create_run(
+        db_client,
+        &run_id,
+        &serde_json::to_value(&config)?,
+        body.get("notes").and_then(|n| n.as_str()).unwrap_or(""),
+    )
+    .await?;
+
+    if let Some(execution_arn) = start_step_function(&run_id, is_lambda).await? {
+        return Ok(json!({
+            "statusCode": 202,
+            "status": "started",
+            "run_id": run_id,
+            "execution_arn": execution_arn,
+        }));
+    }
+
+    Ok(json!({"statusCode": 202, "status": "started", "run_id": run_id}))
+}
+
+async fn start_step_function(run_id: &str, is_lambda: bool) -> ApiResult<Option<String>> {
+    let sfn_arn = env::var("PIPELINE_STATE_MACHINE_ARN").unwrap_or_default();
+    if !is_lambda || sfn_arn.is_empty() {
+        return Ok(None);
+    }
+    let sdk_config = aws_config::load_defaults(aws_config::BehaviorVersion::latest()).await;
+    let sfn = aws_sdk_sfn::Client::new(&sdk_config);
+    let resp = sfn
+        .start_execution()
+        .state_machine_arn(&sfn_arn)
+        .name(run_id)
+        .input(serde_json::to_string(&json!({"run_id": run_id}))?)
+        .send()
+        .await?;
+    Ok(Some(resp.execution_arn().to_string()))
+}
+
+async fn approve_pipeline_stage(
+    db_client: &tokio_postgres::Client,
+    event: &Request,
+) -> ApiResult<Value> {
+    let body = json_body(event);
+    let stage = required_stage(&body)?;
+    let run_id = db::get_latest_run(db_client)
+        .await?
+        .ok_or_else(|| api_error(404, "No pipeline runs found"))?;
+    ensure_pending_review(db_client, &run_id, stage).await?;
+    db::approve_stage(db_client, &run_id, stage).await?;
+    Ok(json!({"status": "approved", "stage": stage}))
+}
+
+fn required_stage(body: &Value) -> ApiResult<i32> {
+    let stage = body
+        .get("stage")
+        .and_then(|s| s.as_i64())
+        .ok_or_else(|| api_error(400, "Missing stage"))? as i32;
+    if stage == 2 || stage == 5 {
+        Ok(stage)
+    } else {
+        Err(api_error(
+            400,
+            "Only stages 2 and 5 have human review gates.",
+        ))
+    }
+}
+
+async fn ensure_pending_review(
+    db_client: &tokio_postgres::Client,
+    run_id: &str,
+    stage: i32,
+) -> ApiResult<()> {
+    let status = db::get_stage_status(db_client, run_id, stage).await?;
+    if status.as_deref() == Some("pending_review") {
+        return Ok(());
+    }
+    Err(api_error(
+        400,
+        &format!("Stage {} is '{:?}', not pending review.", stage, status),
+    ))
+}
+
+async fn create_enforcement_source(
+    db_client: &tokio_postgres::Client,
+    event: &Request,
+) -> ApiResult<Value> {
+    let body = json_body(event);
+    let name = required_trimmed(&body, "name")?;
+    let source_id = body
+        .get("source_id")
+        .and_then(|s| s.as_str())
+        .map(String::from)
+        .unwrap_or_else(|| slug_id(&name));
+    ensure_source_available(db_client, &source_id).await?;
+
+    let source = enforcement_source_from_body(&body, &source_id, name);
+    db::upsert_enforcement_source(db_client, &source).await?;
+    Ok(json!(
+        db::get_enforcement_source(db_client, &source_id).await?
+    ))
+}
+
+async fn ensure_source_available(
+    db_client: &tokio_postgres::Client,
+    source_id: &str,
+) -> ApiResult<()> {
+    if db::get_enforcement_source(db_client, source_id)
+        .await?
+        .is_none()
+    {
+        return Ok(());
+    }
+    Err(api_error(
+        409,
+        &format!("Source '{}' already exists", source_id),
+    ))
+}
+
+fn enforcement_source_from_body(body: &Value, source_id: &str, name: String) -> EnforcementSource {
+    EnforcementSource {
+        source_id: source_id.to_string(),
+        name,
+        url: json_opt_string(body, "url"),
+        source_type: body
+            .get("source_type")
+            .and_then(|t| t.as_str())
+            .unwrap_or("press_release")
+            .to_string(),
+        description: json_opt_string(body, "description"),
+        has_document: false,
+        s3_key: None,
+        doc_id: None,
+        summary: None,
+        validation_status: Some("pending".to_string()),
+        created_at: Utc::now().to_rfc3339(),
+        updated_at: Utc::now().to_rfc3339(),
+        candidate_id: None,
+        feed_id: None,
+    }
+}
+
+async fn delete_enforcement_source(
+    db_client: &tokio_postgres::Client,
+    event: &Request,
+) -> ApiResult<Value> {
+    let body = json_body(event);
+    let source_id = required_str(&body, "source_id")?;
+    if db::get_enforcement_source(db_client, source_id)
+        .await?
+        .is_none()
+    {
+        return Err(api_error(404, &format!("Source '{}' not found", source_id)));
+    }
+    db::delete_enforcement_source(db_client, source_id).await?;
+    Ok(json!({"status": "deleted", "source_id": source_id}))
+}
+
+async fn create_discovery_feed(
+    db_client: &tokio_postgres::Client,
+    event: &Request,
+) -> ApiResult<Value> {
+    let body = json_body(event);
+    let name = required_trimmed(&body, "name")?;
+    let listing_url = required_trimmed(&body, "listing_url")?;
+    let feed_id = slug_id(&name);
+    let feed = SourceFeed {
+        feed_id: feed_id.clone(),
+        name,
+        listing_url,
+        content_type: body
+            .get("content_type")
+            .and_then(|t| t.as_str())
+            .unwrap_or("press_release")
+            .to_string(),
+        link_selector: json_opt_string(&body, "link_selector"),
+        last_checked_at: None,
+        last_entry_url: None,
+        enabled: Some(true),
+        created_at: Utc::now().to_rfc3339(),
+        updated_at: Utc::now().to_rfc3339(),
+    };
+    db::upsert_source_feed(db_client, &feed).await?;
+    Ok(json!({"status": "created", "feed_id": feed_id}))
+}
+
+async fn delete_run(db_client: &tokio_postgres::Client, event: &Request) -> ApiResult<Value> {
+    let body = json_body(event);
+    let run_id = required_str(&body, "run_id")?.trim();
+    if run_id.is_empty() {
+        return Err(api_error(400, "Missing required field: run_id"));
+    }
+    db::delete_run(db_client, run_id).await?;
+    Ok(json!({"status": "deleted", "run_id": run_id}))
+}
+
+async fn case_response(db_client: &tokio_postgres::Client, case_id: &str) -> ApiResult<Value> {
+    let cases = db::get_cases(db_client).await?;
+    let matrix = db::get_convergence_matrix(db_client).await?;
+    let case = enrich_cases(cases, &matrix)
+        .into_iter()
+        .find(|case| case.case_id == case_id);
+    case.map(|case| json!(case))
+        .ok_or_else(|| api_error(404, &format!("Case {} not found", case_id)))
+}
+
+async fn quality_response(
+    db_client: &tokio_postgres::Client,
+    quality_id: &str,
+) -> ApiResult<Value> {
+    let taxonomy = db::get_taxonomy(db_client).await?;
+    let quality = taxonomy
+        .into_iter()
+        .find(|quality| quality.quality_id == quality_id);
+    quality
+        .map(|quality| json!(quality))
+        .ok_or_else(|| api_error(404, &format!("Quality {} not found", quality_id)))
+}
+
+async fn policy_response(db_client: &tokio_postgres::Client, policy_id: &str) -> ApiResult<Value> {
+    let policies = db::get_policies(db_client).await?;
+    let scores = db::get_policy_scores(db_client).await?;
+    let calibration = db::get_calibration(db_client).await?;
+    let policy = enrich_policies(policies, &scores, calibration.as_ref())
+        .into_iter()
+        .find(|policy| policy.policy_id == policy_id);
+    policy
+        .map(|policy| json!(policy))
+        .ok_or_else(|| api_error(404, &format!("Policy {} not found", policy_id)))
+}
+
+fn required_str<'a>(body: &'a Value, key: &str) -> ApiResult<&'a str> {
+    body.get(key)
+        .and_then(|value| value.as_str())
+        .ok_or_else(|| api_error(400, &format!("Missing {key}")))
+}
+
+fn required_trimmed(body: &Value, key: &str) -> ApiResult<String> {
+    let value = required_str(body, key)?.trim().to_string();
+    if value.is_empty() {
+        Err(api_error(400, &format!("Missing required field: {key}")))
+    } else {
+        Ok(value)
+    }
+}
+
+fn slug_id(name: &str) -> String {
+    let re = Regex::new(r"[^a-z0-9_]").unwrap();
+    re.replace_all(&name.to_lowercase().replace(' ', "_"), "")
+        .chars()
+        .take(50)
+        .collect()
+}
+
+fn json_opt_string(value: &Value, key: &str) -> Option<String> {
+    value.get(key).and_then(|v| v.as_str()).map(String::from)
 }
 
 fn extract_param(path: &str, prefix: &str) -> Option<String> {

@@ -2836,6 +2836,7 @@ dependencies = [
  "serde_json",
  "svap-shared",
  "tokio",
+ "tokio-postgres",
  "tracing",
  "tracing-subscriber",
 ]

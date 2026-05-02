@@ -67,7 +67,11 @@ function StepNode({
   const hasDetail = [step.description, step.actor_action, step.enabling_qualities?.length].some(Boolean);
 
   return (
-    <div className="tree-step" style={{ '--step-depth': depth } as React.CSSProperties}>
+    <div
+      className="tree-step"
+      // eslint-disable-next-line local/no-inline-styles -- CSS custom property carries tree depth.
+      style={{ '--step-depth': depth } as React.CSSProperties}
+    >
       <div
         className={`tree-step-content${hasDetail ? " clickable" : ""}`}
         {...(hasDetail ? expandableProps(() => onToggle(step.step_id)) : {})}

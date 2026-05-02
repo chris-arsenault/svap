@@ -1,4 +1,29 @@
 // drift-generated
+const expandPattern = /^(is)?expand(ed)?/i;
+
+function isUseStateCallee(callee) {
+  return (
+    (callee.type === "Identifier" && callee.name === "useState") ||
+    (callee.type === "MemberExpression" &&
+      callee.property.type === "Identifier" &&
+      callee.property.name === "useState")
+  );
+}
+
+function isUseStateDeclarator(node) {
+  return (
+    node.id.type === "ArrayPattern" &&
+    node.init &&
+    node.init.type === "CallExpression" &&
+    isUseStateCallee(node.init.callee)
+  );
+}
+
+function stateName(node) {
+  const firstEl = node.id.elements[0];
+  return firstEl?.type === "Identifier" ? firstEl.name : null;
+}
+
 /**
  * ESLint rule: no-manual-expand-state
  *
@@ -33,30 +58,9 @@ export default {
 
     return {
       VariableDeclarator(node) {
-        // Must be: const [foo, setFoo] = useState(...)
-        if (
-          node.id.type !== "ArrayPattern" ||
-          !node.init ||
-          node.init.type !== "CallExpression"
-        ) {
-          return;
-        }
-
-        const callee = node.init.callee;
-        const isUseState =
-          (callee.type === "Identifier" && callee.name === "useState") ||
-          (callee.type === "MemberExpression" &&
-            callee.property.type === "Identifier" &&
-            callee.property.name === "useState");
-
-        if (!isUseState) return;
-
-        const firstEl = node.id.elements[0];
-        if (!firstEl || firstEl.type !== "Identifier") return;
-
-        const name = firstEl.name;
-        // Match: expanded, expandedId, expandedFoo, isExpanded
-        const expandPattern = /^(is)?expand(ed)?/i;
+        if (!isUseStateDeclarator(node)) return;
+        const name = stateName(node);
+        if (!name) return;
 
         if (expandPattern.test(name)) {
           context.report({

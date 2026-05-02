@@ -5,6 +5,7 @@
 
 use chrono::Utc;
 use serde_json::Value;
+use std::cmp::Reverse;
 use std::sync::atomic::{AtomicBool, Ordering};
 use tokio_postgres::{Client, NoTls};
 use tracing::{info, warn};
@@ -12,15 +13,14 @@ use tracing::{info, warn};
 use crate::types::*;
 
 static SCHEMA_READY: AtomicBool = AtomicBool::new(false);
+type DbResult<T> = Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
 fn now() -> String {
     Utc::now().to_rfc3339()
 }
 
 /// Connect to PostgreSQL and run migrations if needed.
-pub async fn connect(
-    database_url: &str,
-) -> Result<Client, Box<dyn std::error::Error + Send + Sync>> {
+pub async fn connect(database_url: &str) -> DbResult<Client> {
     let (client, connection) = tokio_postgres::connect(database_url, NoTls).await?;
 
     // Spawn the connection handler
@@ -39,29 +39,53 @@ pub async fn connect(
 }
 
 /// Run pending schema migrations inside a transaction with advisory lock.
-async fn migrate(client: &Client) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-    // Check/acquire advisory lock
+async fn migrate(client: &Client) -> DbResult<()> {
+    if !acquire_migration_lock(client).await? {
+        return skip_if_schema_current(client).await;
+    }
+
+    ensure_schema_version_table(client).await?;
+    let current = current_schema_version(client).await?;
+
+    if current < SCHEMA_VERSION {
+        apply_pending_migrations(client, current).await?;
+        client
+            .execute(
+                "UPDATE _svap_schema SET version = $1 WHERE id = 1",
+                &[&SCHEMA_VERSION],
+            )
+            .await?;
+        info!("Migration: schema now at v{SCHEMA_VERSION}");
+    }
+
+    release_migration_lock(client).await
+}
+
+async fn acquire_migration_lock(client: &Client) -> DbResult<bool> {
     let row = client
         .query_one("SELECT pg_try_advisory_lock(42)", &[])
         .await?;
-    let acquired: bool = row.get(0);
+    Ok(row.get(0))
+}
 
-    if !acquired {
-        // Check if schema is already at target version
-        let result = client
-            .query_opt("SELECT version FROM _svap_schema WHERE id = 1", &[])
-            .await;
-        if let Ok(Some(row)) = result {
-            let version: i32 = row.get(0);
-            if version >= SCHEMA_VERSION {
-                return Ok(());
-            }
-        }
-        info!("Migration: another instance holds the lock, skipping");
+async fn skip_if_schema_current(client: &Client) -> DbResult<()> {
+    if current_schema_version_if_available(client).await >= Some(SCHEMA_VERSION) {
         return Ok(());
     }
+    info!("Migration: another instance holds the lock, skipping");
+    Ok(())
+}
 
-    // Ensure schema version table exists
+async fn current_schema_version_if_available(client: &Client) -> Option<i32> {
+    client
+        .query_opt("SELECT version FROM _svap_schema WHERE id = 1", &[])
+        .await
+        .ok()
+        .flatten()
+        .map(|row| row.get(0))
+}
+
+async fn ensure_schema_version_table(client: &Client) -> DbResult<()> {
     client
         .execute(
             "CREATE TABLE IF NOT EXISTS _svap_schema (
@@ -78,17 +102,17 @@ async fn migrate(client: &Client) -> Result<(), Box<dyn std::error::Error + Send
             &[],
         )
         .await?;
+    Ok(())
+}
 
+async fn current_schema_version(client: &Client) -> DbResult<i32> {
     let row = client
         .query_one("SELECT version FROM _svap_schema WHERE id = 1", &[])
         .await?;
-    let current: i32 = row.get(0);
+    Ok(row.get(0))
+}
 
-    if current >= SCHEMA_VERSION {
-        client.execute("SELECT pg_advisory_unlock(42)", &[]).await?;
-        return Ok(());
-    }
-
+async fn apply_pending_migrations(client: &Client, current: i32) -> DbResult<()> {
     for (version, statements) in MIGRATIONS {
         if *version <= current {
             continue;
@@ -104,17 +128,11 @@ async fn migrate(client: &Client) -> Result<(), Box<dyn std::error::Error + Send
             }
         }
     }
+    Ok(())
+}
 
-    client
-        .execute(
-            "UPDATE _svap_schema SET version = $1 WHERE id = 1",
-            &[&SCHEMA_VERSION],
-        )
-        .await?;
-
+async fn release_migration_lock(client: &Client) -> DbResult<()> {
     client.execute("SELECT pg_advisory_unlock(42)", &[]).await?;
-
-    info!("Migration: schema now at v{SCHEMA_VERSION}");
     Ok(())
 }
 
@@ -1648,7 +1666,7 @@ pub async fn search_chunks(
             ));
         }
     }
-    scored.sort_by(|a, b| b.0.cmp(&a.0));
+    scored.sort_by_key(|(score, _)| Reverse(*score));
     Ok(scored.into_iter().take(limit).map(|(_, c)| c).collect())
 }
 

@@ -33,8 +33,8 @@ function DashboardMetrics({
     <div className="metrics-row">
       <MetricCard label="Enforcement Cases" value={cases} sub={<>{formatDollars(totalFraudDollars)} total intended losses</>} />
       <MetricCard label="Vulnerability Qualities" value={taxonomy} sub={<>Threshold: {"\u2265"}{threshold} = high risk</>} />
-      <MetricCard label="Policies Scanned" value={policies} sub={<span className="metric-sub-critical">{criticalPolicies} critical risk</span>} />
-      <MetricCard label="Detection Patterns" value={detectionPatterns} sub={<span className="metric-sub-critical">{criticalPatterns} critical priority</span>} />
+      <MetricCard label="Policies Scanned" value={policies} sub={`${criticalPolicies} critical risk`} subClassName="metric-sub-critical" />
+      <MetricCard label="Detection Patterns" value={detectionPatterns} sub={`${criticalPatterns} critical priority`} subClassName="metric-sub-critical" />
     </div>
   );
 }

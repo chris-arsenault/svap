@@ -11,7 +11,7 @@ function MatrixCell({ present, color }: { present: boolean; color: string }) {
   return (
     <span
       className="matrix-cell-present"
-       
+      // eslint-disable-next-line local/no-inline-styles -- CSS custom property carries taxonomy color.
       style={{ "--cell-color": color } as React.CSSProperties}
     >
       {"\u2713"}

@@ -1,4 +1,44 @@
 // drift-generated
+const asyncNamePattern = /^(is)?(busy|loading|submitting)/i;
+const errorNamePattern = /error/i;
+
+function isUseStateCallee(callee) {
+  return (
+    (callee.type === "Identifier" && callee.name === "useState") ||
+    (callee.type === "MemberExpression" &&
+      callee.property.type === "Identifier" &&
+      callee.property.name === "useState")
+  );
+}
+
+function isUseStateDeclarator(node) {
+  return (
+    node.id.type === "ArrayPattern" &&
+    node.init &&
+    node.init.type === "CallExpression" &&
+    isUseStateCallee(node.init.callee)
+  );
+}
+
+function stateName(node) {
+  const firstEl = node.id.elements[0];
+  return firstEl?.type === "Identifier" ? firstEl.name : null;
+}
+
+function isLiteralValue(node, values) {
+  return node?.type === "Literal" && values.includes(node.value);
+}
+
+function shouldReportAsyncState(name, initArg) {
+  if (asyncNamePattern.test(name)) {
+    return !initArg || isLiteralValue(initArg, [false, null]);
+  }
+  if (errorNamePattern.test(name)) {
+    return !initArg || isLiteralValue(initArg, [null]);
+  }
+  return false;
+}
+
 /**
  * ESLint rule: no-manual-async-state
  *
@@ -46,67 +86,20 @@ export default {
       },
 
       VariableDeclarator(node) {
-        // Skip if inside a store create() call
         if (insideStoreCreate > 0) return;
+        if (!isUseStateDeclarator(node)) return;
 
-        // Must be: const [foo, setFoo] = useState(...)
-        if (
-          node.id.type !== "ArrayPattern" ||
-          !node.init ||
-          node.init.type !== "CallExpression"
-        ) {
-          return;
-        }
-
-        const callee = node.init.callee;
-        const isUseState =
-          (callee.type === "Identifier" && callee.name === "useState") ||
-          (callee.type === "MemberExpression" &&
-            callee.property.type === "Identifier" &&
-            callee.property.name === "useState");
-
-        if (!isUseState) return;
-
-        // Get the first element name (the state variable)
-        const firstEl = node.id.elements[0];
-        if (!firstEl || firstEl.type !== "Identifier") return;
-
-        const name = firstEl.name;
-        const asyncNamePattern = /^(is)?(busy|loading|submitting)/i;
-        const errorNamePattern = /error/i;
-
-        // Check initial value to confirm async-state usage
+        const name = stateName(node);
+        if (!name) return;
         const args = node.init.arguments;
         const initArg = args.length > 0 ? args[0] : null;
 
-        // For busy/loading/submitting: flag if useState(false) or useState<...>(null) or useState(null)
-        if (asyncNamePattern.test(name)) {
-          if (
-            !initArg ||
-            (initArg.type === "Literal" &&
-              (initArg.value === false || initArg.value === null))
-          ) {
-            context.report({
-              node,
-              messageId: "noManualAsyncState",
-              data: { name },
-            });
-            return;
-          }
-        }
-
-        // For error: flag if useState(null) or useState<string|null>(null)
-        if (errorNamePattern.test(name)) {
-          if (
-            !initArg ||
-            (initArg.type === "Literal" && initArg.value === null)
-          ) {
-            context.report({
-              node,
-              messageId: "noManualAsyncState",
-              data: { name },
-            });
-          }
+        if (shouldReportAsyncState(name, initArg)) {
+          context.report({
+            node,
+            messageId: "noManualAsyncState",
+            data: { name },
+          });
         }
       },
     };

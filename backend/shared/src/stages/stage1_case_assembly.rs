@@ -10,7 +10,7 @@ use tracing::info;
 
 use crate::bedrock::BedrockClient;
 use crate::db;
-use crate::types::{Case, Config};
+use crate::types::{Case, Config, Document};
 
 const SYSTEM_PROMPT: &str =
     "You are an analyst extracting structured information from enforcement \
@@ -19,13 +19,14 @@ const SYSTEM_PROMPT: &str =
      design feature that was exploited, not generic labels like \"weak oversight\".";
 
 const STAGE1_EXTRACT_PROMPT: &str = include_str!("../../prompts/stage1_extract.txt");
+type StageResult<T> = Result<T, Box<dyn std::error::Error + Send + Sync>>;
 
 pub async fn run(
     db_client: &Client,
     bedrock: &BedrockClient,
     run_id: &str,
     config: &Config,
-) -> Result<serde_json::Value, Box<dyn std::error::Error + Send + Sync>> {
+) -> StageResult<serde_json::Value> {
     info!("Stage 1: Case Corpus Assembly");
     db::log_stage_start(db_client, run_id, 1).await?;
 
@@ -46,99 +47,18 @@ async fn run_inner(
     bedrock: &BedrockClient,
     _run_id: &str,
     _config: &Config,
-) -> Result<serde_json::Value, Box<dyn std::error::Error + Send + Sync>> {
+) -> StageResult<serde_json::Value> {
     let docs = db::get_all_documents(db_client, Some("enforcement")).await?;
     if docs.is_empty() {
         info!("No enforcement documents found.");
         return Ok(json!({"cases_extracted": 0, "note": "no documents"}));
     }
 
-    let mut new_docs = Vec::new();
-    let mut skipped = 0;
-    for doc in &docs {
-        if db::cases_exist_for_document(db_client, &doc.doc_id).await? {
-            skipped += 1;
-        } else {
-            new_docs.push(doc);
-        }
-    }
+    let (new_docs, skipped) = documents_needing_cases(db_client, &docs).await?;
 
     let mut total_cases = 0;
     for doc in &new_docs {
-        info!(
-            "Processing: {}",
-            doc.filename.as_deref().unwrap_or("unknown")
-        );
-        let truncated = truncate(&doc.full_text, 12000);
-        let prompt =
-            BedrockClient::render_prompt(STAGE1_EXTRACT_PROMPT, &[("document_text", &truncated)]);
-
-        let response = bedrock
-            .invoke_json(&prompt, SYSTEM_PROMPT, None, Some(4096))
-            .await?;
-
-        let cases: Vec<serde_json::Value> = if response.is_array() {
-            response.as_array().cloned().unwrap_or_default()
-        } else if let Some(arr) = response.get("cases").and_then(|c| c.as_array()) {
-            arr.clone()
-        } else {
-            vec![response]
-        };
-
-        for case_data in &cases {
-            let case_name = case_data
-                .get("case_name")
-                .and_then(|v| v.as_str())
-                .unwrap_or("Unknown");
-
-            let mut hasher = Sha256::new();
-            hasher.update(format!(
-                "{}:{}",
-                doc.filename.as_deref().unwrap_or(""),
-                case_name
-            ));
-            let case_id = format!("{:x}", hasher.finalize())[..12].to_string();
-
-            let case = Case {
-                case_id,
-                source_doc_id: Some(doc.doc_id.clone()),
-                case_name: case_name.to_string(),
-                scheme_mechanics: case_data
-                    .get("scheme_mechanics")
-                    .and_then(|v| v.as_str())
-                    .unwrap_or("")
-                    .to_string(),
-                exploited_policy: case_data
-                    .get("exploited_policy")
-                    .and_then(|v| v.as_str())
-                    .unwrap_or("")
-                    .to_string(),
-                enabling_condition: case_data
-                    .get("enabling_condition")
-                    .and_then(|v| v.as_str())
-                    .unwrap_or("")
-                    .to_string(),
-                scale_dollars: parse_dollars(case_data.get("scale_dollars")),
-                scale_defendants: case_data
-                    .get("scale_defendants")
-                    .and_then(|v| v.as_i64())
-                    .map(|v| v as i32),
-                scale_duration: case_data
-                    .get("scale_duration")
-                    .and_then(|v| v.as_str())
-                    .map(String::from),
-                detection_method: case_data
-                    .get("detection_method")
-                    .and_then(|v| v.as_str())
-                    .map(String::from),
-                raw_extraction: Some(case_data.clone()),
-                created_at: String::new(), // set by db layer
-                qualities: Vec::new(),
-            };
-            db::insert_case(db_client, &case).await?;
-            total_cases += 1;
-            info!("Extracted: {}", case.case_name);
-        }
+        total_cases += extract_cases_for_document(db_client, bedrock, doc).await?;
     }
 
     let result = json!({
@@ -153,6 +73,103 @@ async fn run_inner(
         skipped
     );
     Ok(result)
+}
+
+async fn documents_needing_cases<'a>(
+    db_client: &Client,
+    docs: &'a [Document],
+) -> StageResult<(Vec<&'a Document>, usize)> {
+    let mut new_docs = Vec::new();
+    let mut skipped = 0;
+    for doc in docs {
+        if db::cases_exist_for_document(db_client, &doc.doc_id).await? {
+            skipped += 1;
+        } else {
+            new_docs.push(doc);
+        }
+    }
+    Ok((new_docs, skipped))
+}
+
+async fn extract_cases_for_document(
+    db_client: &Client,
+    bedrock: &BedrockClient,
+    doc: &Document,
+) -> StageResult<usize> {
+    info!(
+        "Processing: {}",
+        doc.filename.as_deref().unwrap_or("unknown")
+    );
+    let truncated = truncate(&doc.full_text, 12000);
+    let prompt =
+        BedrockClient::render_prompt(STAGE1_EXTRACT_PROMPT, &[("document_text", &truncated)]);
+    let response = bedrock
+        .invoke_json(&prompt, SYSTEM_PROMPT, None, Some(4096))
+        .await?;
+
+    let cases = response_cases(response);
+    for case_data in &cases {
+        let case = build_case(doc, case_data);
+        db::insert_case(db_client, &case).await?;
+        info!("Extracted: {}", case.case_name);
+    }
+    Ok(cases.len())
+}
+
+fn response_cases(response: serde_json::Value) -> Vec<serde_json::Value> {
+    if response.is_array() {
+        return response.as_array().cloned().unwrap_or_default();
+    }
+    if let Some(cases) = response.get("cases").and_then(|c| c.as_array()) {
+        return cases.clone();
+    }
+    vec![response]
+}
+
+fn build_case(doc: &Document, case_data: &serde_json::Value) -> Case {
+    let case_name = case_data
+        .get("case_name")
+        .and_then(|v| v.as_str())
+        .unwrap_or("Unknown");
+
+    let mut hasher = Sha256::new();
+    hasher.update(format!(
+        "{}:{}",
+        doc.filename.as_deref().unwrap_or(""),
+        case_name
+    ));
+    let case_id = format!("{:x}", hasher.finalize())[..12].to_string();
+
+    Case {
+        case_id,
+        source_doc_id: Some(doc.doc_id.clone()),
+        case_name: case_name.to_string(),
+        scheme_mechanics: json_string(case_data, "scheme_mechanics"),
+        exploited_policy: json_string(case_data, "exploited_policy"),
+        enabling_condition: json_string(case_data, "enabling_condition"),
+        scale_dollars: parse_dollars(case_data.get("scale_dollars")),
+        scale_defendants: case_data
+            .get("scale_defendants")
+            .and_then(|v| v.as_i64())
+            .map(|v| v as i32),
+        scale_duration: optional_json_string(case_data, "scale_duration"),
+        detection_method: optional_json_string(case_data, "detection_method"),
+        raw_extraction: Some(case_data.clone()),
+        created_at: String::new(),
+        qualities: Vec::new(),
+    }
+}
+
+fn json_string(value: &serde_json::Value, key: &str) -> String {
+    value
+        .get(key)
+        .and_then(|v| v.as_str())
+        .unwrap_or("")
+        .to_string()
+}
+
+fn optional_json_string(value: &serde_json::Value, key: &str) -> Option<String> {
+    value.get(key).and_then(|v| v.as_str()).map(String::from)
 }
 
 fn truncate(text: &str, max_chars: usize) -> String {

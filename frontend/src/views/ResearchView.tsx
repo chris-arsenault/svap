@@ -71,7 +71,11 @@ function TriageTable({
             <td>{t.priority_rank}</td>
             <td className="td-name">{policyName(t.policy_id)}</td>
             <td>
-              <span className="score-highlight" style={{ '--score-color': triageScoreColor(t.triage_score) } as React.CSSProperties}>
+              <span
+                className="score-highlight"
+                // eslint-disable-next-line local/no-inline-styles -- CSS custom property carries data-driven score color.
+                style={{ '--score-color': triageScoreColor(t.triage_score) } as React.CSSProperties}
+              >
                 {t.triage_score.toFixed(2)}
               </span>
             </td>

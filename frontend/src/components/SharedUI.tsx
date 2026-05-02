@@ -105,17 +105,19 @@ export function ViewHeader({ title, description }: { title: string; description:
   );
 }
 
-export function MetricCard({ label, value, sub, className }: {
+export function MetricCard({ label, value, sub, className, valueClassName, subClassName }: {
   label: string;
   value: React.ReactNode;
   sub?: React.ReactNode;
   className?: string;
+  valueClassName?: string;
+  subClassName?: string;
 }) {
   return (
     <div className={["metric-card stagger-in", className].filter(Boolean).join(" ")}>
       <div className="metric-label">{label}</div>
-      <div className="metric-value">{value}</div>
-      {sub && <div className="metric-sub">{sub}</div>}
+      <div className={["metric-value", valueClassName].filter(Boolean).join(" ")}>{value}</div>
+      {sub && <div className={["metric-sub", subClassName].filter(Boolean).join(" ")}>{sub}</div>}
     </div>
   );
 }

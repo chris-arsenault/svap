@@ -17,7 +17,7 @@ function QualityCard({
     <div
       className={`stagger-in quality-card ${isSelected ? "selected" : ""}`}
       {...expandableProps(() => onSelectId(quality.quality_id))}
-
+      // eslint-disable-next-line local/no-inline-styles -- CSS custom property carries taxonomy color.
       style={{ "--q-color": quality.color } as React.CSSProperties}
     >
       <div className="quality-card-header">
@@ -38,7 +38,7 @@ function QualityDetail({ quality, matchingCases }: { quality: Quality; matchingC
   return (
     <div
       className="panel quality-detail-panel"
-       
+      // eslint-disable-next-line local/no-inline-styles -- CSS custom property carries taxonomy color.
       style={{ "--q-color": quality.color } as React.CSSProperties}
     >
       <div className="panel-header">

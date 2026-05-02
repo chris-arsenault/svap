@@ -35,7 +35,7 @@ function DiscoveryMetrics({ feedCount, candidateCount, reviewCount, acceptedCoun
     <div className="metrics-row">
       <MetricCard label="Feeds" value={feedCount} sub="configured" />
       <MetricCard label="Candidates" value={candidateCount} sub="discovered" />
-      <MetricCard label="Review Queue" value={<span className={reviewCount > 0 ? "text-high" : ""}>{reviewCount}</span>} sub="pending" />
+      <MetricCard label="Review Queue" value={reviewCount} valueClassName={reviewCount > 0 ? "text-high" : undefined} sub="pending" />
       <MetricCard label="Accepted" value={acceptedCount} sub="sources" />
     </div>
   );
@@ -230,7 +230,11 @@ function CandidateRow({
       </td>
       <td>
         {c.richness_score !== null ? (
-          <span className="score-highlight" style={{ '--score-color': richnessColor(c.richness_score) } as React.CSSProperties}>
+          <span
+            className="score-highlight"
+            // eslint-disable-next-line local/no-inline-styles -- CSS custom property carries data-driven score color.
+            style={{ '--score-color': richnessColor(c.richness_score) } as React.CSSProperties}
+          >
             {c.richness_score.toFixed(2)}
           </span>
         ) : (
